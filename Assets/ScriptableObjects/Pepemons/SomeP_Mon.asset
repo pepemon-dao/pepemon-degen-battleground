@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SomeP_Mon
   m_EditorClassIdentifier: 
   hp: 0
-  pType: 0
+  nature: 1
   intelligence: 0
   speed: 0
   normalAttack: 0
