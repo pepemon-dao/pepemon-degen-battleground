@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
+  m_Name: Pepesaur
+  m_EditorClassIdentifier: 
+  UID: c9c572f3-439a-4cdc-859c-19717e4d9035
+  DisplayName: Pepesaur
+  HealthPoints: 450
+  PType: 0
+  Speed: 10
+  Intelligence: 5
+  Defense: 10
+  NAttackType: 0
+  NAttack: 10
+  SAttack: 20
+  sAttackType: 0
+  DisplayIcon: {fileID: 0}

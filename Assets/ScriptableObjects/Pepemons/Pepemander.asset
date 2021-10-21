@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
+  m_Name: Pepemander
+  m_EditorClassIdentifier: 
+  UID: b75b96ab-b151-4139-b999-f9a95082fe0b
+  DisplayName: Pepemander
+  HealthPoints: 300
+  PType: 1
+  Speed: 20
+  Intelligence: 6
+  Defense: 8
+  NAttackType: 1
+  NAttack: 12
+  SAttack: 24
+  sAttackType: 1
+  DisplayIcon: {fileID: 0}

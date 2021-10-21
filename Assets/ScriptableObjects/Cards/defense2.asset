@@ -9,13 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 948956357242fce4aaa0e5438530a4d1, type: 3}
-  m_Name: SomeP_Mon
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: defense2
   m_EditorClassIdentifier: 
-  hp: 0
-  nature: 1
-  intelligence: 0
-  speed: 0
-  normalAttack: 0
-  stronglAttack: 0
-  defense: 0
+  UID: b79121b4-9d63-45b1-859c-5adb02e4061d
+  DisplayName: mouse
+  CType: 1
+  HasBeenPlayed: 0
