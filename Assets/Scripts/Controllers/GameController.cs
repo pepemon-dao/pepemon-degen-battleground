@@ -5,32 +5,38 @@ using Sirenix.OdinInspector;
 
 public class GameController : MonoBehaviour
 {
-    [BoxGroup("Debug")]
-    [BoxGroup("Debug/P1"), SerializeField] Pepemon _player1Pepemon;
-    [BoxGroup("Debug/P1"), SerializeField] Deck _player1Deck;
+    [BoxGroup("Debug"), SerializeField] Player _player1;
+    [BoxGroup("Debug"), SerializeField] Player _player2;
 
-    [BoxGroup("Debug/P2"), SerializeField] Pepemon _player2Pepemon;
-    [BoxGroup("Debug/P2"), SerializeField] Deck _player2Deck;
-
-    public List<Card> _p1Hand = new List<Card>();
-    public List<Card> _p2Hand = new List<Card>();
+    [Header("temp public")]
+    public Deck _p1Hand;
+    public Deck _p2Hand;
 
     [Button()]
     void StartGame()
     {
-        Debug.Log("X");
+        DrawHands();
+    }
+
+    [Button()]
+    void Reset()
+    {
+        _p1Hand = null;
+        _p2Hand = null;
     }
 
     // Each player shuffles their deck and draws cards equal to pepemon intelligence 
     void DrawHands()
     {
-        _player1Deck.ShuffelDeck();
-        _player2Deck.ShuffelDeck();
+        _p1Hand = _player1.PlayerDeck;
+        _p2Hand = _player2.PlayerDeck;
 
-        while (_p1Hand.Count < _player1Pepemon.Intelligence)
-        {
-            _p1Hand.Add(_player1Deck)
-        }
+        _p1Hand.ShuffelDeck(1);
+        _p2Hand.ShuffelDeck(2);
+        // while (_p1Hand.Count < _player1Pepemon.Intelligence)
+        // {
+        //     _p1Hand.Add(_player1Deck)
+        // }
     }
 
     // todo: think of a way to handle card managment that are only played  once? perhaps a temp card list cached here for example?

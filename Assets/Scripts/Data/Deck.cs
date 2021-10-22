@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using Sirenix.OdinInspector;
 
 [System.Serializable]
@@ -9,15 +10,19 @@ public class Deck
     public List<Card> AllCards = new List<Card>();
 
 
-
+    public List<Card> GetDeck() => AllCards;
+    public List<Card> AllOffenseCards => AllCards.Where(x => x.CType == CardType.Offense).ToList();
+    public List<Card> AllDefenseCards => AllCards.Where(x => x.CType == CardType.Defense).ToList();
+    public List<Card> AllSpecialOffenseCards => AllCards.Where(x => x.CType == CardType.SpecialOffense).ToList();
+    public List<Card> AllSpecialDefenseCards => AllCards.Where(x => x.CType == CardType.SpecialDefense).ToList();
 
 
     // This uses the Fisher-Yates shuffle algorithm to randomly sort elements.
     // It is an accurate, effective shuffling method for all array types.
     [Button()]
-    public void ShuffelDeck()
+    public void ShuffelDeck(int seed)
     {
-        System.Random _random = new System.Random();
+        System.Random _random = new System.Random(seed);
         Card _cacheCard;
 
         int n = AllCards.Count;
