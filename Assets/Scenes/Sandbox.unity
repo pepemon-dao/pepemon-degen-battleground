@@ -646,12 +646,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587e060c60706b04c89d700f34e2c53a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player1Pepemon: {fileID: 11400000, guid: dd69264817a3adb40b59c2ea668b6e9a, type: 2}
-  _player1Deck:
+  _player1:
+    PlayerPeepemon: {fileID: 11400000, guid: dd69264817a3adb40b59c2ea668b6e9a, type: 2}
+    PlayerDeck:
+      AllCards:
+      - {fileID: 11400000, guid: 60405d209bbe1c344af37bb53fd1019d, type: 2}
+      - {fileID: 11400000, guid: 7bfb2fefcf193ef47b9244108644fabe, type: 2}
+      - {fileID: 11400000, guid: 3d641da6bc96b954596b4c1e41c29124, type: 2}
+      - {fileID: 11400000, guid: 671a6787b0802f547ada32a2248ee3fa, type: 2}
+      - {fileID: 11400000, guid: dcb089495e4056d4280fb3102f7125d5, type: 2}
+      - {fileID: 11400000, guid: 9b5f17fa9564bf14fa4ad0fa8fcc7eae, type: 2}
+  _player2:
+    PlayerPeepemon: {fileID: 11400000, guid: f60e86c709fde5640b0466f4c0f37e7d, type: 2}
+    PlayerDeck:
+      AllCards:
+      - {fileID: 11400000, guid: 9b5f17fa9564bf14fa4ad0fa8fcc7eae, type: 2}
+      - {fileID: 11400000, guid: 3d641da6bc96b954596b4c1e41c29124, type: 2}
+      - {fileID: 11400000, guid: dcb089495e4056d4280fb3102f7125d5, type: 2}
+      - {fileID: 11400000, guid: 671a6787b0802f547ada32a2248ee3fa, type: 2}
+      - {fileID: 11400000, guid: 7bfb2fefcf193ef47b9244108644fabe, type: 2}
+      - {fileID: 11400000, guid: 60405d209bbe1c344af37bb53fd1019d, type: 2}
+  _p1Deck:
     AllCards: []
-  _player2Pepemon: {fileID: 11400000, guid: f60e86c709fde5640b0466f4c0f37e7d, type: 2}
-  _player2Deck:
+  _p2Deck:
     AllCards: []
+  _p1Hand: []
+  _p2Hand: []
 --- !u!4 &1869662263
 Transform:
   m_ObjectHideFlags: 0

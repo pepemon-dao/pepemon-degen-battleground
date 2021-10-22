@@ -17,7 +17,7 @@ MonoBehaviour:
   HealthPoints: 450
   PType: 0
   Speed: 10
-  Intelligence: 5
+  Intelligence: 4
   Defense: 10
   NAttackType: 0
   NAttack: 10
