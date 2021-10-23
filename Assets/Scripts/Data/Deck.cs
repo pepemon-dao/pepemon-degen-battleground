@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Sirenix.OdinInspector;
-using System;
 
 // Container class for holding all of the players cards. This object is usually copied as value not reference
 [System.Serializable]
 public class Deck
 {
-    public List<Card> AllCards = new List<Card>();
+    [ShowInInspector]
+    private List<Card> AllCards = new List<Card>();
 
     public List<Card> GetDeck() => AllCards;
-    public List<Card> AllOffenseCards => AllCards.Where(x => x.CType == CardType.Offense).ToList();
-    public List<Card> AllDefenseCards => AllCards.Where(x => x.CType == CardType.Defense).ToList();
-    public List<Card> AllSpecialOffenseCards => AllCards.Where(x => x.CType == CardType.SpecialOffense).ToList();
-    public List<Card> AllSpecialDefenseCards => AllCards.Where(x => x.CType == CardType.SpecialDefense).ToList();
+    public void ClearDeck() => AllCards.Clear();
+
 
 
     // This uses the Fisher-Yates shuffle algorithm to randomly sort elements.

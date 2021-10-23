@@ -12,5 +12,7 @@ public class Card : ScriptableObject
 
     public CardType CType;
 
-    public bool HasBeenPlayed;
+    [ShowIf("@this.CType == CardType.Offense || this.CType == CardType.SpecialOffense")] public int AttackPower;
+
+    [ShowIf("@this.CType == CardType.Defense || this.CType == CardType.SpecialDefense")] public int DefensePower;
 }
