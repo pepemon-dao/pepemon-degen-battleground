@@ -31,17 +31,17 @@ public class Hand
         foreach (var card in AllSpecialDefenseCards) _cardsInHand.Remove(card);
     }
 
-    public int GetTotalAttackPower()
+    public int GetTotalAttackPower(int baseAttack)
     {
-        int totalAP = 0;
+        int totalAP = baseAttack;
         for (int i = 0; i < AllOffenseCards.Count; i++) totalAP += AllOffenseCards[i].AttackPower;
         for (int i = 0; i < AllSpecialOffenseCards.Count; i++) totalAP += AllSpecialOffenseCards[i].AttackPower;
         return totalAP;
     }
 
-    public int GetTotalDefensePower()
+    public int GetTotalDefensePower(int baseDefense)
     {
-        int totalDP = 0;
+        int totalDP = baseDefense;
         for (int i = 0; i < AllDefenseCards.Count; i++) totalDP += AllDefenseCards[i].DefensePower;
         for (int i = 0; i < AllSpecialDefenseCards.Count; i++) totalDP += AllSpecialDefenseCards[i].DefensePower;
         return totalDP;

@@ -15,7 +15,7 @@ public class Pepemon : ScriptableObject
     public int Intelligence;
     public int Defense;
     public PepemonType NAttackType;
-    public int NAttack;
+    public int Attack;
     public int SAttack;
     public PepemonType sAttackType;
 

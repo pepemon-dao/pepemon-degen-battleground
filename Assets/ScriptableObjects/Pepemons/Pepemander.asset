@@ -20,7 +20,7 @@ MonoBehaviour:
   Intelligence: 5
   Defense: 8
   NAttackType: 1
-  NAttack: 12
+  Attack: 12
   SAttack: 24
   sAttackType: 1
   DisplayIcon: {fileID: 0}

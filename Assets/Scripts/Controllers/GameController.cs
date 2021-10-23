@@ -95,8 +95,8 @@ public class GameController : MonoBehaviour
     // Plays out each round split (offense & defense) lead by the attacking index
     void PlayHand(int attackingIndex)
     {
-        int totalAttackPower = attackingIndex == 1 ? _player1.CurrentHand.GetTotalAttackPower() : _player2.CurrentHand.GetTotalAttackPower();
-        int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower() : _player1.CurrentHand.GetTotalDefensePower();
+        int totalAttackPower = attackingIndex == 1 ? _player1.CurrentHand.GetTotalAttackPower(_player1.PlayerPepemon.Attack) : _player2.CurrentHand.GetTotalAttackPower(_player2.PlayerPepemon.Attack);
+        int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower(_player2.PlayerPepemon.Defense) : _player1.CurrentHand.GetTotalDefensePower(_player1.PlayerPepemon.Defense);
         int delta = totalAttackPower - totalDefensePower;
 
         Debug.Log("<b>STARTING HAND </b>");
