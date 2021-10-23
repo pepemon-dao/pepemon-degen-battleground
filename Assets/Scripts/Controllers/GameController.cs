@@ -5,8 +5,8 @@ using Sirenix.OdinInspector;
 
 public class GameController : MonoBehaviour
 {
-    [BoxGroup("Debug"), SerializeField] Player _player1;
-    [BoxGroup("Debug"), SerializeField] Player _player2;
+    [TitleGroup("Opponents"), SerializeField] Player _player1;
+    [TitleGroup("Opponents"), SerializeField] Player _player2;
 
     [Header("temp public")]
     public Deck _p1Deck = new Deck();
@@ -17,12 +17,16 @@ public class GameController : MonoBehaviour
 
     public int _attackFirstIndex; // index of player who is attacking first 1 : 2
 
+    public int _p1HP;
+    public int _p2HP;
+
+    public bool _gameHasFinished;
+
 
 
     [Button()]
     void StartGame()
     {
-        CalculateFirstAttacker();
         InitFirstRound();
     }
 
@@ -33,6 +37,9 @@ public class GameController : MonoBehaviour
         _p2Deck = new Deck();
         _p1Hand.ClearHand();
         _p2Hand.ClearHand();
+        _p1HP = 0;
+        _p2HP = 0;
+        _gameHasFinished = false;
     }
 
     // We check the Pepemon speed stat and cache the result as either 1 (player1) or 2 (player2)
@@ -70,20 +77,51 @@ public class GameController : MonoBehaviour
         foreach (var item in cacheList1) _p1Deck.RemoveCard(item);
         foreach (var item in cacheList2) _p2Deck.RemoveCard(item);
 
+        // PepemonHP
+        _p1HP = _player1.PlayerPepemon.HealthPoints;
+        _p2HP = _player2.PlayerPepemon.HealthPoints;
+
         // Calculate first attacker
         CalculateFirstAttacker();
+        PlayRound(_attackFirstIndex);
     }
 
     // Plays out the round with the leading attackingIndex
     void PlayRound(int attackingIndex)
     {
-         int totalAttackPower = _attackFirstIndex == 1 ? _p1Hand.GetTotalAttackPower() : _p2Hand.GetTotalAttackPower();
-         int totalDefensePower = _attackFirstIndex == 2 ? _p2Hand.GetTotalDefensePower() : _p1Hand.GetTotalDefensePower();
+        int totalAttackPower = attackingIndex == 1 ? _p1Hand.GetTotalAttackPower() : _p2Hand.GetTotalAttackPower();
+        int totalDefensePower = attackingIndex == 1 ? _p2Hand.GetTotalDefensePower() : _p1Hand.GetTotalDefensePower();
+        int delta = totalAttackPower - totalDefensePower;
 
+        Debug.Log("attack first: p" + attackingIndex);
+        Debug.Log("totalAP: " + totalAttackPower);
+        Debug.Log("totalDP: " + totalDefensePower);
+        Debug.Log("p1hp: " + _p1HP);
+        Debug.Log("p2hp: " + _p2HP);
+        Debug.Log("delta: " + delta);
 
-         Debug.Log("attack first: " + _attackFirstIndex);
-         Debug.Log("tap: " + totalAttackPower);
-         Debug.Log("tdp: "+ totalDefensePower);
+        if (attackingIndex == 1)
+        {
+            _p2HP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
+            if (_p2HP <= 0) Winner(_player1);
+        }
+        else
+        {
+            _p1HP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
+            if (_p1HP <= 0) Winner(_player2);
+        }
     }
 
+    // CARRY ON:
+    // We are on step 8.. now we switch roles
+
+
+
+
+
+    void Winner(Player player)
+    {
+        Debug.Log("WINNER: " + player.PlayerPepemon.DisplayName);
+        _gameHasFinished = true;
+    }
 }

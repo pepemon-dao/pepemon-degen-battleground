@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Pepemander
   HealthPoints: 300
   PType: 1
-  Speed: 20
+  Speed: 10
   Intelligence: 3
   Defense: 8
   NAttackType: 1

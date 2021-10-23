@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 
 // Represents the current players hand
@@ -15,9 +13,6 @@ public class Hand
     public List<Card> AllDefenseCards => _cardsInHand.Where(x => x.CType == CardType.Defense).ToList();
     public List<Card> AllSpecialOffenseCards => _cardsInHand.Where(x => x.CType == CardType.SpecialOffense).ToList();
     public List<Card> AllSpecialDefenseCards => _cardsInHand.Where(x => x.CType == CardType.SpecialDefense).ToList();
-
-
-
 
     public void ClearHand() => _cardsInHand.Clear();
     public void AddCardToHand(Card card) => _cardsInHand.Add(card);

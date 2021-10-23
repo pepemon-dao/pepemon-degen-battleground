@@ -15,4 +15,5 @@ MonoBehaviour:
   UID: 8152f7c2-1521-44ff-bb93-b3cdf6d1c394
   DisplayName: cat
   CType: 0
-  HasBeenPlayed: 0
+  AttackPower: 1
+  DefensePower: 0

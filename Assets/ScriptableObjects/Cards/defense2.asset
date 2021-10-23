@@ -15,4 +15,5 @@ MonoBehaviour:
   UID: b79121b4-9d63-45b1-859c-5adb02e4061d
   DisplayName: mouse
   CType: 1
-  HasBeenPlayed: 0
+  AttackPower: 0
+  DefensePower: 3
