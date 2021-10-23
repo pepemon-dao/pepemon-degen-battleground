@@ -16,7 +16,20 @@ public class Hand
 
     public void ClearHand() => _cardsInHand.Clear();
     public void AddCardToHand(Card card) => _cardsInHand.Add(card);
+    public void RemoveCardFromHand(Card card) => _cardsInHand.Remove(card);
 
+
+    public void RemoveAllOffenseCards()
+    {
+        foreach (var card in AllOffenseCards) _cardsInHand.Remove(card);
+        foreach (var card in AllSpecialOffenseCards) _cardsInHand.Remove(card);
+    }
+
+    public void RemoveAllDefenseCards()
+    {
+        foreach (var card in AllDefenseCards) _cardsInHand.Remove(card);
+        foreach (var card in AllSpecialDefenseCards) _cardsInHand.Remove(card);
+    }
 
     public int GetTotalAttackPower()
     {

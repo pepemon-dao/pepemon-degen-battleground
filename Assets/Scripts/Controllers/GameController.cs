@@ -3,29 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
+// Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
 {
     [TitleGroup("Opponents"), SerializeField] Player _player1;
     [TitleGroup("Opponents"), SerializeField] Player _player2;
 
     [Header("temp public")]
-    public Deck _p1Deck = new Deck();
-    public Deck _p2Deck = new Deck();
-
-    public Hand _p1Hand = new Hand();
-    public Hand _p2Hand = new Hand();
-
     public int _attackFirstIndex; // index of player who is attacking first 1 : 2
-
-    public int _p1HP;
-    public int _p2HP;
-
     public bool _gameHasFinished;
+    public int _roundNumber;
 
 
 
     [Button()]
-    void StartGame()
+    public void StartGame()
     {
         InitFirstRound();
     }
@@ -33,13 +25,11 @@ public class GameController : MonoBehaviour
     [Button()]
     void ResetGame()
     {
-        _p1Deck = new Deck();
-        _p2Deck = new Deck();
-        _p1Hand.ClearHand();
-        _p2Hand.ClearHand();
-        _p1HP = 0;
-        _p2HP = 0;
         _gameHasFinished = false;
+        _attackFirstIndex = 0;
+        _roundNumber = 0;
+        _player1.Reset();
+        _player2.Reset();
     }
 
     // We check the Pepemon speed stat and cache the result as either 1 (player1) or 2 (player2)
@@ -51,71 +41,66 @@ public class GameController : MonoBehaviour
     // Each player shuffles their deck and draws cards equal to pepemon intelligence 
     void InitFirstRound()
     {
-        // Get local copy of deck and shuffle
-        _p1Deck.GetDeck().AddRange(_player1.PlayerDeck.GetDeck());
-        _p2Deck.GetDeck().AddRange(_player2.PlayerDeck.GetDeck());
-        _p1Deck.ShuffelDeck(1); // todo pass in random seed from client
-        _p2Deck.ShuffelDeck(2); // todo pass in random seed from client
-
-        // Draw cards to hand
-        List<Card> cacheList1 = new List<Card>();
-        for (int i = 0; i < _player1.PlayerPepemon.Intelligence; i++)
-        {
-            _p1Hand.AddCardToHand(_p1Deck.GetDeck()[i]);
-            cacheList1.Add(_p1Deck.GetDeck()[i]);
-        }
-
-        // Draw cards to hand
-        List<Card> cacheList2 = new List<Card>();
-        for (int i = 0; i < _player2.PlayerPepemon.Intelligence; i++)
-        {
-            _p2Hand.AddCardToHand(_p2Deck.GetDeck()[i]);
-            cacheList2.Add(_p2Deck.GetDeck()[i]);
-        }
-
-        // Cleanup working decks
-        foreach (var item in cacheList1) _p1Deck.RemoveCard(item);
-        foreach (var item in cacheList2) _p2Deck.RemoveCard(item);
-
-        // PepemonHP
-        _p1HP = _player1.PlayerPepemon.HealthPoints;
-        _p2HP = _player2.PlayerPepemon.HealthPoints;
+        _roundNumber = 1;
+        _player1.Initialise(1); // todo: pass in seed from client connection index
+        _player2.Initialise(2); // todo: pass in seed from client connection index
 
         // Calculate first attacker
         CalculateFirstAttacker();
-        PlayRound(_attackFirstIndex);
+        StartRound();
     }
 
-    // Plays out the round with the leading attackingIndex
-    void PlayRound(int attackingIndex)
+    [Button()]
+    void StartRound()
     {
-        int totalAttackPower = attackingIndex == 1 ? _p1Hand.GetTotalAttackPower() : _p2Hand.GetTotalAttackPower();
-        int totalDefensePower = attackingIndex == 1 ? _p2Hand.GetTotalDefensePower() : _p1Hand.GetTotalDefensePower();
+        Debug.Log("<b>DRAWING HANDS:</b>");
+        _player1.DrawNewHand();
+        _player2.DrawNewHand();
+
+        Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
+        for (int i = 0; i < 2; i++)
+        {
+            if (_gameHasFinished == false)
+            {
+                PlayHand(_attackFirstIndex);
+                _attackFirstIndex = _attackFirstIndex == 1 ? 2 : 1;
+            }
+        }
+        _roundNumber++;
+    }
+
+    // Plays out each round split (offense & defense) lead by the attacking index
+    void PlayHand(int attackingIndex)
+    {
+        int totalAttackPower = attackingIndex == 1 ? _player1.CurrentHand.GetTotalAttackPower() : _player2.CurrentHand.GetTotalAttackPower();
+        int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower() : _player1.CurrentHand.GetTotalDefensePower();
         int delta = totalAttackPower - totalDefensePower;
 
-        Debug.Log("attack first: p" + attackingIndex);
+        Debug.Log("attacker p: " + attackingIndex);
         Debug.Log("totalAP: " + totalAttackPower);
         Debug.Log("totalDP: " + totalDefensePower);
-        Debug.Log("p1hp: " + _p1HP);
-        Debug.Log("p2hp: " + _p2HP);
+        Debug.Log("p1hp: " + _player1.CurrentHP);
+        Debug.Log("p2hp: " + _player2.CurrentHP);
         Debug.Log("delta: " + delta);
 
+        // Remove played cards from current hand
         if (attackingIndex == 1)
         {
-            _p2HP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-            if (_p2HP <= 0) Winner(_player1);
+            _player2.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
+            _player2.CurrentHand.RemoveAllDefenseCards();
+            _player1.CurrentHand.RemoveAllOffenseCards();
+
+            if (_player2.CurrentHP <= 0) Winner(_player1);
         }
         else
         {
-            _p1HP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-            if (_p1HP <= 0) Winner(_player2);
+            _player1.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
+            _player1.CurrentHand.RemoveAllDefenseCards();
+            _player2.CurrentHand.RemoveAllOffenseCards();
+
+            if (_player1.CurrentHP <= 0) Winner(_player2);
         }
     }
-
-    // CARRY ON:
-    // We are on step 8.. now we switch roles
-    //! see player.cs (try this first becuase no changes on current commit)
-
 
 
 
