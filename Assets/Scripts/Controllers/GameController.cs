@@ -114,6 +114,7 @@ public class GameController : MonoBehaviour
 
     // CARRY ON:
     // We are on step 8.. now we switch roles
+    //! see player.cs (try this first becuase no changes on current commit)
 
 
 

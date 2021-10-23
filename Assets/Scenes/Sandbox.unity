@@ -650,9 +650,10 @@ MonoBehaviour:
     PlayerPepemon: {fileID: 11400000, guid: dd69264817a3adb40b59c2ea668b6e9a, type: 2}
   _player2:
     PlayerPepemon: {fileID: 11400000, guid: f60e86c709fde5640b0466f4c0f37e7d, type: 2}
-  _attackFirstIndex: 2
-  _p1HP: 299
-  _p2HP: 450
+  _attackFirstIndex: 1
+  _p1HP: 0
+  _p2HP: 0
+  _gameHasFinished: 0
 --- !u!4 &1869662263
 Transform:
   m_ObjectHideFlags: 0

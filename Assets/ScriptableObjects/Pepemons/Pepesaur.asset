@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Pepesaur
   HealthPoints: 450
   PType: 0
-  Speed: 5
+  Speed: 8
   Intelligence: 4
   Defense: 10
   NAttackType: 0
