@@ -14,11 +14,15 @@ public class Player
     [BoxGroup("Runtime")] public Hand CurrentHand;
 
 
-    public void Initialise(int seed)
+    public void Initialise()
     {
         CurrentHP = PlayerPepemon.HealthPoints;
+    }
 
+    public void GetAndShuffelDeck(int seed)
+    {
         // Get local copy of deck and shuffle
+        CurrentDeck.ClearDeck();
         CurrentDeck.GetDeck().AddRange(PlayerDeck.GetDeck());
         CurrentDeck.ShuffelDeck(seed);
     }
@@ -29,15 +33,18 @@ public class Player
         CurrentHand.ClearHand();
 
         // Draw cards to hand
-        List<Card> cacheList1 = new List<Card>();
+        List<Card> cacheList = new List<Card>();
         for (int i = 0; i < PlayerPepemon.Intelligence; i++)
         {
-            CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[i]);
-            cacheList1.Add(CurrentDeck.GetDeck()[i]);
+            if (i >= 0 && i < CurrentDeck.GetDeck().Count)
+            {
+                CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[i]);
+                cacheList.Add(CurrentDeck.GetDeck()[i]);
+            }
         }
 
         // Cleanup working decks
-        foreach (var item in cacheList1) CurrentDeck.RemoveCard(item);
+        foreach (var item in cacheList) CurrentDeck.RemoveCard(item);
     }
 
 
@@ -56,7 +63,7 @@ public class Player
     {
         PlayerDeck.ClearDeck();
         // All all cards to deck 4x
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 5; i++)
         {
             string[] guids = UnityEditor.AssetDatabase.FindAssets("t:" + typeof(Card).Name);  //FindAssets uses tags check documentation for more info
             Card[] a = new Card[guids.Length];

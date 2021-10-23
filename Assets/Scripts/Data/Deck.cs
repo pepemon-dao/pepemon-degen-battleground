@@ -22,8 +22,7 @@ public class Deck
         int n = AllCards.Count;
         for (int i = 0; i < n; i++)
         {
-            // NextDouble returns a random number between 0 and 1.
-            // ... It is equivalent to Math.random()
+            // NextDouble returns a random number between 0 and 1 ..It is equivalent to Math.random()
             int r = i + (int)(_random.NextDouble() * (n - i));
             _cacheCard = AllCards[r];
             AllCards[r] = AllCards[i];

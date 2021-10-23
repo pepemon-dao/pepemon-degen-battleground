@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: c9c572f3-439a-4cdc-859c-19717e4d9035
   DisplayName: Pepesaur
-  HealthPoints: 450
+  HealthPoints: 310
   PType: 0
   Speed: 8
-  Intelligence: 4
+  Intelligence: 5
   Defense: 10
   NAttackType: 0
   NAttack: 10

@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour
     public int _attackFirstIndex; // index of player who is attacking first 1 : 2
     public bool _gameHasFinished;
     public int _roundNumber;
+    public bool _isPlayingRound;
 
 
 
@@ -42,21 +43,42 @@ public class GameController : MonoBehaviour
     void InitFirstRound()
     {
         _roundNumber = 1;
-        _player1.Initialise(1); // todo: pass in seed from client connection index
-        _player2.Initialise(2); // todo: pass in seed from client connection index
+        _player1.Initialise();
+        _player2.Initialise();
+
+        _player1.GetAndShuffelDeck(2); // todo: pass in seed from client connection index
+        _player2.GetAndShuffelDeck(1); // todo: pass in seed from client connection index
 
         // Calculate first attacker
         CalculateFirstAttacker();
-        StartRound();
+        //StartRound();
+        StartCoroutine(LoopGame());
+    }
+
+    IEnumerator LoopGame()
+    {
+        yield return new WaitForSeconds(1f);
+        while (_gameHasFinished == false)
+        {
+            yield return new WaitUntil(() => _isPlayingRound == false); StartRound();
+        }
     }
 
     [Button()]
     void StartRound()
     {
-        Debug.Log("<b>DRAWING HANDS:</b>");
+        // Check if we passed 5 and if so reshuffel decks
+        if (_roundNumber >= 5)
+        {
+            _player1.GetAndShuffelDeck(2 + _roundNumber); // todo: pass in seed from client connection index
+            _player2.GetAndShuffelDeck(1 + _roundNumber); // todo: pass in seed from client connection index
+        }
+
+        Debug.Log("<b>DRAWING HANDS</b>");
         _player1.DrawNewHand();
         _player2.DrawNewHand();
 
+        _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
         for (int i = 0; i < 2; i++)
         {
@@ -67,6 +89,7 @@ public class GameController : MonoBehaviour
             }
         }
         _roundNumber++;
+        _isPlayingRound = false;
     }
 
     // Plays out each round split (offense & defense) lead by the attacking index
@@ -76,7 +99,8 @@ public class GameController : MonoBehaviour
         int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower() : _player1.CurrentHand.GetTotalDefensePower();
         int delta = totalAttackPower - totalDefensePower;
 
-        Debug.Log("attacker p: " + attackingIndex);
+        Debug.Log("<b>STARTING HAND </b>");
+        Debug.Log("attacker: " + attackingIndex);
         Debug.Log("totalAP: " + totalAttackPower);
         Debug.Log("totalDP: " + totalDefensePower);
         Debug.Log("p1hp: " + _player1.CurrentHP);
@@ -100,6 +124,12 @@ public class GameController : MonoBehaviour
 
             if (_player1.CurrentHP <= 0) Winner(_player2);
         }
+
+        Debug.Log("attacker: " + attackingIndex);
+        Debug.Log("totalAP: " + totalAttackPower);
+        Debug.Log("totalDP: " + totalDefensePower);
+        Debug.Log("p1hp: " + _player1.CurrentHP);
+        Debug.Log("p2hp: " + _player2.CurrentHP);
     }
 
 
