@@ -10,6 +10,12 @@ public class Player
     public Deck PlayerDeck;
 
 
+    // idea! we just move everything into here?
+    // Cache the decks and run instances here (removes bloat from GC)
+    public Deck currentDeck;
+    public Hand currentHand;
+
+
 #if UNITY_EDITOR
     [Button("Add All Cards")]
     public void AddAllCardsToDeck()
