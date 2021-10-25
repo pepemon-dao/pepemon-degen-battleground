@@ -10,6 +10,8 @@ public class Card : ScriptableObject
 
     public string DisplayName;
 
+    public Sprite Icon;
+
     public CardType CType;
 
     [ShowIf("@this.CType == CardType.Offense || this.CType == CardType.SpecialOffense")] public int AttackPower;
