@@ -8,18 +8,31 @@ public class Pepemon : ScriptableObject
 {
     [ReadOnly, ShowInInspector] public string UID = System.Guid.NewGuid().ToString();
 
-    public string DisplayName;
-    public int HealthPoints;
-    public PepemonType PType;
-    public int Speed;
-    public int Intelligence;
-    public int Defense;
-    public PepemonType NAttackType;
-    public int Attack;
-    public int SAttack;
-    public PepemonType sAttackType;
-
+    [HideLabel, PreviewField(55), AssetsOnly]
+    [HorizontalGroup("General/Left", 55)]
     public Sprite DisplayIcon;
 
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public string DisplayName;
 
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public PepemonType Type;
+
+
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public CardRarity Rarity;
+
+    [TitleGroup("Properties")] public int HealthPoints;
+    [TitleGroup("Properties")] public int Speed;
+    [TitleGroup("Properties")] public int Intelligence;
+    [TitleGroup("Properties")] public int Attack;
+    [TitleGroup("Properties")] public int Defense;
+
+    public int SAttack;
 }

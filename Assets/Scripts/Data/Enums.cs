@@ -1,4 +1,4 @@
-public enum CardType
+public enum PlayCardType
 {
     Offense,
     Defense,
@@ -10,4 +10,11 @@ public enum PepemonType
 {
     Plant,
     Fire
+}
+
+public enum CardRarity
+{
+    Common,
+    Rare,
+    Epic
 }

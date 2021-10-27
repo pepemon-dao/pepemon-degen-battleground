@@ -9,10 +9,10 @@ public class Hand
     [ShowInInspector]
     private List<Card> _cardsInHand = new List<Card>();
 
-    public List<Card> AllOffenseCards => _cardsInHand.Where(x => x.CType == CardType.Offense).ToList();
-    public List<Card> AllDefenseCards => _cardsInHand.Where(x => x.CType == CardType.Defense).ToList();
-    public List<Card> AllSpecialOffenseCards => _cardsInHand.Where(x => x.CType == CardType.SpecialOffense).ToList();
-    public List<Card> AllSpecialDefenseCards => _cardsInHand.Where(x => x.CType == CardType.SpecialDefense).ToList();
+    public List<Card> AllOffenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.Offense).ToList();
+    public List<Card> AllDefenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.Defense).ToList();
+    public List<Card> AllSpecialOffenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.SpecialOffense).ToList();
+    public List<Card> AllSpecialDefenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.SpecialDefense).ToList();
 
     public void ClearHand() => _cardsInHand.Clear();
     public void AddCardToHand(Card card) => _cardsInHand.Add(card);

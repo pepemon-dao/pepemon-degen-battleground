@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -8,13 +6,37 @@ public class Card : ScriptableObject
 {
     [ReadOnly, ShowInInspector] public string UID = System.Guid.NewGuid().ToString();
 
-    public string DisplayName;
-
+    [HideLabel, PreviewField(55), AssetsOnly]
+    [HorizontalGroup("General/Left", 55)]
     public Sprite Icon;
 
-    public CardType CType;
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public string DisplayName;
 
-    [ShowIf("@this.CType == CardType.Offense || this.CType == CardType.SpecialOffense")] public int AttackPower;
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public CardRarity Rarity;
 
-    [ShowIf("@this.CType == CardType.Defense || this.CType == CardType.SpecialDefense")] public int DefensePower;
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public PlayCardType Type;
+
+    [TitleGroup("Properties")]
+    [ShowIf("@this.Type == PlayCardType.Offense || this.Type == PlayCardType.SpecialOffense")] public int AttackPower;
+
+    [TitleGroup("Properties")]
+    [ShowIf("@this.Type == PlayCardType.Defense || this.Type == PlayCardType.SpecialDefense")] public int DefensePower;
+
+    [TitleGroup("Properties")]
+    public bool Unstackable;
+
+    [TitleGroup("Properties")]
+    public bool Unresettable;
+
+    [TitleGroup("Additionals"), ShowIf("Unstackable")] public int UnstackableAmount;
+    [TitleGroup("Additionals"), ShowIf("Unresettable")] public int UnresettableAmount;
 }
