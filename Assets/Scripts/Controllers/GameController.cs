@@ -6,6 +6,10 @@ using Sirenix.OdinInspector;
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
 {
+    [TitleGroup("Component References"), SerializeField] GameObject _cardPrefab;
+    [TitleGroup("Component References"), SerializeField] Transform _player1HandUIList;
+    [TitleGroup("Component References"), SerializeField] Transform _player2HandUIList;
+
     [TitleGroup("Opponents"), SerializeField] Player _player1;
     [TitleGroup("Opponents"), SerializeField] Player _player2;
 
@@ -51,8 +55,10 @@ public class GameController : MonoBehaviour
 
         // Calculate first attacker
         CalculateFirstAttacker();
-        //StartRound();
-        StartCoroutine(LoopGame());
+
+
+        // uncomment to automate
+        // StartCoroutine(LoopGame());
     }
 
     IEnumerator LoopGame()
@@ -78,6 +84,14 @@ public class GameController : MonoBehaviour
         _player1.DrawNewHand();
         _player2.DrawNewHand();
 
+        // Display hands?
+        for (int i = 0; i < _player1.CurrentHand.GetCardsInHand.Count; i++)
+        {
+            GameObject go = Instantiate(_cardPrefab);
+            go.transform.SetParent(_player1HandUIList);
+            go.GetComponent<CardController>().PouplateCard(_player1.CurrentHand.GetCardsInHand[i]);
+        }
+
         _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
         for (int i = 0; i < 2; i++)
@@ -99,13 +113,13 @@ public class GameController : MonoBehaviour
         int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower(_player2.PlayerPepemon.Defense) : _player1.CurrentHand.GetTotalDefensePower(_player1.PlayerPepemon.Defense);
         int delta = totalAttackPower - totalDefensePower;
 
-        Debug.Log("<b>STARTING HAND </b>");
-        Debug.Log("attacker: " + attackingIndex);
-        Debug.Log("totalAP: " + totalAttackPower);
-        Debug.Log("totalDP: " + totalDefensePower);
-        Debug.Log("p1hp: " + _player1.CurrentHP);
-        Debug.Log("p2hp: " + _player2.CurrentHP);
-        Debug.Log("delta: " + delta);
+        //      Debug.Log("<b>STARTING HAND </b>");
+        //      Debug.Log("attacker: " + attackingIndex);
+        //      Debug.Log("totalAP: " + totalAttackPower);
+        //      Debug.Log("totalDP: " + totalDefensePower);
+        //      Debug.Log("p1hp: " + _player1.CurrentHP);
+        //      Debug.Log("p2hp: " + _player2.CurrentHP);
+        //      Debug.Log("delta: " + delta);
 
         // Remove played cards from current hand
         if (attackingIndex == 1)
@@ -125,11 +139,11 @@ public class GameController : MonoBehaviour
             if (_player1.CurrentHP <= 0) Winner(_player2);
         }
 
-        Debug.Log("attacker: " + attackingIndex);
-        Debug.Log("totalAP: " + totalAttackPower);
-        Debug.Log("totalDP: " + totalDefensePower);
-        Debug.Log("p1hp: " + _player1.CurrentHP);
-        Debug.Log("p2hp: " + _player2.CurrentHP);
+        //   Debug.Log("attacker: " + attackingIndex);
+        //   Debug.Log("totalAP: " + totalAttackPower);
+        //   Debug.Log("totalDP: " + totalDefensePower);
+        //   Debug.Log("p1hp: " + _player1.CurrentHP);
+        //   Debug.Log("p2hp: " + _player2.CurrentHP);
     }
 
 

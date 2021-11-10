@@ -10,6 +10,10 @@ public class Card : ScriptableObject
     [HorizontalGroup("General/Left", 55)]
     public Sprite Icon;
 
+    // breakup card into loadable gfx (sprite:mid : sprite:icon) ect
+    // basically something better than just "icon"
+
+
     [BoxGroup("General")]
     [VerticalGroup("General/Left/Right")]
     [LabelWidth(80)]

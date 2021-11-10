@@ -17,6 +17,7 @@ public class Hand
     public void ClearHand() => _cardsInHand.Clear();
     public void AddCardToHand(Card card) => _cardsInHand.Add(card);
     public void RemoveCardFromHand(Card card) => _cardsInHand.Remove(card);
+    public List<Card> GetCardsInHand => _cardsInHand;
 
 
     public void RemoveAllOffenseCards()
