@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pepesaur
   m_EditorClassIdentifier: 
   UID: c9c572f3-439a-4cdc-859c-19717e4d9035
-  DisplayIcon: {fileID: 0}
+  DisplayIcon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   DisplayName: Pepesaur
   Type: 0
   Rarity: 0

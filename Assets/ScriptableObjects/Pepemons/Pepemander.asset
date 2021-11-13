@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: Pepemander
   m_EditorClassIdentifier: 
   UID: b75b96ab-b151-4139-b999-f9a95082fe0b
+  DisplayIcon: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   DisplayName: Pepemander
+  Type: 0
+  Rarity: 0
   HealthPoints: 300
-  PType: 1
   Speed: 9
   Intelligence: 5
-  Defense: 8
-  NAttackType: 1
   Attack: 12
+  Defense: 8
   SAttack: 24
-  sAttackType: 1
-  DisplayIcon: {fileID: 0}
