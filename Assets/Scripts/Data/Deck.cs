@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 // Container class for holding all of the players cards. This object is usually copied as value not reference
 [System.Serializable]

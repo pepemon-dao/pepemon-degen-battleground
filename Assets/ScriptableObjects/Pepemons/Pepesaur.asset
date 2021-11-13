@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: Pepesaur
   m_EditorClassIdentifier: 
   UID: c9c572f3-439a-4cdc-859c-19717e4d9035
-  DisplayName: Pepesaur
-  HealthPoints: 310
-  PType: 0
-  Speed: 8
-  Intelligence: 5
-  Defense: 10
-  NAttackType: 0
-  Attack: 10
-  SAttack: 20
-  sAttackType: 0
   DisplayIcon: {fileID: 0}
+  DisplayName: Pepesaur
+  Type: 0
+  Rarity: 0
+  HealthPoints: 310
+  Speed: 8
+  Intelligence: 6
+  Attack: 10
+  Defense: 10
+  SAttack: 20

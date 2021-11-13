@@ -1,19 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Sirenix.OdinInspector;
+using UnityEngine.UI;
 
 // Handles the instance of a card within a session
 public class CardController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI _cardDisplayName;
 
-    Card _card;
+    public Image colorCircle;
+
+    [ReadOnly] public Card HostedCard;
 
     public void PouplateCard(Card card)
     {
-        _card = card;
-        _cardDisplayName.text = _card.DisplayName;
+        HostedCard = card;
+        _cardDisplayName.text = HostedCard.DisplayName;
+
+        switch (card.Type)
+        {
+            case PlayCardType.Defense:
+            case PlayCardType.SpecialDefense:
+                {
+                    colorCircle.color = Color.green;
+                    break;
+                }
+
+            case PlayCardType.Offense:
+            case PlayCardType.SpecialOffense:
+                {
+                    colorCircle.color = Color.red;
+                    break;
+                }
+        }
     }
 }

@@ -16,7 +16,7 @@ MonoBehaviour:
   Icon: {fileID: 0}
   DisplayName: mouse
   Rarity: 0
-  Type: 0
+  Type: 1
   AttackPower: 0
   DefensePower: 1
   Unstackable: 0

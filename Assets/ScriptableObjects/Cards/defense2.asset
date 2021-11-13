@@ -13,7 +13,13 @@ MonoBehaviour:
   m_Name: defense2
   m_EditorClassIdentifier: 
   UID: b79121b4-9d63-45b1-859c-5adb02e4061d
+  Icon: {fileID: 0}
   DisplayName: mouse
-  CType: 1
+  Rarity: 0
+  Type: 1
   AttackPower: 0
   DefensePower: 3
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

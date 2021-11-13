@@ -43,4 +43,11 @@ public class Card : ScriptableObject
 
     [TitleGroup("Additionals"), ShowIf("Unstackable")] public int UnstackableAmount;
     [TitleGroup("Additionals"), ShowIf("Unresettable")] public int UnresettableAmount;
+
+
+    public bool IsAttackingCard()
+    {
+        if (Type == PlayCardType.SpecialOffense || Type == PlayCardType.Offense) return true;
+        else return false;
+    }
 }

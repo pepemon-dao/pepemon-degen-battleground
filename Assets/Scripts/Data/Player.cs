@@ -12,11 +12,13 @@ public class Player
     [BoxGroup("Runtime")] public int CurrentHP;
     [BoxGroup("Runtime")] public Deck CurrentDeck;
     [BoxGroup("Runtime")] public Hand CurrentHand;
+    [BoxGroup("Runtime")] public int StartingIndex;
 
 
-    public void Initialise()
+    public void Initialise(int index)
     {
         CurrentHP = PlayerPepemon.HealthPoints;
+        StartingIndex = index;
     }
 
     public void GetAndShuffelDeck(int seed)
