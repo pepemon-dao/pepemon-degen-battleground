@@ -2,7 +2,8 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine.UI;
-
+using System.Collections.Generic;
+using System.Collections;
 // Handles displaying game state
 public class UIController : MonoBehaviour
 {
@@ -22,6 +23,16 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Board")] Transform _index1CardContainer;
     [SerializeField, BoxGroup("Board")] Transform _index2CardContainer;
+    [SerializeField, BoxGroup("Board")] Transform _deck1Transform;
+    [SerializeField, BoxGroup("Board")] Transform _deck2Transform;
+    [SerializeField, BoxGroup("Board")] Transform _board;
+
+
+    [SerializeField, BoxGroup("Board")] List<CardController> _player1Cards = new List<CardController>();
+    [SerializeField, BoxGroup("Board")] List<CardController> _player2Cards = new List<CardController>();
+
+
+
 
     Player _player1;
     Player _player2;
@@ -58,19 +69,15 @@ public class UIController : MonoBehaviour
         foreach (Transform child in _index2CardContainer) GameObject.Destroy(child.gameObject);
 
         // Display new hand
-        for (int i = 0; i < _player1.CurrentHand.GetCardsInHand.Count; i++)
-        {
-            GameObject go = Instantiate(_cardPrefab);
-            go.transform.SetParent(_index1CardContainer);
-            go.GetComponent<CardController>().PouplateCard(_player1.CurrentHand.GetCardsInHand[i]);
-        }
+        StartCoroutine(DrawCards(_player1));
+        StartCoroutine(DrawCards(_player2));
 
-        for (int i = 0; i < _player2.CurrentHand.GetCardsInHand.Count; i++)
-        {
-            GameObject go = Instantiate(_cardPrefab);
-            go.transform.SetParent(_index2CardContainer);
-            go.GetComponent<CardController>().PouplateCard(_player2.CurrentHand.GetCardsInHand[i]);
-        }
+        // for (int i = 0; i < _player2.CurrentHand.GetCardsInHand.Count; i++)
+        // {
+        //     GameObject go = Instantiate(_cardPrefab);
+        //     go.transform.SetParent(_index2CardContainer);
+        //     go.GetComponent<CardController>().PouplateCard(_player2.CurrentHand.GetCardsInHand[i]);
+        // }
 
         // Update deck count
         _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + "cards";
@@ -78,20 +85,39 @@ public class UIController : MonoBehaviour
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 
+    IEnumerator DrawCards(Player _whichPlayer)
+    {
+        for (int i = 0; i < _whichPlayer.CurrentHand.GetCardsInHand.Count; i++)
+        {
+            //delay between each card spawn for effect
+            yield return new WaitForSeconds(.2f);
+            GameObject go = new GameObject("Card Container", typeof(RectTransform));
+            GameObject card = Instantiate(_cardPrefab, _deck1Transform.position, Quaternion.identity);
+            card.transform.SetParent(_board);
+            if (_whichPlayer == _player1) go.transform.SetParent(_index1CardContainer);
+            else go.transform.SetParent(_index2CardContainer);
+            card.GetComponent<CardController>().PouplateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
+            card.GetComponent<CardController>().SetTargetTransform(go.transform);
+            if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
+            else _player2Cards.Add(card.GetComponent<CardController>());
+        }
+    }
+
+
     // disables cards based on attacking or defending
     public void FlipCards(int attackIndex)
     {
         if (attackIndex == 1) // p1
         {
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_index1CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == false)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == false)
                 {
-                    _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
 
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
                 if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == true)
                 {
@@ -101,7 +127,7 @@ public class UIController : MonoBehaviour
         }
         else if (attackIndex == 2) // p2
         {
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
                 if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == false)
                 {
@@ -109,24 +135,24 @@ public class UIController : MonoBehaviour
                 }
             }
 
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_index1CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == true)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == true)
                 {
-                    _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
         }
         else if (attackIndex == 3) // reset cards
         {
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
                 _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.black;
             }
 
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.black;
+                _player1Cards[i].GetComponent<Image>().color = Color.black;
             }
         }
     }

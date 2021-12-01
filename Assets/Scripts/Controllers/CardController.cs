@@ -12,6 +12,8 @@ public class CardController : MonoBehaviour
 
     [ReadOnly] public Card HostedCard;
 
+    private Transform _targetPostion;        //the target transform in the layout group this card will lerp to
+
     public void PouplateCard(Card card)
     {
         HostedCard = card;
@@ -33,5 +35,16 @@ public class CardController : MonoBehaviour
                     break;
                 }
         }
+    }
+
+    public void SetTargetTransform(Transform _target)
+    {
+        _targetPostion = _target;
+    }
+
+    void Update()
+    {
+        //lerp to target position on UI
+        transform.position = Vector3.Lerp(transform.position, _targetPostion.position, 5 * Time.deltaTime);
     }
 }
