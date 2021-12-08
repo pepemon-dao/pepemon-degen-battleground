@@ -42,6 +42,18 @@ public class CardController : MonoBehaviour
         _targetPostion = _target;
     }
 
+    /// <summary>
+    /// The cards move foward when they are attacking
+    /// </summary>
+    public void SetAttackingTransform(int attackIndex)
+    {
+        if (attackIndex == 1)
+            _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 10f, _targetPostion.position.z);
+        else if (attackIndex == 2)
+            _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 10f, _targetPostion.position.z);
+
+    }
+
     void Update()
     {
         //lerp to target position on UI

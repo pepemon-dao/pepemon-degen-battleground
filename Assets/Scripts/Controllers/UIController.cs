@@ -9,6 +9,9 @@ public class UIController : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _cardPrefab;
     [TitleGroup("Component References"), SerializeField] GameController _gameController;
+    [TitleGroup("Component References"), SerializeField] Sprite _defendIcon;
+    [TitleGroup("Component References"), SerializeField] Sprite _attackIcon;
+
 
     [BoxGroup("Sidebar")]
     [SerializeField, BoxGroup("Sidebar")] TextMeshProUGUI _roundCount;
@@ -26,6 +29,12 @@ public class UIController : MonoBehaviour
     [SerializeField, BoxGroup("Board")] Transform _deck1Transform;
     [SerializeField, BoxGroup("Board")] Transform _deck2Transform;
     [SerializeField, BoxGroup("Board")] Transform _board;
+    [SerializeField, BoxGroup("Board")] Image _player1TotalDisplay;
+    [SerializeField, BoxGroup("Board")] Image _player2TotalDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _player1TotalTextDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _player2TotalTextDisplay;
+
+
 
 
     [SerializeField, BoxGroup("Board")] List<CardController> _player1Cards = new List<CardController>();
@@ -111,6 +120,7 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() == false)
                 {
+                    _player1Cards[i].SetAttackingTransform(1);
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
@@ -119,6 +129,7 @@ public class UIController : MonoBehaviour
             {
                 if (_player2Cards[i].HostedCard.IsAttackingCard() == true)
                 {
+                    _player2Cards[i].SetAttackingTransform(2);
                     _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
@@ -129,6 +140,8 @@ public class UIController : MonoBehaviour
             {
                 if (_player2Cards[i].HostedCard.IsAttackingCard() == false)
                 {
+                    _player2Cards[i].SetAttackingTransform(2);
+
                     _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
@@ -137,6 +150,8 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() == true)
                 {
+                    _player1Cards[i].SetAttackingTransform(1);
+
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
@@ -145,14 +160,51 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player2Cards.Count; i++)
             {
+                _player2Cards[i].SetAttackingTransform(3);
+
                 _player2Cards[i].GetComponent<Image>().color = Color.black;
             }
 
             for (int i = 0; i < _player1Cards.Count; i++)
             {
+                _player1Cards[i].SetAttackingTransform(3);
+
                 _player1Cards[i].GetComponent<Image>().color = Color.black;
             }
         }
+    }
+
+    /// <summary>
+    /// Sequence where the shielf and sword icons are displayed and the total attk/def are displayed
+    /// </summary>
+    /// <param name="attackIndex"></param>
+    /// <param name="_totalAttack"></param>
+    /// <param name="_totalDef"></param>
+    /// <returns></returns>
+    public IEnumerator DisplayTotalValues(int attackIndex, int _totalAttack, int _totalDef)
+    {
+        _player1TotalDisplay.gameObject.SetActive(true);
+        _player2TotalDisplay.gameObject.SetActive(true);
+        //display the proper attack and defend symbols
+        if (attackIndex == 1)
+        {
+            _player1TotalTextDisplay.text = _totalAttack.ToString();
+            _player2TotalTextDisplay.text = _totalDef.ToString();
+            _player1TotalDisplay.sprite = _attackIcon;
+            _player2TotalDisplay.sprite = _defendIcon;
+        }
+        else if (attackIndex == 2)
+        {
+            _player1TotalTextDisplay.text = _totalDef.ToString();
+            _player2TotalTextDisplay.text = _totalAttack.ToString();
+            _player1TotalDisplay.sprite = _defendIcon;
+            _player2TotalDisplay.sprite = _attackIcon;
+        }
+        yield return new WaitForSeconds(1f);
+
+        _player1TotalDisplay.gameObject.SetActive(false);
+        _player2TotalDisplay.gameObject.SetActive(false);
+
     }
 
 
