@@ -65,19 +65,17 @@ public class UIController : MonoBehaviour
     public void DisplayHands()
     {
         // Cleanup old hand
+        foreach (CardController _card in _player1Cards) { GameObject.Destroy(_card.gameObject); }
+        foreach (CardController _card in _player2Cards) { GameObject.Destroy(_card.gameObject); }
         foreach (Transform child in _index1CardContainer) GameObject.Destroy(child.gameObject);
         foreach (Transform child in _index2CardContainer) GameObject.Destroy(child.gameObject);
-
+        _player1Cards.Clear();
+        _player2Cards.Clear();
         // Display new hand
         StartCoroutine(DrawCards(_player1));
         StartCoroutine(DrawCards(_player2));
 
-        // for (int i = 0; i < _player2.CurrentHand.GetCardsInHand.Count; i++)
-        // {
-        //     GameObject go = Instantiate(_cardPrefab);
-        //     go.transform.SetParent(_index2CardContainer);
-        //     go.GetComponent<CardController>().PouplateCard(_player2.CurrentHand.GetCardsInHand[i]);
-        // }
+
 
         // Update deck count
         _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + "cards";
@@ -119,9 +117,9 @@ public class UIController : MonoBehaviour
 
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == true)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == true)
                 {
-                    _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
         }
@@ -129,9 +127,9 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == false)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == false)
                 {
-                    _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
 
@@ -147,7 +145,7 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.black;
+                _player2Cards[i].GetComponent<Image>().color = Color.black;
             }
 
             for (int i = 0; i < _player1Cards.Count; i++)
