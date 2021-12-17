@@ -61,10 +61,17 @@ public class CardController : MonoBehaviour
     /// </summary>
     public void SetAttackingTransform(int attackIndex)
     {
+
         if (attackIndex == 1)
+        {
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z - 15);
+            transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
+        }
         else if (attackIndex == 2)
+        {
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 5f, _targetPostion.position.z - 15);
+            transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
+        }
 
     }
 

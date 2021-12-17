@@ -10,8 +10,8 @@ public class TallyParticleEffect : MonoBehaviour
     {
         if (targetPosition != null)
         {
-            Vector2.MoveTowards(this.transform.position, targetPosition, 5 * Time.deltaTime);
-            if (Vector2.Distance(this.transform.position, targetPosition) < 1f) Destroy(this.gameObject);
+            this.transform.position = Vector2.MoveTowards(this.transform.position, targetPosition, 10 * Time.deltaTime);
+            if (Vector2.Distance(this.transform.position, targetPosition) < .2f) Destroy(this.gameObject);
         }
     }
 }
