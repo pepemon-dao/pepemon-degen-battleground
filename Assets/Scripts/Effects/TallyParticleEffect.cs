@@ -1,0 +1,17 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class TallyParticleEffect : MonoBehaviour
+{
+    public Vector2 targetPosition;            //it will move toward the visual tally 
+
+    private void Update()
+    {
+        if (targetPosition != null)
+        {
+            Vector2.MoveTowards(this.transform.position, targetPosition, 5 * Time.deltaTime);
+            if (Vector2.Distance(this.transform.position, targetPosition) < 1f) Destroy(this.gameObject);
+        }
+    }
+}

@@ -116,11 +116,11 @@ public class GameController : MonoBehaviour
                     _uiController.FlipCards(1);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(2f);
+                    yield return new WaitForSeconds(.5f);
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1f);
+                    yield return new WaitForSeconds(2f);
 
                     _player2.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
                     _player2.CurrentHand.RemoveAllDefenseCards();
