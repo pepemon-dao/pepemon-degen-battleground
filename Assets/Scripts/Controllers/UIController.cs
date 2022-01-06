@@ -36,6 +36,8 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Board")] List<CardController> _player1Cards = new List<CardController>();
     [SerializeField, BoxGroup("Board")] List<CardController> _player2Cards = new List<CardController>();
+    [SerializeField, BoxGroup("Board")] GameObject _newRoundDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _newRoundDisplayText;
 
     [SerializeField, BoxGroup("Effects")] GameObject _attackTallyPS;         //the effect spawned by the card when tally the defense/attack amount
 
@@ -61,6 +63,17 @@ public class UIController : MonoBehaviour
 
         _index1Icon.sprite = player1.PlayerPepemon.DisplayIcon;
         _index2Icon.sprite = player2.PlayerPepemon.DisplayIcon;
+    }
+
+    public void NewRoundDisplay()
+    {
+        _newRoundDisplay.SetActive(true);
+        _newRoundDisplayText.text = "Round: " + _gameController.GetRoundNumber();
+    }
+
+    public void HideNewRoundDisplay()
+    {
+        _newRoundDisplay.SetActive(false);
     }
 
 
@@ -100,16 +113,13 @@ public class UIController : MonoBehaviour
             GameObject card;
             if (_whichPlayer == _player1) card = Instantiate(_cardPrefab, _deck1Transform.position, Quaternion.identity);
             else card = Instantiate(_cardPrefab, _deck2Transform.position, Quaternion.identity);
-            Debug.Log("Spawned card with scale:" + card.transform.localScale);
             card.transform.SetParent(_board);
 
-            Debug.Log("Spawned card with scale 2:" + card.transform.localScale);
 
             if (_whichPlayer == _player1) go.transform.SetParent(_index1CardContainer);
             else go.transform.SetParent(_index2CardContainer);
             go.transform.localPosition = Vector3.zero;
             card.GetComponent<CardController>().PouplateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
-            Debug.Log("Spawned card with scale 3:" + card.transform.localScale);
 
             card.GetComponent<CardController>().SetTargetTransform(go.transform);
             if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
@@ -167,14 +177,14 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                _player2Cards[i].SetAttackingTransform(3);
+                _player2Cards[i].ReturnToBaseTransform();
 
                 _player2Cards[i].GetComponent<Image>().color = Color.black;
             }
 
             for (int i = 0; i < _player1Cards.Count; i++)
             {
-                _player1Cards[i].SetAttackingTransform(3);
+                _player1Cards[i].ReturnToBaseTransform();
 
                 _player1Cards[i].GetComponent<Image>().color = Color.black;
             }
@@ -193,6 +203,14 @@ public class UIController : MonoBehaviour
 
         _player1TotalDisplay.gameObject.SetActive(true);
         _player2TotalDisplay.gameObject.SetActive(true);
+        TallyUpCardValues(attackIndex);
+
+
+        yield return new WaitForSeconds(2f);
+
+        _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+        _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+
 
         int _maxTallyP1;
         int _maxTallyP2;
@@ -216,7 +234,6 @@ public class UIController : MonoBehaviour
         }
 
 
-        TallyUpCardValues(attackIndex);
 
 
         yield return new WaitForSeconds(1f);

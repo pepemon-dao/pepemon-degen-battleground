@@ -74,6 +74,10 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
+        _uiController.NewRoundDisplay();
+        yield return new WaitForSeconds(1.6f);
+        _uiController.HideNewRoundDisplay();
+        yield return new WaitForSeconds(.3f);
 
         // Check if we passed 5 and if so reshuffel decks
         if (_roundNumber >= 5)
