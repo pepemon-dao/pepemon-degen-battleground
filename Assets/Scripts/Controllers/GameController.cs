@@ -74,6 +74,10 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
+        _uiController.NewRoundDisplay();
+        yield return new WaitForSeconds(1.6f);
+        _uiController.HideNewRoundDisplay();
+        yield return new WaitForSeconds(.3f);
 
         // Check if we passed 5 and if so reshuffel decks
         if (_roundNumber >= 5)
@@ -88,6 +92,9 @@ public class GameController : MonoBehaviour
 
         // Display hands in the UI
         _uiController.DisplayHands();
+
+        //delay to show drawing of cards
+        yield return new WaitForSeconds(2f);
 
         //! need to think of a better way to display the cards being played
 
@@ -110,22 +117,35 @@ public class GameController : MonoBehaviour
                 // Remove played cards from current hand
                 if (attackingIndex == 1)
                 {
+                    _uiController.FlipCards(1);
+
+                    //wait for animations showing the attacking/defending cards
+                    yield return new WaitForSeconds(.5f);
+
+                    _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
+
+                    yield return new WaitForSeconds(2f);
+
                     _player2.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
                     _player2.CurrentHand.RemoveAllDefenseCards();
                     _player1.CurrentHand.RemoveAllOffenseCards();
 
-                    _uiController.FlipCards(1);
                     _uiController.UpdateUI();
 
                     if (_player2.CurrentHP <= 0) Winner(_player1);
                 }
                 else
                 {
+                    _uiController.FlipCards(2);
+
+                    yield return new WaitForSeconds(2f);
+                    _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
+
+                    yield return new WaitForSeconds(1f);
                     _player1.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
                     _player1.CurrentHand.RemoveAllDefenseCards();
                     _player2.CurrentHand.RemoveAllOffenseCards();
 
-                    _uiController.FlipCards(2);
                     _uiController.UpdateUI();
 
                     if (_player1.CurrentHP <= 0) Winner(_player2);

@@ -2,12 +2,16 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine.UI;
-
+using System.Collections.Generic;
+using System.Collections;
 // Handles displaying game state
 public class UIController : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _cardPrefab;
     [TitleGroup("Component References"), SerializeField] GameController _gameController;
+    [TitleGroup("Component References"), SerializeField] Sprite _defendIcon;
+    [TitleGroup("Component References"), SerializeField] Sprite _attackIcon;
+
 
     [BoxGroup("Sidebar")]
     [SerializeField, BoxGroup("Sidebar")] TextMeshProUGUI _roundCount;
@@ -22,6 +26,22 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Board")] Transform _index1CardContainer;
     [SerializeField, BoxGroup("Board")] Transform _index2CardContainer;
+    [SerializeField, BoxGroup("Board")] Transform _deck1Transform;
+    [SerializeField, BoxGroup("Board")] Transform _deck2Transform;
+    [SerializeField, BoxGroup("Board")] Transform _board;
+    [SerializeField, BoxGroup("Board")] Image _player1TotalDisplay;
+    [SerializeField, BoxGroup("Board")] Image _player2TotalDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _player1TotalTextDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _player2TotalTextDisplay;
+
+    [SerializeField, BoxGroup("Board")] List<CardController> _player1Cards = new List<CardController>();
+    [SerializeField, BoxGroup("Board")] List<CardController> _player2Cards = new List<CardController>();
+    [SerializeField, BoxGroup("Board")] GameObject _newRoundDisplay;
+    [SerializeField, BoxGroup("Board")] TextMeshProUGUI _newRoundDisplayText;
+
+    [SerializeField, BoxGroup("Effects")] GameObject _attackTallyPS;         //the effect spawned by the card when tally the defense/attack amount
+
+
 
     Player _player1;
     Player _player2;
@@ -45,6 +65,17 @@ public class UIController : MonoBehaviour
         _index2Icon.sprite = player2.PlayerPepemon.DisplayIcon;
     }
 
+    public void NewRoundDisplay()
+    {
+        _newRoundDisplay.SetActive(true);
+        _newRoundDisplayText.text = "Round: " + _gameController.GetRoundNumber();
+    }
+
+    public void HideNewRoundDisplay()
+    {
+        _newRoundDisplay.SetActive(false);
+    }
+
 
     // part1 lay down all AD + DF cards
     // play the hand
@@ -54,23 +85,17 @@ public class UIController : MonoBehaviour
     public void DisplayHands()
     {
         // Cleanup old hand
+        foreach (CardController _card in _player1Cards) { GameObject.Destroy(_card.gameObject); }
+        foreach (CardController _card in _player2Cards) { GameObject.Destroy(_card.gameObject); }
         foreach (Transform child in _index1CardContainer) GameObject.Destroy(child.gameObject);
         foreach (Transform child in _index2CardContainer) GameObject.Destroy(child.gameObject);
-
+        _player1Cards.Clear();
+        _player2Cards.Clear();
         // Display new hand
-        for (int i = 0; i < _player1.CurrentHand.GetCardsInHand.Count; i++)
-        {
-            GameObject go = Instantiate(_cardPrefab);
-            go.transform.SetParent(_index1CardContainer);
-            go.GetComponent<CardController>().PouplateCard(_player1.CurrentHand.GetCardsInHand[i]);
-        }
+        StartCoroutine(DrawCards(_player1));
+        StartCoroutine(DrawCards(_player2));
 
-        for (int i = 0; i < _player2.CurrentHand.GetCardsInHand.Count; i++)
-        {
-            GameObject go = Instantiate(_cardPrefab);
-            go.transform.SetParent(_index2CardContainer);
-            go.GetComponent<CardController>().PouplateCard(_player2.CurrentHand.GetCardsInHand[i]);
-        }
+
 
         // Update deck count
         _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + "cards";
@@ -78,55 +103,190 @@ public class UIController : MonoBehaviour
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 
+    IEnumerator DrawCards(Player _whichPlayer)
+    {
+        for (int i = 0; i < _whichPlayer.CurrentHand.GetCardsInHand.Count; i++)
+        {
+            //delay between each card spawn for effect
+            yield return new WaitForSeconds(.2f);
+            GameObject go = new GameObject("Card Container", typeof(RectTransform));
+            GameObject card;
+            if (_whichPlayer == _player1) card = Instantiate(_cardPrefab, _deck1Transform.position, Quaternion.identity);
+            else card = Instantiate(_cardPrefab, _deck2Transform.position, Quaternion.identity);
+            card.transform.SetParent(_board);
+
+
+            if (_whichPlayer == _player1) go.transform.SetParent(_index1CardContainer);
+            else go.transform.SetParent(_index2CardContainer);
+            go.transform.localPosition = Vector3.zero;
+            card.GetComponent<CardController>().PouplateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
+
+            card.GetComponent<CardController>().SetTargetTransform(go.transform);
+            if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
+            else _player2Cards.Add(card.GetComponent<CardController>());
+        }
+    }
+
+
     // disables cards based on attacking or defending
     public void FlipCards(int attackIndex)
     {
         if (attackIndex == 1) // p1
         {
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_index1CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == false)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == false)
                 {
-                    _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player1Cards[i].SetAttackingTransform(1);
+                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
 
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == true)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == true)
                 {
-                    _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player2Cards[i].SetAttackingTransform(2);
+                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
         }
         else if (attackIndex == 2) // p2
         {
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_index2CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == false)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == false)
                 {
-                    _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player2Cards[i].SetAttackingTransform(2);
+
+                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
 
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_index1CardContainer.GetChild(i).GetComponent<CardController>().HostedCard.IsAttackingCard() == true)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == true)
                 {
-                    _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.gray;
+                    _player1Cards[i].SetAttackingTransform(1);
+
+                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
                 }
             }
         }
         else if (attackIndex == 3) // reset cards
         {
-            for (int i = 0; i < _index2CardContainer.childCount; i++)
+            for (int i = 0; i < _player2Cards.Count; i++)
             {
-                _index2CardContainer.GetChild(i).GetComponent<Image>().color = Color.black;
+                _player2Cards[i].ReturnToBaseTransform();
+
+                _player2Cards[i].GetComponent<Image>().color = Color.black;
             }
 
-            for (int i = 0; i < _index1CardContainer.childCount; i++)
+            for (int i = 0; i < _player1Cards.Count; i++)
             {
-                _index1CardContainer.GetChild(i).GetComponent<Image>().color = Color.black;
+                _player1Cards[i].ReturnToBaseTransform();
+
+                _player1Cards[i].GetComponent<Image>().color = Color.black;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sequence where the shielf and sword icons are displayed and the total attk/def are displayed
+    /// </summary>
+    /// <param name="attackIndex"></param>
+    /// <param name="_totalAttack"></param>
+    /// <param name="_totalDef"></param>
+    /// <returns></returns>
+    public IEnumerator DisplayTotalValues(int attackIndex, int _totalAttack, int _totalDef)
+    {
+
+        _player1TotalDisplay.gameObject.SetActive(true);
+        _player2TotalDisplay.gameObject.SetActive(true);
+        TallyUpCardValues(attackIndex);
+
+
+        yield return new WaitForSeconds(2f);
+
+        _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+        _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+
+
+        int _maxTallyP1;
+        int _maxTallyP2;
+        int _currentTallyP1;
+        int _currentTallyP2;
+
+        //display the proper attack and defend symbols
+        if (attackIndex == 1)
+        {
+            _player1TotalTextDisplay.text = _totalAttack.ToString();
+            _player2TotalTextDisplay.text = _totalDef.ToString();
+            _player1TotalDisplay.sprite = _attackIcon;
+            _player2TotalDisplay.sprite = _defendIcon;
+        }
+        else if (attackIndex == 2)
+        {
+            _player1TotalTextDisplay.text = _totalDef.ToString();
+            _player2TotalTextDisplay.text = _totalAttack.ToString();
+            _player1TotalDisplay.sprite = _defendIcon;
+            _player2TotalDisplay.sprite = _attackIcon;
+        }
+
+
+
+
+        yield return new WaitForSeconds(1f);
+
+        _player1TotalDisplay.gameObject.SetActive(false);
+        _player2TotalDisplay.gameObject.SetActive(false);
+
+    }
+
+    /// <summary>
+    /// Show the effect/animation of the player's total def/attack being tallied up. This involves particle systems spawning and moving toward the display.
+    /// </summary>
+    /// <param name="_attackIndex"></param>
+    void TallyUpCardValues(int _attackIndex)
+    {
+        if (_attackIndex == 1)
+        {
+            foreach (CardController _card in _player1Cards)
+            {
+                if (_card.HostedCard.IsAttackingCard())
+                {
+                    GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
+                }
+            }
+            foreach (CardController _card in _player2Cards)
+            {
+                if (_card.HostedCard.Type == PlayCardType.Defense)
+                {
+                    GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
+                }
+            }
+        }
+        else if (_attackIndex == 2)
+        {
+            foreach (CardController _card in _player1Cards)
+            {
+                if (_card.HostedCard.Type == PlayCardType.Defense)
+                {
+                    GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
+                    //particle system moves toward the tally display for effect
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
+                }
+            }
+            foreach (CardController _card in _player2Cards)
+            {
+                if (_card.HostedCard.IsAttackingCard())
+                {
+                    GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
+                    //particle system moves toward the tally display for effect
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
+                }
             }
         }
     }
