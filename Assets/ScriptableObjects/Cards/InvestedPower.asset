@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: InvestedPower
+  m_EditorClassIdentifier: 
+  UID: 37e6bad2-733a-4663-8d9f-31d664d1f434
+  Icon: {fileID: 0}
+  ID: 24
+  DisplayName: Invested Power
+  CardDescription: "If the Pepemon\u2019s Intelligence is 5 or less, then until end
+    of turn, the Pepemon receives an additional Attack Power equal to the total of
+    all the offense cards used by its player this turn (excluding offense card bonuses)."
+  Rarity: 2
+  Type: 1
+  CardEffectSprite: {fileID: 21300000, guid: 4b959a362f896784cbd7ca626958f560, type: 3}
+  AttackPower: 4
+  DefensePower: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

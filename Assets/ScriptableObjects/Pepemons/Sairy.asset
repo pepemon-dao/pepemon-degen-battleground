@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
+  m_Name: Sairy
+  m_EditorClassIdentifier: 
+  UID: a30e1660-8c48-4738-86de-08cd89e2a28b
+  DisplayIcon: {fileID: 0}
+  ID: 3
+  DisplayName: Sairy
+  CardContentBackdrop: {fileID: 21300000, guid: 94f7611efffce1e459212ad8f4615cd1, type: 3}
+  CardContent: {fileID: 0}
+  Level: 1
+  Type: 3
+  Weakness: 4
+  Resistence: 5
+  Rarity: 0
+  HealthPoints: 350
+  Speed: 20
+  Intelligence: 5
+  Attack: 5
+  Defense: 10
+  SAttack: 15
+  SDeffense: 10

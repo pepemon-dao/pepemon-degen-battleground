@@ -16,7 +16,14 @@ public class GameController : MonoBehaviour
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] bool _gameHasFinished;
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] bool _isPlayingRound;
 
+    [BoxGroup("Pepemon Controller")] public PepemonCardController player1Controller;
+    [BoxGroup("Pepemon Controller")] public PepemonCardController player2Controller;
 
+    private void Start()
+    {
+        player1Controller.PopulateCard(_player1.PlayerPepemon);
+        player2Controller.PopulateCard(_player2.PlayerPepemon);
+    }
 
     [Button()]
     public void StartGame()

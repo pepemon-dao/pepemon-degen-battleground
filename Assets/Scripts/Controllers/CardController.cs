@@ -6,28 +6,29 @@ using UnityEngine.UI;
 // Handles the instance of a card within a session
 public class CardController : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI _cardDisplayName;
+    [BoxGroup("Card Components"), SerializeField] private TextMeshProUGUI _cardDisplayName;
+    [BoxGroup("Card Components"), SerializeField] private TextMeshProUGUI _cardDescription;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardFrameImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardBackgroundImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
 
-    [BoxGroup("Card Components"), SerializeField] private Image cardFrameImage;
-    [BoxGroup("Card Components"), SerializeField] private Image cardBackgroundImage;
-    [BoxGroup("Card Components"), SerializeField] private Image gemImage;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialDefenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _attackCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialAttackCardFrame;
 
-    [BoxGroup("Card Backdrops"), SerializeField] private Sprite defenceCardFrame;
-    [BoxGroup("Card Backdrops"), SerializeField] private Sprite specialDefenceCardFrame;
-    [BoxGroup("Card Backdrops"), SerializeField] private Sprite attackCardFrame;
-    [BoxGroup("Card Backdrops"), SerializeField] private Sprite specialAttackCardFrame;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _commonGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _rareGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _epicGem;
 
-    [BoxGroup("Card Gems"), SerializeField] private Sprite commonGem;
-    [BoxGroup("Card Gems"), SerializeField] private Sprite rareGem;
-    [BoxGroup("Card Gems"), SerializeField] private Sprite epicGem;
-
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite atkBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite defBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite intBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite r_atkBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite r_defBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite spclBG;
-    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite speedBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _atkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _defBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _intBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _rAtkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _rDefBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _spclBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _speedBG;
 
     [ReadOnly] public Card HostedCard;
 
@@ -35,36 +36,37 @@ public class CardController : MonoBehaviour
     private Vector3 _startingTargetPosition = Vector3.zero;  //the position to return to after being highlighted
 
     public void PouplateCard(Card card)
-    {
+    { 
         HostedCard = card;
         _cardDisplayName.text = HostedCard.DisplayName;
+        _cardDescription.text = HostedCard.CardDescription;
 
         switch (card.Type)
         {
             case PlayCardType.Defense:
-                cardFrameImage.sprite = defenceCardFrame;
+                _cardFrameImage.sprite = _defenceCardFrame;
                 break;
             case PlayCardType.SpecialDefense:
-                cardFrameImage.sprite = specialDefenceCardFrame;
+                _cardFrameImage.sprite = _specialDefenceCardFrame;
                 break;
             case PlayCardType.Offense:
-                cardFrameImage.sprite = attackCardFrame;
+                _cardFrameImage.sprite = _attackCardFrame;
                 break;
             case PlayCardType.SpecialOffense:
-                cardFrameImage.sprite = specialAttackCardFrame;
+                _cardFrameImage.sprite = _specialAttackCardFrame;
                 break;
         }
 
         switch (card.Rarity)
         {
             case CardRarity.Common:
-                gemImage.sprite = commonGem;
+                _gemImage.sprite = _commonGem;
                 break;
             case CardRarity.Rare:
-                gemImage.sprite = rareGem;
+                _gemImage.sprite = _rareGem;
                 break;
             case CardRarity.Epic:
-                gemImage.sprite = epicGem;
+                _gemImage.sprite = _epicGem;
                 break;
         }
     }

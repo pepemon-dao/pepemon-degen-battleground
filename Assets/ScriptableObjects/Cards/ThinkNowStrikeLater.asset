@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: ThinkNowStrikeLater
+  m_EditorClassIdentifier: 
+  UID: e57237d7-dc20-438f-b258-21fbd17e28ab
+  Icon: {fileID: 0}
+  ID: 26
+  DisplayName: Think Now Strike Later
+  CardDescription: Pepemon adds an +2 Attack Power effect for this turn and the next
+    3 turns. (Unstackable 3, Unresettable 3) Effects do not stack or reset with another
+    card of the same name.
+  Rarity: 2
+  Type: 0
+  CardEffectSprite: {fileID: 21300000, guid: 94ce8b49e4ae7a24caacd0f13ec23627, type: 3}
+  AttackPower: 0
+  DefensePower: 0
+  Unstackable: 1
+  Unresettable: 1
+  UnstackableAmount: 3
+  UnresettableAmount: 3

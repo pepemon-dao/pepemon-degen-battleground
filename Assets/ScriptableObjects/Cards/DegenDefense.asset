@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: DegenDefense
+  m_EditorClassIdentifier: 
+  UID: 1a88d7a7-e5c6-437b-856c-411d27bde817
+  Icon: {fileID: 0}
+  ID: 32
+  DisplayName: Degen Defence
+  CardDescription: Pepemon adds +1 Intelligence for the next 2 turns. (Unstackable
+    2, Unresettable 2) Effects do not stack or reset with another card of the same
+    name.
+  Rarity: 2
+  Type: 3
+  CardEffectSprite: {fileID: 21300000, guid: 90e1c13e83cf7cf48a7b0d0775f68c94, type: 3}
+  AttackPower: 0
+  DefensePower: 9
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0
