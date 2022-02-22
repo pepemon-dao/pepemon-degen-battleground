@@ -23,7 +23,7 @@ public class Card : ScriptableObject
     [VerticalGroup("General/Left/Right")]
     [LabelWidth(80)]
     public CardRarity Rarity;
-
+ 
     [BoxGroup("General")]
     [VerticalGroup("General/Left/Right")]
     [LabelWidth(80)]

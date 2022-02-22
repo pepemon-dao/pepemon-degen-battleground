@@ -8,13 +8,26 @@ public class CardController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI _cardDisplayName;
 
-    public Image colorCircle;
-    public Image cardImage;
+    [BoxGroup("Card Components"), SerializeField] private Image cardFrameImage;
+    [BoxGroup("Card Components"), SerializeField] private Image cardBackgroundImage;
+    [BoxGroup("Card Components"), SerializeField] private Image gemImage;
 
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite defenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite specialDefenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite attackCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite specialAttackCardFrame;
 
-    public Sprite defenseCard;
-    public Sprite attkCard;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite commonGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite rareGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite epicGem;
 
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite atkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite defBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite intBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite r_atkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite r_defBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite spclBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite speedBG;
 
     [ReadOnly] public Card HostedCard;
 
@@ -29,27 +42,32 @@ public class CardController : MonoBehaviour
         switch (card.Type)
         {
             case PlayCardType.Defense:
-                cardImage.sprite = defenseCard;
+                cardFrameImage.sprite = defenceCardFrame;
                 break;
             case PlayCardType.SpecialDefense:
-                {
-                    cardImage.sprite = attkCard;
-                    colorCircle.color = Color.green;
-                    break;
-                }
-
+                cardFrameImage.sprite = specialDefenceCardFrame;
+                break;
             case PlayCardType.Offense:
-                cardImage.sprite = attkCard;
+                cardFrameImage.sprite = attackCardFrame;
                 break;
             case PlayCardType.SpecialOffense:
-                {
-                    cardImage.sprite = attkCard;
-                    colorCircle.color = Color.red;
-                    break;
-                }
+                cardFrameImage.sprite = specialAttackCardFrame;
+                break;
+        }
+
+        switch (card.Rarity)
+        {
+            case CardRarity.Common:
+                gemImage.sprite = commonGem;
+                break;
+            case CardRarity.Rare:
+                gemImage.sprite = rareGem;
+                break;
+            case CardRarity.Epic:
+                gemImage.sprite = epicGem;
+                break;
         }
     }
-
 
     public void SetTargetTransform(Transform _target)
     {
