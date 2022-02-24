@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
+using DG.Tweening;
 
 // Handles the instance of a card within a session
 public class CardController : MonoBehaviour
@@ -12,6 +13,7 @@ public class CardController : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] private Image _cardBackgroundImage;
     [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
     [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
+    [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
 
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialDefenceCardFrame;
@@ -36,7 +38,7 @@ public class CardController : MonoBehaviour
     private Vector3 _startingTargetPosition = Vector3.zero;  //the position to return to after being highlighted
 
     public void PouplateCard(Card card)
-    { 
+    {
         HostedCard = card;
         _cardDisplayName.text = HostedCard.DisplayName;
         _cardDescription.text = HostedCard.CardDescription;
@@ -88,6 +90,7 @@ public class CardController : MonoBehaviour
             _startingTargetPosition = _targetPostion.position;
 
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z - 15);
+            _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
         else if (attackIndex == 2)
@@ -95,6 +98,7 @@ public class CardController : MonoBehaviour
             _startingTargetPosition = _targetPostion.position;
 
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 5f, _targetPostion.position.z - 15);
+            _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
 
@@ -105,6 +109,8 @@ public class CardController : MonoBehaviour
     /// </summary>
     public void ReturnToBaseTransform()
     {
+        _cardGlow.DOFade(0, .2f);
+
         if (_startingTargetPosition != Vector3.zero)
             _targetPostion.position = _startingTargetPosition;
 
