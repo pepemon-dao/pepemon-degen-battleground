@@ -279,8 +279,8 @@ public class UIController : MonoBehaviour
 
     public void UpdateUI()
     {
-        _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + " Cards Remaining";
-        _index2DeckCount.text = _player2.CurrentDeck.GetDeck().Count + " Cards Remaining";
+        _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + " Cards";
+        _index2DeckCount.text = _player2.CurrentDeck.GetDeck().Count + " Cards";
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 

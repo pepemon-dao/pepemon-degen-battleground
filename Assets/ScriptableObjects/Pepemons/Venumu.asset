@@ -17,7 +17,7 @@ MonoBehaviour:
   ID: 4
   DisplayName: Venumu
   CardContentBackdrop: {fileID: 21300000, guid: 0c2c8f3f511c1cf48a8753eb091880b5, type: 3}
-  CardContent: {fileID: 0}
+  CardContent: {fileID: 21300000, guid: 0b1f88eca2da00b48bdec767687f1f2a, type: 3}
   Level: 1
   Type: 4
   Weakness: 9

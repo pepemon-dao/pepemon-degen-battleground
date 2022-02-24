@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
-  m_Name: Unifairy
+  m_Name: Zaptry
   m_EditorClassIdentifier: 
-  UID: 7ab89c70-10d0-4118-a3dc-db51f6b7f231
+  UID: 9a77f825-f403-4b84-8b89-2ee7ca22d615
   DisplayIcon: {fileID: 0}
-  ID: 10
-  DisplayName: Unifairy
-  CardContentBackdrop: {fileID: 21300000, guid: 0d3977d6fab14234586bf42865d660d7, type: 3}
-  CardContent: {fileID: 21300000, guid: 5a1eaeae308d5b84ba85956663702fac, type: 3}
+  ID: 
+  DisplayName: Zaptry
+  CardContentBackdrop: {fileID: 21300000, guid: c9bbfa23bee9235488520cbd5e43f94a, type: 3}
+  CardContent: {fileID: 21300000, guid: f28798e41df46134695100edb2358ff3, type: 3}
   Level: 1
-  Type: 9
-  Weakness: 8
-  Resistence: 9
+  Type: 2
+  Weakness: 5
+  Resistence: 3
   Rarity: 0
-  HealthPoints: 320
-  Speed: 18
-  Intelligence: 5
-  Attack: 5
-  Defense: 15
+  HealthPoints: 400
+  Speed: 10
+  Intelligence: 10
+  Attack: 10
+  Defense: 10
   SAttack: 10
-  SDeffense: 15
+  SDeffense: 10
