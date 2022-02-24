@@ -429,6 +429,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -2044,6 +2045,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -2499,6 +2501,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -3402,6 +3405,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -5931,6 +5935,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -6388,6 +6393,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -9649,6 +9655,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -10451,6 +10458,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -11743,6 +11751,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -12511,6 +12520,7 @@ MonoBehaviour:
   _cardBackgroundImage: {fileID: 0}
   _cardStatImage: {fileID: 0}
   _gemImage: {fileID: 0}
+  _cardGlow: {fileID: 0}
   _defenceCardFrame: {fileID: 0}
   _specialDefenceCardFrame: {fileID: 0}
   _attackCardFrame: {fileID: 0}
@@ -13054,7 +13064,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _uiController: {fileID: 731252689}
   _player1:
-    PlayerPepemon: {fileID: 11400000, guid: 6336132a4bf40534fabb8f8f19907f58, type: 2}
+    PlayerPepemon: {fileID: 11400000, guid: ebf2eb4e75cd2fc41860cb891e6cbf2c, type: 2}
     PlayerDeck:
       AllCards:
       - {fileID: 11400000, guid: a234538c2f067d74fbb9d4cb7b9db11d, type: 2}
