@@ -11,7 +11,8 @@ public class UIController : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameController _gameController;
     [TitleGroup("Component References"), SerializeField] Sprite _defendIcon;
     [TitleGroup("Component References"), SerializeField] Sprite _attackIcon;
-
+    [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player1Health;
+    [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player2Health;
 
     [BoxGroup("Sidebar")]
     [SerializeField, BoxGroup("Sidebar")] TextMeshProUGUI _roundCount;
@@ -40,11 +41,12 @@ public class UIController : MonoBehaviour
     Player _player1;
     Player _player2;
 
-
     public void InitialiseGame(Player player1, Player player2)
     {
         _player1 = player1;
         _player2 = player2;
+
+        UpdateUI();
 
         _index1DeckCount.text = player1.PlayerDeck.GetDeck().Count + "cards";
         _index2DeckCount.text = player2.PlayerDeck.GetDeck().Count + "cards";
@@ -281,6 +283,10 @@ public class UIController : MonoBehaviour
     {
         _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + " Cards";
         _index2DeckCount.text = _player2.CurrentDeck.GetDeck().Count + " Cards";
+
+        _player1Health.text = "Health " + _player1.CurrentHP.ToString();
+        _player2Health.text = "Health " + _player2.CurrentHP.ToString();
+
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 
