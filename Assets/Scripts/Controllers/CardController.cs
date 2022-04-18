@@ -21,7 +21,7 @@ public class CardController : MonoBehaviour
     private Transform _targetPostion;        //the target transform in the layout group this card will lerp to
     private Vector3 _startingTargetPosition = Vector3.zero;  //the position to return to after being highlighted
 
-    public void PouplateCard(Card card)
+    public void PopulateCard(Card card)
     {
         HostedCard = card;
         _cardDisplayName.text = HostedCard.DisplayName;

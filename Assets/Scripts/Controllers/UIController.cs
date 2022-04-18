@@ -119,7 +119,7 @@ public class UIController : MonoBehaviour
             if (_whichPlayer == _player1) go.transform.SetParent(_index1CardContainer);
             else go.transform.SetParent(_index2CardContainer);
             go.transform.localPosition = Vector3.zero;
-            card.GetComponent<CardController>().PouplateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
+            card.GetComponent<CardController>().PopulateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
 
             card.GetComponent<CardController>().SetTargetTransform(go.transform);
             if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
@@ -200,23 +200,6 @@ public class UIController : MonoBehaviour
     /// <returns></returns>
     public IEnumerator DisplayTotalValues(int attackIndex, int _totalAttack, int _totalDef)
     {
-
-        _player1TotalDisplay.gameObject.SetActive(true);
-        _player2TotalDisplay.gameObject.SetActive(true);
-        TallyUpCardValues(attackIndex);
-
-
-        yield return new WaitForSeconds(2f);
-
-        _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
-        _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
-
-
-        int _maxTallyP1;
-        int _maxTallyP2;
-        int _currentTallyP1;
-        int _currentTallyP2;
-
         //display the proper attack and defend symbols
         if (attackIndex == 1)
         {
@@ -233,14 +216,19 @@ public class UIController : MonoBehaviour
             _player2TotalDisplay.sprite = _attackIcon;
         }
 
+        _player1TotalDisplay.gameObject.SetActive(true);
+        _player2TotalDisplay.gameObject.SetActive(true);
+        TallyUpCardValues(attackIndex);
 
+        yield return new WaitForSeconds(2f);
 
+        _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+        _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
 
         yield return new WaitForSeconds(1f);
 
         _player1TotalDisplay.gameObject.SetActive(false);
         _player2TotalDisplay.gameObject.SetActive(false);
-
     }
 
     /// <summary>
