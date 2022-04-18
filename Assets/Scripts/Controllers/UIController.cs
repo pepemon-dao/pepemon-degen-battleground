@@ -119,7 +119,7 @@ public class UIController : MonoBehaviour
             if (_whichPlayer == _player1) go.transform.SetParent(_index1CardContainer);
             else go.transform.SetParent(_index2CardContainer);
             go.transform.localPosition = Vector3.zero;
-            card.GetComponent<CardController>().PouplateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
+            card.GetComponent<CardController>().PopulateCard(_whichPlayer.CurrentHand.GetCardsInHand[i]);
 
             card.GetComponent<CardController>().SetTargetTransform(go.transform);
             if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
