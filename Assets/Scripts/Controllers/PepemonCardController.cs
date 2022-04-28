@@ -59,4 +59,9 @@ public class PepemonCardController : MonoBehaviour
         _cardContentBackdrop.sprite = pepemonData.CardContentBackdrop;
         _cardContent.sprite = pepemonData.CardContent;
     }
+
+    public void UpdateCard(Player player)
+    {
+        _hpText.text = player.CurrentHP.ToString();
+    }
 }
