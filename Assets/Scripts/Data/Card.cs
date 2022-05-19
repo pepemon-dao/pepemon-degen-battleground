@@ -10,14 +10,20 @@ public class Card : ScriptableObject
     [HorizontalGroup("General/Left", 55)]
     public Sprite Icon;
 
-    // breakup card into loadable gfx (sprite:mid : sprite:icon) ect
-    // basically something better than just "icon"
-
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public int ID;
 
     [BoxGroup("General")]
     [VerticalGroup("General/Left/Right")]
     [LabelWidth(80)]
     public string DisplayName;
+
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public string CardDescription;
 
     [BoxGroup("General")]
     [VerticalGroup("General/Left/Right")]
@@ -28,6 +34,11 @@ public class Card : ScriptableObject
     [VerticalGroup("General/Left/Right")]
     [LabelWidth(80)]
     public PlayCardType Type;
+
+    [BoxGroup("General")]
+    [VerticalGroup("General/Left/Right")]
+    [LabelWidth(80)]
+    public Sprite CardEffectSprite;
 
     [TitleGroup("Properties")]
     [ShowIf("@this.Type == PlayCardType.Offense || this.Type == PlayCardType.SpecialOffense")] public int AttackPower;

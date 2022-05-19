@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: FoundAnOpening
+  m_EditorClassIdentifier: 
+  UID: b8e79265-fd2d-4f63-ad56-67fc386ec5ff
+  Icon: {fileID: 0}
+  ID: 19
+  DisplayName: Found An Opening
+  CardDescription: Pepemon adds +1 to its Attack Power until end of turn. If the
+    player of the defending Pepemon does not lay any Defense cards, Pepemon adds
+    an additional +7 to its Attack Power until end of turn.
+  Rarity: 1
+  Type: 0
+  CardEffectSprite: {fileID: 21300000, guid: 21b3e2254ddcf2548872f1b6dd0afafe, type: 3}
+  AttackPower: 8
+  DefensePower: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

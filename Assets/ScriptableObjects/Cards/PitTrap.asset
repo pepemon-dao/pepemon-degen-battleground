@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: PitTrap
+  m_EditorClassIdentifier: 
+  UID: 6bbbab99-de3e-41ab-9b63-9c140c89b7d0
+  Icon: {fileID: 0}
+  ID: 44
+  DisplayName: Pit Trap
+  CardDescription: Target attacking Pepemon gets -2 Defense Power for this turn and
+    the next 3 turns. (Unstackable 3, Unresettable 3) Effects do not stack with another
+    card of the same name.
+  Rarity: 1
+  Type: 3
+  CardEffectSprite: {fileID: 21300000, guid: 29caaf971c121244d91ecf5784c836a7, type: 3}
+  AttackPower: 0
+  DefensePower: 0
+  Unstackable: 1
+  Unresettable: 1
+  UnstackableAmount: 3
+  UnresettableAmount: 3

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
+  m_Name: Zaptry
+  m_EditorClassIdentifier: 
+  UID: 9a77f825-f403-4b84-8b89-2ee7ca22d615
+  DisplayIcon: {fileID: 0}
+  ID: 
+  DisplayName: Zaptry
+  CardContentBackdrop: {fileID: 21300000, guid: c9bbfa23bee9235488520cbd5e43f94a, type: 3}
+  CardContent: {fileID: 21300000, guid: f28798e41df46134695100edb2358ff3, type: 3}
+  Level: 1
+  Type: 2
+  Weakness: 5
+  Resistence: 3
+  Rarity: 0
+  HealthPoints: 400
+  Speed: 10
+  Intelligence: 10
+  Attack: 10
+  Defense: 10
+  SAttack: 10
+  SDeffense: 10

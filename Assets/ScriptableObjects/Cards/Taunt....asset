@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: Taunt...
+  m_EditorClassIdentifier: 
+  UID: f327f22c-48f6-4820-8a9f-00fb665f6461
+  Icon: {fileID: 0}
+  ID: 38
+  DisplayName: Taunt...
+  CardDescription: Target defending Pepemon gets -3 to its Defense Power for this
+    turn and in the next 2 turns. (Unstackable 2, Unresettable 2). Effects do not
+    stack or reset with another card of the same name.
+  Rarity: 2
+  Type: 1
+  CardEffectSprite: {fileID: 21300000, guid: 20908c6287a4d764c9fa0771911fe834, type: 3}
+  AttackPower: 0
+  DefensePower: 0
+  Unstackable: 1
+  Unresettable: 1
+  UnstackableAmount: 2
+  UnresettableAmount: 2

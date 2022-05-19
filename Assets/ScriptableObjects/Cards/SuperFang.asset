@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: SuperFang
+  m_EditorClassIdentifier: 
+  UID: 33444df9-42df-4052-b637-32d317c59edb
+  Icon: {fileID: 0}
+  ID: 20
+  DisplayName: Super Fang
+  CardDescription: Pepemon adds +7 to its Attack Power until end of turn for each
+    +2 offense card used by its player during this turn
+  Rarity: 1
+  Type: 1
+  CardEffectSprite: {fileID: 21300000, guid: 6cc6cd9aeea06ce48b3c50ff8107842c, type: 3}
+  AttackPower: 7
+  DefensePower: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

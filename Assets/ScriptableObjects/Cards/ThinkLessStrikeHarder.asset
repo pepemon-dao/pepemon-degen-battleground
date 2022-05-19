@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: ThinkLessStrikeHarder
+  m_EditorClassIdentifier: 
+  UID: bf1e9e3a-fdce-4996-8170-452eae4ba743
+  Icon: {fileID: 0}
+  ID: 24
+  DisplayName: Think Less Strike Harder
+  CardDescription: "If the Pepemon\u2019s Intelligence is 5 or less, then until end
+    of turn, the Pepemon receives an additional Attack Power equal to the total of
+    all the offense cards used by its player this turn (excluding offense card bonuses)."
+  Rarity: 2
+  Type: 3
+  CardEffectSprite: {fileID: 21300000, guid: 799aa18debc0f7a44b9f1ac3e947f5a2, type: 3}
+  AttackPower: 0
+  DefensePower: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

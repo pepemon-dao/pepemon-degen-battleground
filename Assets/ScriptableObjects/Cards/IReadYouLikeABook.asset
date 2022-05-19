@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: IReadYouLikeABook
+  m_EditorClassIdentifier: 
+  UID: fec9ca8b-6c5f-40f1-879b-c29a1fb46594
+  Icon: {fileID: 0}
+  ID: 34
+  DisplayName: I Read You Like A Book
+  CardDescription: Pepemon adds +2 to its Defense Power until end of turn. Pepemon
+    adds an additional +10 to its Defense Power until end of turn, if the attacking
+    Pepemon used its strong attack this turn.
+  Rarity: 1
+  Type: 3
+  CardEffectSprite: {fileID: 21300000, guid: 86f3adde04f43a041ac6d8aefe951833, type: 3}
+  AttackPower: 0
+  DefensePower: 12
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

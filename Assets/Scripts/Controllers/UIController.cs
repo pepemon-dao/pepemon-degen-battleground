@@ -11,18 +11,13 @@ public class UIController : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameController _gameController;
     [TitleGroup("Component References"), SerializeField] Sprite _defendIcon;
     [TitleGroup("Component References"), SerializeField] Sprite _attackIcon;
-
+    [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player1Health;
+    [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player2Health;
 
     [BoxGroup("Sidebar")]
     [SerializeField, BoxGroup("Sidebar")] TextMeshProUGUI _roundCount;
-    [SerializeField, BoxGroup("Sidebar/ID1")] TextMeshProUGUI _index1Name;
-    [SerializeField, BoxGroup("Sidebar/ID2")] TextMeshProUGUI _index2Name;
     [SerializeField, BoxGroup("Sidebar/ID1")] TextMeshProUGUI _index1DeckCount;
     [SerializeField, BoxGroup("Sidebar/ID2")] TextMeshProUGUI _index2DeckCount;
-    [SerializeField, BoxGroup("Sidebar/ID1")] TextMeshProUGUI _index1HP;
-    [SerializeField, BoxGroup("Sidebar/ID2")] TextMeshProUGUI _index2HP;
-    [SerializeField, BoxGroup("Sidebar/ID1")] Image _index1Icon;
-    [SerializeField, BoxGroup("Sidebar/ID2")] Image _index2Icon;
 
     [SerializeField, BoxGroup("Board")] Transform _index1CardContainer;
     [SerializeField, BoxGroup("Board")] Transform _index2CardContainer;
@@ -46,23 +41,15 @@ public class UIController : MonoBehaviour
     Player _player1;
     Player _player2;
 
-
     public void InitialiseGame(Player player1, Player player2)
     {
         _player1 = player1;
         _player2 = player2;
 
-        _index1Name.text = player1.PlayerPepemon.DisplayName;
-        _index2Name.text = player2.PlayerPepemon.DisplayName;
+        UpdateUI();
 
         _index1DeckCount.text = player1.PlayerDeck.GetDeck().Count + "cards";
         _index2DeckCount.text = player2.PlayerDeck.GetDeck().Count + "cards";
-
-        _index1HP.text = player1.CurrentHP + "hp";
-        _index2HP.text = player2.CurrentHP + "hp";
-
-        _index1Icon.sprite = player1.PlayerPepemon.DisplayIcon;
-        _index2Icon.sprite = player2.PlayerPepemon.DisplayIcon;
     }
 
     public void NewRoundDisplay()
@@ -282,11 +269,12 @@ public class UIController : MonoBehaviour
 
     public void UpdateUI()
     {
-        _index1HP.text = _player1.CurrentHP + "hp";
-        _index2HP.text = _player2.CurrentHP + "hp";
+        _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + " Cards";
+        _index2DeckCount.text = _player2.CurrentDeck.GetDeck().Count + " Cards";
 
-        _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + "cards";
-        _index2DeckCount.text = _player2.CurrentDeck.GetDeck().Count + "cards";
+        _player1Health.text = "Health " + _player1.CurrentHP.ToString();
+        _player2Health.text = "Health " + _player2.CurrentHP.ToString();
+
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 

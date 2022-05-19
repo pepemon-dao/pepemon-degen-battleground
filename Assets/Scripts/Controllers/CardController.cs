@@ -2,19 +2,35 @@ using UnityEngine;
 using TMPro;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
+using DG.Tweening;
 
 // Handles the instance of a card within a session
 public class CardController : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI _cardDisplayName;
+    [BoxGroup("Card Components"), SerializeField] private TextMeshProUGUI _cardDisplayName;
+    [BoxGroup("Card Components"), SerializeField] private TextMeshProUGUI _cardDescription;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardFrameImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardBackgroundImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
+    [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
 
-    public Image colorCircle;
-    public Image cardImage;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialDefenceCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _attackCardFrame;
+    [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialAttackCardFrame;
 
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _commonGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _rareGem;
+    [BoxGroup("Card Gems"), SerializeField] private Sprite _epicGem;
 
-    public Sprite defenseCard;
-    public Sprite attkCard;
-
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _atkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _defBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _intBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _rAtkBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _rDefBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _spclBG;
+    [BoxGroup("Card Backgrounds"), SerializeField] private Sprite _speedBG;
 
     [ReadOnly] public Card HostedCard;
 
@@ -25,31 +41,37 @@ public class CardController : MonoBehaviour
     {
         HostedCard = card;
         _cardDisplayName.text = HostedCard.DisplayName;
+        _cardDescription.text = HostedCard.CardDescription;
 
         switch (card.Type)
         {
             case PlayCardType.Defense:
-                cardImage.sprite = defenseCard;
+                _cardFrameImage.sprite = _defenceCardFrame;
                 break;
             case PlayCardType.SpecialDefense:
-                {
-                    cardImage.sprite = attkCard;
-                    colorCircle.color = Color.green;
-                    break;
-                }
-
+                _cardFrameImage.sprite = _specialDefenceCardFrame;
+                break;
             case PlayCardType.Offense:
-                cardImage.sprite = attkCard;
+                _cardFrameImage.sprite = _attackCardFrame;
                 break;
             case PlayCardType.SpecialOffense:
-                {
-                    cardImage.sprite = attkCard;
-                    colorCircle.color = Color.red;
-                    break;
-                }
+                _cardFrameImage.sprite = _specialAttackCardFrame;
+                break;
+        }
+
+        switch (card.Rarity)
+        {
+            case CardRarity.Common:
+                _gemImage.sprite = _commonGem;
+                break;
+            case CardRarity.Rare:
+                _gemImage.sprite = _rareGem;
+                break;
+            case CardRarity.Epic:
+                _gemImage.sprite = _epicGem;
+                break;
         }
     }
-
 
     public void SetTargetTransform(Transform _target)
     {
@@ -68,6 +90,7 @@ public class CardController : MonoBehaviour
             _startingTargetPosition = _targetPostion.position;
 
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z - 15);
+            _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
         else if (attackIndex == 2)
@@ -75,6 +98,7 @@ public class CardController : MonoBehaviour
             _startingTargetPosition = _targetPostion.position;
 
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 5f, _targetPostion.position.z - 15);
+            _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
 
@@ -85,6 +109,8 @@ public class CardController : MonoBehaviour
     /// </summary>
     public void ReturnToBaseTransform()
     {
+        _cardGlow.DOFade(0, .2f);
+
         if (_startingTargetPosition != Vector3.zero)
             _targetPostion.position = _startingTargetPosition;
 

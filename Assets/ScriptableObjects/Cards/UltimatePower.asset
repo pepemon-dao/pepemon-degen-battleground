@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: UltimatePower
+  m_EditorClassIdentifier: 
+  UID: a3cb8e2c-e4a4-4f29-aa51-ee6bf3bfc8ea
+  Icon: {fileID: 0}
+  ID: 22
+  DisplayName: Ultimate Power
+  CardDescription: Pepemon uses its Special Attack instead of its Normal Attack during
+    this turn (no bonuses for using two copies of the same card in the same turn)
+  Rarity: 1
+  Type: 1
+  CardEffectSprite: {fileID: 21300000, guid: 618a0dc45e16a6a4b94a4ecc640978fb, type: 3}
+  AttackPower: 0
+  DefensePower: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

@@ -1,15 +1,25 @@
 public enum PlayCardType
 {
     Offense,
-    Defense,
     SpecialOffense,
+    Defense,
     SpecialDefense
 }
+
 
 public enum PepemonType
 {
     Plant,
-    Fire
+    Fire,
+    Lightning,
+    Wind,
+    Poison,
+    Earth,
+    Grass,
+    Unknown,
+    Ghost,
+    Fairy,
+    Water
 }
 
 public enum CardRarity

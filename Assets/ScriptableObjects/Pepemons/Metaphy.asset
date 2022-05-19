@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de52e7b4bb85c0e4cb5cd562d11df8e9, type: 3}
+  m_Name: Metaphy
+  m_EditorClassIdentifier: 
+  UID: 58715f61-1d13-456d-85e4-29667bec8256
+  DisplayIcon: {fileID: 0}
+  ID: 20
+  DisplayName: Metaphy
+  CardContentBackdrop: {fileID: 21300000, guid: 3e6344641535fdf4baee93b8722bbf68, type: 3}
+  CardContent: {fileID: 21300000, guid: e996e435c12c8bf4cb69d1b30c2d1150, type: 3}
+  Level: 1
+  Type: 8
+  Weakness: 9
+  Resistence: 4
+  Rarity: 0
+  HealthPoints: 400
+  Speed: 10
+  Intelligence: 10
+  Attack: 10
+  Defense: 10
+  SAttack: 10
+  SDeffense: 10
