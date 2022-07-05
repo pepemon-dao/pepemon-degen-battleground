@@ -138,6 +138,8 @@ public class GameController : MonoBehaviour
                     _player1.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
+                    player1Controller.UpdateCard(_player1);
+                    player2Controller.UpdateCard(_player2);
 
                     if (_player2.CurrentHP <= 0) Winner(_player1);
                 }
@@ -154,6 +156,8 @@ public class GameController : MonoBehaviour
                     _player2.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
+                    player1Controller.UpdateCard(_player1);
+                    player2Controller.UpdateCard(_player2);
 
                     if (_player1.CurrentHP <= 0) Winner(_player2);
                 }
@@ -199,6 +203,8 @@ public class GameController : MonoBehaviour
 
             _uiController.FlipCards(1);
             _uiController.UpdateUI();
+            player1Controller.UpdateCard(_player1);
+            player2Controller.UpdateCard(_player2);
 
             if (_player2.CurrentHP <= 0) Winner(_player1);
         }
@@ -210,6 +216,8 @@ public class GameController : MonoBehaviour
 
             _uiController.FlipCards(2);
             _uiController.UpdateUI();
+            player1Controller.UpdateCard(_player1);
+            player2Controller.UpdateCard(_player2);
 
             if (_player1.CurrentHP <= 0) Winner(_player2);
         }
