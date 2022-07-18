@@ -36,15 +36,15 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Effects")] GameObject _attackTallyPS;         //the effect spawned by the card when tally the defense/attack amount
 
-
-
     Player _player1;
     Player _player2;
+    Transform _sidebar;
 
     public void InitialiseGame(Player player1, Player player2)
     {
         _player1 = player1;
         _player2 = player2;
+        _sidebar = _board.Find("Sidebar");
 
         UpdateUI();
 
@@ -68,7 +68,6 @@ public class UIController : MonoBehaviour
     // play the hand
     // Reverse role
     // next round
-
     public void DisplayHands()
     {
         // Cleanup old hand
@@ -81,8 +80,6 @@ public class UIController : MonoBehaviour
         // Display new hand
         StartCoroutine(DrawCards(_player1));
         StartCoroutine(DrawCards(_player2));
-
-
 
         // Update deck count
         _index1DeckCount.text = _player1.CurrentDeck.GetDeck().Count + "cards";
@@ -176,6 +173,9 @@ public class UIController : MonoBehaviour
                 _player1Cards[i].GetComponent<Image>().color = Color.black;
             }
         }
+
+        // Make pepemon card, stage & hp points appear in front of support cards
+        _sidebar.SetAsLastSibling();
     }
 
     /// <summary>
