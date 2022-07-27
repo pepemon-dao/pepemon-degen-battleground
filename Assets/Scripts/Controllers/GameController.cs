@@ -11,6 +11,8 @@ public class GameController : MonoBehaviour
     [TitleGroup("Opponents"), SerializeField] Player _player1;
     [TitleGroup("Opponents"), SerializeField] Player _player2;
 
+    [TitleGroup("Behaviour"), SerializeField] bool playAutomatically;
+
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] int _attackFirstIndex; // index of player who is attacking first 1 : 2
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] int _roundNumber;
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] bool _gameHasFinished;
@@ -23,6 +25,12 @@ public class GameController : MonoBehaviour
     {
         player1Controller.PopulateCard(_player1.PlayerPepemon);
         player2Controller.PopulateCard(_player2.PlayerPepemon);
+
+        if (playAutomatically)
+        {
+            InitFirstRound();
+            StartCoroutine(LoopGame());
+        }
     }
 
     [Button()]
@@ -54,10 +62,6 @@ public class GameController : MonoBehaviour
 
         // Calculate first attacker
         _attackFirstIndex = _player1.PlayerPepemon.Speed > _player2.PlayerPepemon.Speed ? 1 : 2;
-
-
-        // uncomment to automate
-        // StartCoroutine(LoopGame());
     }
 
     IEnumerator LoopGame()
@@ -65,7 +69,8 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         while (_gameHasFinished == false)
         {
-            yield return new WaitUntil(() => _isPlayingRound == false); StartCoroutine(StartRound());
+            yield return new WaitUntil(() => _isPlayingRound == false);
+            yield return StartCoroutine(StartRound());
         }
     }
 
@@ -104,7 +109,6 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         //! need to think of a better way to display the cards being played
-
 
         _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
@@ -173,6 +177,7 @@ public class GameController : MonoBehaviour
                 _attackFirstIndex = _attackFirstIndex == 1 ? 2 : 1;
             }
         }
+        Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
         _roundNumber++;
         _isPlayingRound = false;
     }

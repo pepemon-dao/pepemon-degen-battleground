@@ -1,0 +1,1 @@
+﻿https://github.com/ChainSafe/web3.unity/releases/tag/v1.2.9
