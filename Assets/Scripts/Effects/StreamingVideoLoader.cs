@@ -12,6 +12,7 @@ public class StreamingVideoLoader : MonoBehaviour
     public bool isStreamingAsset;
     public UnityEvent onVideoStarted;
     public UnityEvent onVideoFinished;
+    public float onVideoFinishedDelay = 2f;
 
     private bool finished = false;
 
@@ -46,10 +47,12 @@ public class StreamingVideoLoader : MonoBehaviour
         OnVideoFinished(source);
     }
 
-    private void OnVideoFinished(VideoPlayer _)
+    private async void OnVideoFinished(VideoPlayer _)
     {
         if (!finished)
         {
+            // Wait a bit before calling the event
+            await Task.Delay((int)(onVideoFinishedDelay * 1000));
             onVideoFinished?.Invoke();
             finished = true;
         }

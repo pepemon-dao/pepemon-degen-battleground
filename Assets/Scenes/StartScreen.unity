@@ -13435,6 +13435,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  onVideoFinishedDelay: 2
 --- !u!1 &1580972200
 GameObject:
   m_ObjectHideFlags: 0
