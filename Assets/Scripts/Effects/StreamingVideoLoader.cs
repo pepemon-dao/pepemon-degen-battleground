@@ -51,10 +51,10 @@ public class StreamingVideoLoader : MonoBehaviour
     {
         if (!finished)
         {
+            finished = true;
             // Wait a bit before calling the event
             await Task.Delay((int)(onVideoFinishedDelay * 1000));
             onVideoFinished?.Invoke();
-            finished = true;
         }
     }
 
