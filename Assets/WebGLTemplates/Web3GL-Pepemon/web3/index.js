@@ -11,25 +11,25 @@ let web3;
 async function handleRequest(req) {
   try {
     let response;
-    if (req.action == "Connect") {
+    if (req.action === "Connect") {
       response = await connectToWallet(req.args);
     }
-    else if (req.action == "CallContract") {
+    else if (req.action === "CallContract") {
       response = await callContract(req.args);
     }
-    else if (req.action == "SendContract") {
+    else if (req.action === "SendContract") {
       response = await sendContract(req.args);
     }
-    else if (req.action == "SendTransaction") {
+    else if (req.action === "SendTransaction") {
       response = await sendTransaction(req.args);
     }
-    else if (req.action == "SignMessage") {
+    else if (req.action === "SignMessage") {
       response = await signMessage(req.args);
     }
-    else if (req.action == "GetPastEvents") {
+    else if (req.action === "GetPastEvents") {
       response = await getPastEvents(req.args);
     }
-    else if (req.action == "GetLatestBlockNumber") {
+    else if (req.action === "GetLatestBlockNumber") {
       response = await getLatestBlockNumber();
     }
     else {
@@ -60,7 +60,7 @@ async function connectToWallet(args) {
   web3 = new Web3(provider);
 
   // if current network id is not equal to desired network id, then switch
-  if (parseInt(provider.chainId) != args.chainId) {
+  if (parseInt(provider.chainId) !== args.chainId) {
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
@@ -141,9 +141,9 @@ async function sendContract(args) {
 }
 
 async function getPastEvents(args) {
-  let filters = {};
+  const filters = {};
   args.filters.forEach(f => {
-    let values = filters[f.param] || [];
+    const values = filters[f.param] || [];
     values.push(f.value);
     filters[f.param] = values;
   });
@@ -184,7 +184,7 @@ async function addEthereumChain(chainId) {
   const chains = await response.json();
 
   // find chain with network id
-  const chain = chains.find((chain) => chain.chainId == chainId);
+  const chain = chains.find((chain) => chain.chainId === chainId);
 
   const params = {
     chainId: "0x" + chain.chainId.toString(16), // A 0x-prefixed hexadecimal string
