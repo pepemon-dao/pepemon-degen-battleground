@@ -10,7 +10,8 @@ on:
 
 permissions:
   contents: write
-
+  checks: write
+  
 jobs:
   build:
     name: Build the Pepemon Unity Project 
