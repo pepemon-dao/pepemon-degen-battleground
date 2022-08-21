@@ -11,7 +11,7 @@ on:
 permissions:
   contents: write
   checks: write
-  
+
 jobs:
   build:
     name: Build the Pepemon Unity Project 
@@ -62,4 +62,4 @@ jobs:
       - name: Deploy to Github Pages🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: build
+          folder: build/WebGL/WebGL
