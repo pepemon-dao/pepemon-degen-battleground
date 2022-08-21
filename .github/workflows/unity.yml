@@ -1,4 +1,4 @@
-name: .NET
+name: Build & Deploy the Pepemon Unity Project
 
 on:
   push:
@@ -8,11 +8,14 @@ on:
   workflow_dispatch:
     branches: [ '*' ]
 
+permissions:
+  contents: write
 
 jobs:
   build:
     name: Build the Pepemon Unity Project 
     runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}
 
     steps:
       # Checkout
@@ -54,3 +57,8 @@ jobs:
         with:
           name: Build
           path: build
+
+      - name: Deploy to Github Pages🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
