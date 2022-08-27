@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -28,39 +29,49 @@ public class StreamingVideoLoader : MonoBehaviour
             {
                 player.url = isStreamingAsset ? Path.Combine(Application.streamingAssetsPath, url) : url;
             }
+
+            player.Prepare();
             if (autoStart)
             {
-                onVideoStarted?.Invoke();
                 player.Play();
             }
         }
     }
 
-    private async void OnVideoStarted(VideoPlayer source)
+    private IEnumerator ForceCompleteCoroutine()
     {
-        if (!autoStart)
+        if (TryGetComponent(out VideoPlayer player))
         {
-            onVideoStarted?.Invoke();
+            yield return new WaitForSeconds((float)player.length);
         }
-        // Skip the video if it wasn't able to play in time
-        await Task.Delay((int)(source.length * 1000));
-        OnVideoFinished(source);
+        OnVideoFinished(null);
     }
 
-    private async void OnVideoFinished(VideoPlayer _)
+    private IEnumerator DelayedCompletionCoroutine()
+    {
+        yield return new WaitForSeconds(onVideoFinishedDelay);
+        onVideoFinished?.Invoke();
+    }
+
+    private void OnVideoStarted(VideoPlayer _)
+    {
+        onVideoStarted?.Invoke();
+        StartCoroutine(ForceCompleteCoroutine());
+    }
+
+    private void OnVideoFinished(VideoPlayer _)
     {
         if (!finished)
         {
             finished = true;
-            // Wait a bit before calling the event
-            await Task.Delay((int)(onVideoFinishedDelay * 1000));
-            onVideoFinished?.Invoke();
+            StartCoroutine(DelayedCompletionCoroutine());
         }
     }
 
     private void OnVideoErrored(VideoPlayer _, string errorMessage)
     {
         Debug.Log("VideoPlayer encountered an error, skipping: " + errorMessage);
+        finished = true;
         onVideoFinished?.Invoke();
     }
 }
