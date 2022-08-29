@@ -14,15 +14,20 @@ public class TimerDelay : MonoBehaviour
     {
         if (triggerOnEnable)
         {
-            StartCoroutine(Coroutine());
+            StartTimer();
         }
     }
     void Start()
     {
         if (triggerOnStart)
         {
-            StartCoroutine(Coroutine());
+            StartTimer();
         }
+    }
+
+    public void StartTimer()
+    {
+        StartCoroutine(Coroutine());
     }
 
     private IEnumerator Coroutine()
