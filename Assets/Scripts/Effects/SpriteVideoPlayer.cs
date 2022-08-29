@@ -14,7 +14,6 @@ public class SpriteVideoPlayer : MonoBehaviour
     public UnityEvent onFinish;
 
     private bool playing;
-    private int lastFrame = -1;
     private float startTimestamp = 0;
 
     void Start()
