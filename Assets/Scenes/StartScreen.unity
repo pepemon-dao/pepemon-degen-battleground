@@ -11129,6 +11129,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a611e70d270696243b4eee8c2f54f623, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultChainId: 31337
+  currentChainId: 31337
+  settings:
+    chains:
+    - chainId: 31337
+      pepemonBattleAddress: 0xfCA7f990115e4Bd6134Db9D5A32885C9c362f677
+      pepemonFactoryAddress: 0xa02e589d5a8e3c0f540ebb931fda0b91d742a79e
+      pepemonCardDeckAddress: 0xD27464A4f21C2c08888A0F37fEF82199BAFabC48
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
@@ -13906,7 +13914,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -19.999878, y: -20}
+  m_AnchoredPosition: {x: -20, y: -20}
   m_SizeDelta: {x: 420, y: 160}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1591767662
