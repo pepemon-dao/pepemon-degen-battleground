@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11134,9 +11134,9 @@ MonoBehaviour:
   settings:
     chains:
     - chainId: 31337
-      pepemonBattleAddress: 0xfCA7f990115e4Bd6134Db9D5A32885C9c362f677
+      pepemonBattleAddress: 0x3bB1490Ad830a59A7cFEe00Bf1ac65074Cc91f02
       pepemonFactoryAddress: 0xa02e589d5a8e3c0f540ebb931fda0b91d742a79e
-      pepemonCardDeckAddress: 0xD27464A4f21C2c08888A0F37fEF82199BAFabC48
+      pepemonCardDeckAddress: 0xfCA7f990115e4Bd6134Db9D5A32885C9c362f677
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
@@ -11176,6 +11176,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  _isMetamaskInitialised: 0
 --- !u!4 &1335276443
 Transform:
   m_ObjectHideFlags: 0
