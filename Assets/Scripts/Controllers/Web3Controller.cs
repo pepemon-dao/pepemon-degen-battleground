@@ -49,8 +49,11 @@ public class Web3Controller : MonoBehaviour
     public void ConnectWallet()
     {
         Debug.Log("Trying to connect");
+#if !DEBUG
         MetamaskConnectButton_Clicked();
+#else
         onWalletConnected?.Invoke();
+#endif
     }
 
     public Web3Settings.Web3ChainConfig GetChainConfig()
@@ -194,6 +197,7 @@ public class Web3Controller : MonoBehaviour
             MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
             _isMetamaskInitialised = true;
         }
+        onWalletConnected?.Invoke();
         NewAccountSelected(addressSelected);
 #endif
     }
