@@ -3,6 +3,7 @@ using Nethereum.Contracts;
 using Nethereum.Contracts.ContractHandlers;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Unity.Contracts;
+using Nethereum.Unity.Metamask;
 using Nethereum.Unity.Rpc;
 using Nethereum.Web3;
 using Newtonsoft.Json;
@@ -24,8 +25,8 @@ public class Web3Controller : MonoBehaviour
     public int defaultChainId = 31337;
 #else
     public int defaultChainId = 1;
-    public string _selectedAccountAddress = "";
 #endif
+    public string _selectedAccountAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
     public int currentChainId = 1;
     public Web3Settings settings;
     public IWeb3Provider provider; // TODO: remove
@@ -142,9 +143,10 @@ public class Web3Controller : MonoBehaviour
             DisplayError("Metamask is not available, please install it");
             return null;
         }
-#endif
+#else
         //_selectedAccountAddress = "0x12890D2cce102216644c59daE5baed380d84830c";
         return new UnityWebRequestRpcClientFactory("http://localhost:8545");
+#endif
     }
 
     /// <summary>
