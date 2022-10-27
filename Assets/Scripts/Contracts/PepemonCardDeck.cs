@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
-using Nethereum.Contracts;
-using Nethereum.Unity.Contracts;
-using Nethereum.Unity.Contracts.Standards.ERC721;
 using Nethereum.Unity.Rpc;
-using Sirenix.Utilities;
-using UnityEditor.SceneManagement;
-using UnityEngine;
 
 // The ABI definitions were generated using this command:
 // Nethereum.Generator.Console generate from-abi --abiPath C:\Projects\pepemon-battle-degen\Assets\Resources\abi\PepemonCardDeck.abi.json --outputPath C:\Projects\pepemon-battle-degen\Assets\Scripts\Contracts\ --namespace Contracts
