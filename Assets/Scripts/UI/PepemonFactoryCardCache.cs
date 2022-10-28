@@ -38,6 +38,7 @@ class PepemonFactoryCardCache
             catch (Exception e)
             {
                 Debug.Log($"Preloading finished at tokenId: {i} with error: {e.Message}");
+                break;
             }
         }
     }
