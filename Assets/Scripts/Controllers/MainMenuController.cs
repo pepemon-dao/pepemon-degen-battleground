@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
     public string creditsURL;
     public Web3Controller web3;
     public List<GameObject> menuScreens;
+
+    public GameObject _deckListLoader;
 
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
@@ -20,6 +24,7 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         ShowScreen(defaultScreenId);
+        _deckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
     }
 
     public void ConnectWallet()
@@ -57,7 +62,15 @@ public class MainMenuController : MonoBehaviour
 
     public void SelectEditDeck(int deckId)
     {
+        Debug.Log("Editing deck: " + deckId);
         selectedEditDeckId = deckId;
+        ShowScreen(5);
+    }
+
+    public void OnManageDeckClick()
+    {
+        ShowScreen(4);
+        _deckListLoader.GetComponent<DeckListLoader>().ReloadAllDecks(); 
     }
 
     public void StartGame()

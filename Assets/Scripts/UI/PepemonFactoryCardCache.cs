@@ -1,3 +1,4 @@
+using NBitcoin;
 using Nethereum.Unity;
 using System;
 using System.Collections.Generic;
@@ -84,8 +85,8 @@ class PepemonFactoryCardCache
         return cardTextures[tokenId];
     }
 
-    public static PepemonFactory.CardMetadata GetMetadata(ulong tokenId)
+    public static PepemonFactory.CardMetadata? GetMetadata(ulong tokenId)
     {
-        return cardMetadata[tokenId];
+        return cardMetadata.TryGet(tokenId);
     }
 }
