@@ -60,11 +60,6 @@ public class MainMenuController : MonoBehaviour
         selectedEditDeckId = deckId;
     }
 
-    public void MintNewDeck()
-    {
-        
-    }
-
     public void StartGame()
     {
         // Matchmaking
