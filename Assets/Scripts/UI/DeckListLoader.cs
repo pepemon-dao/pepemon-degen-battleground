@@ -62,7 +62,7 @@ public class DeckListLoader : MonoBehaviour
                 delegate { 
                     onItemSelected?.Invoke((int)deckId);
                 });
-            
+
             // this should set each deck detail in parallel
             loadingTasks.Add(deckInstance.GetComponent<DeckController>().LoadDeckInfo(deckId));
         });

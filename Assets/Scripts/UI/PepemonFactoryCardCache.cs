@@ -29,21 +29,24 @@ class PepemonFactoryCardCache
     {
         // Iterate through card IDs and store the card metadata
         // No way to get the maximum token id, so iteration is
-        // complete when an error is thrown.
-        for (ulong i = 0; i < MAX_TOKEN_ID; i++)
+        // complete when we cannot get the data.
+        for (ulong i = 1; i < MAX_TOKEN_ID; i++)
         {
-            try
+            Debug.Log($"Loading metadata of tokenId {i}");
+
+            // returning null does not explode the game in WebGL
+            var result = await PepemonFactory.GetCardMetadata(i);
+            if (result != null)
+                cardMetadata[i] = (PepemonFactory.CardMetadata)result;
+            else
             {
-                cardMetadata[i] = await PepemonFactory.GetCardMetadata(i);
-            }
-            catch (Exception e)
-            {
-                Debug.Log($"Preloading finished at tokenId: {i} with error: {e.Message}");
+                Debug.Log($"Preloading finished at tokenId: {i}");
                 break;
             }
         }
     }
 
+    // TODO: fix this, its always returning HTTP 404
     private async Task PreloadAllImages()
     {
         // Start a task for image to download
@@ -62,7 +65,8 @@ class PepemonFactoryCardCache
                     case UnityWebRequest.Result.DataProcessingError:
                     case UnityWebRequest.Result.ConnectionError:
                     case UnityWebRequest.Result.ProtocolError:
-                        throw new Exception("Error while downloading card image: " + webRequest.error);
+                        Debug.LogWarning("Error while downloading card image: " + webRequest.error);
+                        return new KeyValuePair<ulong, Texture2D>();
                 }
 
                 Texture2D tex = DownloadHandlerTexture.GetContent(webRequest);

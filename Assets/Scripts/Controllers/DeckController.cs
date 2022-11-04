@@ -19,8 +19,8 @@ public class DeckController : MonoBehaviour
         Debug.Log("LoadDeckInfo of deckId " + deckId);
         var battleCard = await PepemonCardDeck.GetBattleCard(deckId);
 
-        var metadata = PepemonFactoryCardCache.GetMetadata(deckId);
+        var metadata = PepemonFactoryCardCache.GetMetadata(battleCard);
 
-        _deckDisplayName.text = metadata?.name ?? "New Deck";
+        _deckDisplayName.text = metadata?.name == null ? "New Deck" : metadata?.name + " Deck";
     }
 }

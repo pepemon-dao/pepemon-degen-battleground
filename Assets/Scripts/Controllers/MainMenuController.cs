@@ -27,9 +27,10 @@ public class MainMenuController : MonoBehaviour
         _deckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
     }
 
-    public void ConnectWallet()
+    public async void ConnectWallet()
     {
         web3.ConnectWallet();
+        await new PepemonFactoryCardCache().PreloadAll();
     }
 
     public void ShowScreen(int screenId)

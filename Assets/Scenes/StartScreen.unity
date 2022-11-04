@@ -5206,8 +5206,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1335276442}
-        m_TargetAssemblyTypeName: Web3Controller, Assembly-CSharp
+      - m_Target: {fileID: 1399361485}
+        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: ConnectWallet
         m_Mode: 1
         m_Arguments:
@@ -11054,7 +11054,7 @@ MonoBehaviour:
   settings:
     chains:
     - chainId: 31337
-      pepemonBattleAddress: 0xb8C25FD8450a6a53539fF8E502fC5Db0D9907417
+      pepemonBattleAddress: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       pepemonFactoryAddress: 0xa02e589d5a8e3c0f540ebb931fda0b91d742a79e
       pepemonCardDeckAddress: 0x9c63D17213A5D6FCf1c7750Fa4F2567Ea088257C
   onWalletConnected:
