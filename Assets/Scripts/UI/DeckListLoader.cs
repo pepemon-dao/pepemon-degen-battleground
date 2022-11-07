@@ -12,6 +12,9 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _deckPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _deckList;
     [TitleGroup("Component References"), SerializeField] GameObject _loadingMessage;
+    // Whether or not display the pen + transparency fade
+    [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
+
     [ReadOnly] public UnityEvent<int> onItemSelected;
     private bool loadingInProgress = false;
 
@@ -30,7 +33,7 @@ public class DeckListLoader : MonoBehaviour
 
         _loadingMessage.SetActive(true);
         var loadingMessageLabel = _loadingMessage.GetComponent<Text>();
-        loadingMessageLabel.text = "Fetching decks...";
+        loadingMessageLabel.text = "Loading decks...";
 
         // destroy before re-creating
         foreach (var deck in _deckList.GetComponentsInChildren<Button>())
@@ -46,16 +49,17 @@ public class DeckListLoader : MonoBehaviour
             return;
         }
 
-
         // load all decks
         var decks = await PepemonCardDeck.GetPlayerDecks(FindObjectOfType<MainMenuController>().web3._selectedAccountAddress);
 
-        loadingMessageLabel.text = "Loading decks...";
         var loadingTasks = new List<Task>();
 
         decks.ForEach((deckId) => {
             var deckInstance = Instantiate(_deckPrefab);
             deckInstance.transform.SetParent(_deckList.transform, false);
+
+            // show or hide the pen overlay
+            deckInstance.GetComponent<DeckController>().DisplayDeckEditMode = _deckEditMode;
 
             // handle the click event for each instantied deck element, passing the ID of the selected deck
             deckInstance.GetComponent<Button>().onClick.AddListener(
