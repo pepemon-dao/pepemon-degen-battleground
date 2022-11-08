@@ -11099,9 +11099,9 @@ MonoBehaviour:
   settings:
     chains:
     - chainId: 31337
-      pepemonBattleAddress: 0x9E231d5f5E28038C25d690fc209268B3395c8d1D
+      pepemonBattleAddress: 0xF00E61fec370467bfeAFeC71C904A0144FFA1F91
       pepemonFactoryAddress: 0xa02e589d5a8e3c0f540ebb931fda0b91d742a79e
-      pepemonCardDeckAddress: 0xa2488910318f57d7982d3edAE66EEce54a9aC97a
+      pepemonCardDeckAddress: 0x88Eba21De90b12cF5b0Ca7b582b05b46b250B8Da
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
@@ -11973,7 +11973,8 @@ MonoBehaviour:
   - {fileID: 909697254}
   - {fileID: 1157378616}
   - {fileID: 894610811}
-  _deckListLoader: {fileID: 1248269243}
+  _editDeckListLoader: {fileID: 1248269243}
+  _selectDeckListLoader: {fileID: 453832911}
   defaultScreenId: 0
 --- !u!114 &1399361486
 MonoBehaviour:

@@ -47,7 +47,9 @@ public class DeckController : MonoBehaviour
         var battleCard = await PepemonCardDeck.GetBattleCard(deckId);
 
         var metadata = PepemonFactoryCardCache.GetMetadata(battleCard);
+        var deckName = metadata?.name == null ? "New Deck" : metadata?.name + " Deck";
+        var supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
-        _deckDisplayName.text = metadata?.name == null ? "New Deck" : metadata?.name + " Deck";
+        _deckDisplayName.text = $"{deckName} ({supportCards?.Count ?? 0})";
     }
 }

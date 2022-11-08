@@ -11,7 +11,8 @@ public class MainMenuController : MonoBehaviour
     public Web3Controller web3;
     public List<GameObject> menuScreens;
 
-    public GameObject _deckListLoader;
+    public GameObject _editDeckListLoader;
+    public GameObject _selectDeckListLoader;
 
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
@@ -24,7 +25,8 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         ShowScreen(defaultScreenId);
-        _deckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
+        _editDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
+        _selectDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectDeck);
     }
 
     public async void ConnectWallet()
@@ -71,7 +73,7 @@ public class MainMenuController : MonoBehaviour
     public void OnManageDeckClick()
     {
         ShowScreen(4);
-        _deckListLoader.GetComponent<DeckListLoader>().ReloadAllDecks(); 
+        _editDeckListLoader.GetComponent<DeckListLoader>().ReloadAllDecks();
     }
 
     public void StartGame()
