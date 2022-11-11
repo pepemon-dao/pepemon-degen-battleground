@@ -1,6 +1,7 @@
 using Contracts.PepemonFactory.abi.ContractDefinition;
 using Nethereum.Unity.Rpc;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ class PepemonFactory
     /// Gets the specified card's metadata
     /// </summary>
     /// <returns></returns>
-    public static async Task<CardMetadata> GetCardMetadata(ulong tokenId)
+    public static async Task<CardMetadata?> GetCardMetadata(ulong tokenId)
     {
         var request = new QueryUnityRequest<UriFunction, UriOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
@@ -25,14 +26,21 @@ class PepemonFactory
             new UriFunction { Id = tokenId },
             Address);
 
-        try
+        // happens when tokenId was not found
+        if (request.Result == null)
+            return null;
+
+        // example of ReturnValue1:
+        // data:application/json;base64\r\n\r\neyJwb29sIjogeyJuYW1lIjogInJvb3QiLCJwb2ludHMiOiAxfSwiZXh0ZXJuYWxfdXJsIjogImh0dHBzOi8vcGVwZW1vbi53b3JsZC8iLCJpbWFnZSI6ICJodHRwczovL2JhZnliZWljNmJkbnRoanA0djU0c3JtN3JvbHp0ZGRqaDRzb2dxajN1Y3V6eXVha3J1dHNqdjY3b21tLmlwZnMuZHdlYi5saW5rL2JmYWZueWNhcmQucG5nIiwibmFtZSI6ICJGYWZueSIsImRlc2NyaXB0aW9uIjogIkZhZm55IChCYXR0bGUgdmVyLikiLCJhdHRyaWJ1dGVzIjpbeyJ0cmFpdF90eXBlIjoiU2V0IiwidmFsdWUiOiJQZXBlbW9uIEJhdHRsZSJ9LHsidHJhaXRfdHlwZSI6IkxldmVsIiwidmFsdWUiOjF9LHsidHJhaXRfdHlwZSI6IkVsZW1lbnQiLCJ2YWx1ZSI6IkZpcmUifSx7InRyYWl0X3R5cGUiOiJXZWFrbmVzcyIsInZhbHVlIjoiV2F0ZXIifSx7InRyYWl0X3R5cGUiOiJSZXNpc3RhbmNlIiwidmFsdWUiOiJHcmFzcyJ9LHsidHJhaXRfdHlwZSI6IkhQIiwidmFsdWUiOjQwMH0seyJ0cmFpdF90eXBlIjoiU3BlZWQiLCJ2YWx1ZSI6NX0seyJ0cmFpdF90eXBlIjoiSW50ZWxsaWdlbmNlIiwidmFsdWUiOjZ9LHsidHJhaXRfdHlwZSI6IkRlZmVuc2UiLCJ2YWx1ZSI6MTJ9LHsidHJhaXRfdHlwZSI6IkF0dGFjayIsInZhbHVlIjo1fSx7InRyYWl0X3R5cGUiOiJTcGVjaWFsIEF0dGFjayIsInZhbHVlIjoyMH0seyJ0cmFpdF90eXBlIjoiU3BlY2lhbCBEZWZlbnNlIiwidmFsdWUiOjEyfV19
+
+        var regexGroups = Regex.Match(request.Result.ReturnValue1, "^data:application/json;base64[^\\w]+(.+)").Groups;
+        if (regexGroups.Count > 1)
         {
-            return JsonUtility.FromJson<CardMetadata>(request.Result.ReturnValue1);
+            var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(regexGroups[1].Value));
+            return JsonUtility.FromJson<CardMetadata>(decoded);
         }
-        catch (Exception e)
-        {
-            throw new Exception($"Unable to load metadata for card token '{tokenId}': {e.Message}", e);
-        }
+        Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);
+        return null;
     }
 
     [Serializable]
