@@ -1,6 +1,8 @@
 using Contracts.PepemonFactory.abi.ContractDefinition;
 using Nethereum.Unity.Rpc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -41,6 +43,35 @@ class PepemonFactory
         }
         Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);
         return null;
+    }
+
+    /// <summary>
+    /// Returns a list of owned cards by checking the owner of a list of card IDs.
+    /// </summary>
+    /// <param name="address">User address</param>
+    /// <param name="tokenIds">Card IDs to be checked</param>
+    /// <returns>List of IDs of owned cards</returns>
+    public static async Task<List<ulong>> GetOwnedCards(string address, List<ulong> tokenIds)
+    {
+        var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
+            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+            Address);
+
+        // using NFTsOfUserUnityRequest fails because PepemonFactory uses ERC1155 but NFTsOfUserUnityRequest is for ERC721
+        await request.Query(
+            new BalanceOfBatchFunction
+            {
+                Ids = tokenIds, 
+                Owners = Enumerable.Repeat(address, tokenIds.Count).ToList()
+            },
+            Address);
+
+        var ownedCards = new List<ulong>();
+        for (int i = 0; i < (request.Result?.ReturnValue1?.Count ?? 0); i++)
+            if (request.Result.ReturnValue1[i] > 0)
+                ownedCards.Add(tokenIds[i]);
+
+        return ownedCards;
     }
 
     [Serializable]

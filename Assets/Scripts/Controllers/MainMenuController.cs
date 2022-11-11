@@ -11,7 +11,6 @@ public class MainMenuController : MonoBehaviour
     public Web3Controller web3;
     public List<GameObject> menuScreens;
 
-    public GameObject _editDeckListLoader;
     public GameObject _selectDeckListLoader;
 
     public int defaultScreenId = 0;
@@ -20,12 +19,10 @@ public class MainMenuController : MonoBehaviour
 
     private int selectedLeagueId = 0;
     private int selectedDeckId = 0;
-    private int selectedEditDeckId = 0;
 
     private void Start()
     {
         ShowScreen(defaultScreenId);
-        _editDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
         _selectDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectDeck);
     }
 
@@ -61,19 +58,6 @@ public class MainMenuController : MonoBehaviour
     public void SelectDeck(int deckId)
     {
         selectedDeckId = deckId;
-    }
-
-    public void SelectEditDeck(int deckId)
-    {
-        Debug.Log("Editing deck: " + deckId);
-        selectedEditDeckId = deckId;
-        ShowScreen(5);
-    }
-
-    public void OnManageDeckClick()
-    {
-        ShowScreen(4);
-        _editDeckListLoader.GetComponent<DeckListLoader>().ReloadAllDecks();
     }
 
     public void StartGame()
