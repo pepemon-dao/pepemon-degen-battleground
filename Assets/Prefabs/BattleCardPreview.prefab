@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4516655868441590207}
   - component: {fileID: -5894125579458932031}
   m_Layer: 5
-  m_Name: BattleCardTemplate
+  m_Name: BattleCardPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

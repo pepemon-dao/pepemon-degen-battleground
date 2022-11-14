@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 5025722707806686193}
   - component: {fileID: 7634078530527426875}
   m_Layer: 5
-  m_Name: SupportCardTemplate
+  m_Name: SupportCardPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

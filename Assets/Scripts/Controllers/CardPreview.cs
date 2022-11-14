@@ -18,10 +18,13 @@ public class CardPreview : MonoBehaviour
     {
         var metadata = (CardMetadata)PepemonFactoryCardCache.GetMetadata(cardId);
 
-        // set card image
+        // set card image. blank if not found
         var tex = PepemonFactoryCardCache.GetImage(cardId);
+        if (tex == null)
+            Debug.LogWarning("Unable to locate texture for card " + cardId);
+
         _cardImage.GetComponent<Image>().sprite =
-            Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2());
+            Sprite.Create(tex ?? new Texture2D(8, 8), new Rect(0, 0, tex.width, tex.height), new Vector2());
 
         _text.GetComponent<Text>().text = metadata.name;
     }

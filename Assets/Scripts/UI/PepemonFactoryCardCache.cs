@@ -86,7 +86,7 @@ class PepemonFactoryCardCache
 
     public static Texture2D GetImage(ulong tokenId)
     {
-        return cardTextures[tokenId];
+        return cardTextures.TryGet(tokenId);
     }
 
     public static PepemonFactory.CardMetadata? GetMetadata(ulong tokenId)

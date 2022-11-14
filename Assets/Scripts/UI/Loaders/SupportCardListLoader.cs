@@ -37,9 +37,4 @@ public class SupportCardListLoader : MonoBehaviour
             // todo: handle selection event
         }
     }
-
-    public void ShowSupportCardsOfDeck(ulong deckId)
-    {
-
-    }
 }
