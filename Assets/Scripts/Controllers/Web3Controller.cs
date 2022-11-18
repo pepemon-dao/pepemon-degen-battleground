@@ -1,37 +1,25 @@
-﻿using Contracts.PepemonCardDeck.abi.ContractDefinition;
-using Nethereum.Contracts;
-using Nethereum.Contracts.ContractHandlers;
-using Nethereum.Hex.HexTypes;
+﻿using Nethereum.Hex.HexTypes;
 using Nethereum.Unity.Contracts;
-using Nethereum.Unity.Metamask;
 using Nethereum.Unity.Rpc;
-using Nethereum.Web3;
-using Newtonsoft.Json;
+using Nethereum.Web3.Accounts;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
-using static EVM;
 
 public class Web3Controller : MonoBehaviour
 {
     public static Web3Controller instance;
 
-#if UNITY_EDITOR
-    public int defaultChainId = 31337;
-#else
-    public int defaultChainId = 1;
-#endif
-    public string _selectedAccountAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-    public int currentChainId = 1;
     public Web3Settings settings;
-    public IWeb3Provider provider; // TODO: remove
+    public IWeb3Provider provider;
     public UnityEvent onWalletConnected;
-    public bool _isMetamaskInitialised = false;
+    public int CurrentChainId { get; private set; } = 0;
+    public string SelectedAccountAddress { get; private set; }
+
+#if !DEBUG
+    private bool _isMetamaskInitialised = false;
+#endif
 
     private void Start()
     {
@@ -51,81 +39,18 @@ public class Web3Controller : MonoBehaviour
     {
         Debug.Log("Trying to connect");
 #if !DEBUG
-        MetamaskConnectButton_Clicked();
+        OpenMetamaskConnectDialog();
 #else
+        Account debugAccount = new Account(settings.debugPrivateKey);
+        ChainChanged(string.Format("0x{0:X}", settings.debugChainId));
+        NewAccountSelected(debugAccount.Address);
         onWalletConnected?.Invoke();
 #endif
     }
 
     public Web3Settings.Web3ChainConfig GetChainConfig()
     {
-        return settings.GetChainConfig(currentChainId);
-    }
-
-    public async void RunTests()
-    {
-        Debug.Log("Creating decks");
-        await PepemonCardDeck.CreateDeck();
-
-        List<ulong> deckIds = await PepemonCardDeck.GetPlayerDecks("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266");
-        Debug.Log("Decks: " + JsonConvert.SerializeObject(deckIds));
-
-        ulong testDeck = deckIds[0];
-        List<ulong> supportCardIDs = await PepemonCardDeck.GetAllSupportCards(testDeck);
-        string supportCardsInfo = supportCardIDs.Select(i => i.ToString()).Aggregate("", (acc, i) => acc + ", " + i);
-        Debug.Log("Deck [" + testDeck + "] has cards: " + supportCardsInfo);
-
-        await PepemonCardDeck.SetApprovalState(true);
-
-        ulong addCardId = 6;
-        Debug.Log("Adding card " + addCardId);
-        string tx = await PepemonCardDeck.AddSupportCards(testDeck, new SupportCardRequest { Amount = 1, SupportCardId = addCardId });
-        Debug.Log("Done? : " + tx);
-
-        supportCardIDs = await PepemonCardDeck.GetAllSupportCards(testDeck);
-        supportCardsInfo = supportCardIDs.Select(i => i.ToString()).Aggregate("", (acc, i) => acc + ", " + i);
-        Debug.Log("Deck [" + testDeck + "] has cards: " + supportCardsInfo);
-
-        Debug.Log("Removing card " + addCardId);
-        tx = await PepemonCardDeck.RemoveSupportCards(testDeck, new SupportCardRequest { Amount = 1, SupportCardId = addCardId });
-        Debug.Log("Done? : " + tx);
-
-        supportCardIDs = await PepemonCardDeck.GetAllSupportCards(testDeck);
-        supportCardsInfo = supportCardIDs.Select(i => i.ToString()).Aggregate("", (acc, i) => acc + ", " + i);
-        Debug.Log("Deck [" + testDeck + "] has cards: " + supportCardsInfo);
-
-
-
-        Debug.Log("Getting battle card ID:");
-
-        ulong currentBattleCardId = await PepemonCardDeck.GetBattleCard(testDeck);
-        Debug.Log("Deck [" + testDeck + "] has battle card: " + currentBattleCardId);
-
-        Debug.Log("Setting battle card");
-        tx = await PepemonCardDeck.SetBattleCard(testDeck, addCardId);
-        Debug.Log("Done? : " + tx);
-
-        currentBattleCardId = await PepemonCardDeck.GetBattleCard(testDeck);
-        Debug.Log("Deck [" + testDeck + "] has battle card: " + currentBattleCardId);
-
-        Debug.Log("Removing battle card");
-        tx = await PepemonCardDeck.RemoveBattleCard(testDeck);
-        Debug.Log("Done? : " + tx);
-
-
-        currentBattleCardId = await PepemonCardDeck.GetBattleCard(testDeck);
-        Debug.Log("Deck [" + testDeck + "] has battle card: " + currentBattleCardId);
-
-        Debug.Log("Setting battle card");
-        tx = await PepemonCardDeck.SetBattleCard(testDeck, addCardId);
-        Debug.Log("Done? : " + tx);
-
-        currentBattleCardId = await PepemonCardDeck.GetBattleCard(testDeck);
-        Debug.Log("Deck [" + testDeck + "] has battle card: " + currentBattleCardId);
-
-        Debug.Log("Removing battle card");
-        tx = await PepemonCardDeck.RemoveBattleCard(testDeck);
-        Debug.Log("Done? : " + tx);
+        return settings.GetChainConfig(CurrentChainId);
     }
 
     /// <summary>
@@ -144,8 +69,7 @@ public class Web3Controller : MonoBehaviour
             return null;
         }
 #else
-        //_selectedAccountAddress = "0x12890D2cce102216644c59daE5baed380d84830c";
-        return new UnityWebRequestRpcClientFactory("http://localhost:8545");
+        return new UnityWebRequestRpcClientFactory(settings.debugRpcUrl);
 #endif
     }
 
@@ -165,18 +89,16 @@ public class Web3Controller : MonoBehaviour
             return null;
         }
 #else
-        //_selectedAccountAddress = "0x12890D2cce102216644c59daE5baed380d84830c";
         return new TransactionSignedUnityRequest(
-            url: "http://localhost:8545",
-            privateKey: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
-            chainId: 31337);
+            url: settings.debugRpcUrl,
+            privateKey: settings.debugPrivateKey,
+            chainId: settings.debugChainId);
 #endif
     }
 
     // connect wallet in WebGL
-    private void MetamaskConnectButton_Clicked()
+    private void OpenMetamaskConnectDialog()
     {
-        //_lblError.visible = false;
 #if !DEBUG
         if (MetamaskInterop.IsMetamaskAvailable())
         {
@@ -207,20 +129,19 @@ public class Web3Controller : MonoBehaviour
     // callback from js
     public void NewAccountSelected(string accountAddress)
     {
-        //_selectedAccountAddress = accountAddress;
-        //_lblAccountSelected.text = accountAddress;
-        //_lblAccountSelected.visible = true;
+        SelectedAccountAddress = accountAddress;
+        Debug.Log($"Account changed to {SelectedAccountAddress}");
     }
 
     // callback from js
     public void ChainChanged(string chainId)
     {
-        print(chainId);
-        currentChainId = (int) new HexBigInteger(chainId).Value;
+        CurrentChainId = (int)new HexBigInteger(chainId).Value;
+        Debug.Log($"Changed chain to {CurrentChainId} (hex: {chainId})");
         try
         {
             //simple workaround to show suported configured chains
-            print(currentChainId.ToString());
+            print(CurrentChainId.ToString());
             StartCoroutine(GetBlockNumber());
         }
         catch (Exception ex)
@@ -238,8 +159,6 @@ public class Web3Controller : MonoBehaviour
 
     public void DisplayError(string errorMessage)
     {
-        //_lblError.text = errorMessage;
-        //_lblError.visible = true;
         Debug.LogError(errorMessage);
     }
 }

@@ -1,6 +1,6 @@
 using NBitcoin;
 using Nethereum.Unity;
-using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,74 +13,62 @@ using UnityEngine.Networking;
 /// </summary>
 class PepemonFactoryCardCache
 {
-    // TODO: Implement local cache using Application.persistentDataPath
-
-    private const ulong MAX_TOKEN_ID = ulong.MaxValue;
-    private static Dictionary<ulong, Texture2D> cardTextures = new Dictionary<ulong, Texture2D>();
-    private static Dictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new Dictionary<ulong, PepemonFactory.CardMetadata>();
+    private static ConcurrentDictionary<ulong, Texture2D> cardTextures = new ConcurrentDictionary<ulong, Texture2D>();
+    private static ConcurrentDictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new ConcurrentDictionary<ulong, PepemonFactory.CardMetadata>();
     public static List<ulong> CardsIds { get => cardMetadata.Keys.ToList(); }
 
     public async Task PreloadAll()
     {
-        await PreloadAllMetadata();
-        await PreloadAllImages();
-    }
+        Debug.Log("Discovering max token ID...");
+        ulong maxTokenId = await PepemonFactory.FindMaxTokenId();
 
-    private async Task PreloadAllMetadata()
-    {
-        // Iterate through card IDs and store the card metadata
-        // No way to get the maximum token id, so iteration is
-        // complete when we cannot get the data.
-        for (ulong i = 1; i < MAX_TOKEN_ID; i++)
+        Debug.Log($"Loading cards 1 to {maxTokenId}...");
+        List<Task> loadTasks = new List<Task>();
+        for (ulong i = 1; i <= maxTokenId; i++)
         {
-            Debug.Log($"Loading metadata of tokenId {i}");
-
-            // returning null does not explode the game in WebGL
-            var result = await PepemonFactory.GetCardMetadata(i);
-            if (result != null)
-                cardMetadata[i] = (PepemonFactory.CardMetadata)result;
-            else
-            {
-                Debug.Log($"Preloading finished at tokenId: {i}");
-                break;
-            }
+            ulong tokenId = i;
+            loadTasks.Add(PreloadToken(tokenId));
         }
+        await Task.WhenAll(loadTasks);
     }
 
-    private async Task PreloadAllImages()
+    private async Task PreloadToken(ulong tokenId)
     {
-        // Start a task for image to download
-        // These will all run in parallel
-        List<Task<KeyValuePair<ulong, Texture2D>>> textureDownloadTasks = cardMetadata.Select(async entry =>
+        await PreloadTokenMetadata(tokenId);
+        await PreloadTokenImage(tokenId);
+    }
+
+    private async Task PreloadTokenMetadata(ulong tokenId)
+    {
+        PepemonFactory.CardMetadata? metadata = await PepemonFactory.GetCardMetadata(tokenId);
+        if (metadata != null)
         {
-            string url = IpfsUrlService.ResolveIpfsUrlGateway(entry.Value.image);
-            using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+            cardMetadata[tokenId] = (PepemonFactory.CardMetadata)metadata;
+        }
+        Debug.Log($"Loaded token metadata for id: {tokenId}");
+    }
+
+    private async Task PreloadTokenImage(ulong tokenId)
+    {
+        PepemonFactory.CardMetadata metadata = cardMetadata[tokenId];
+        string url = IpfsUrlService.ResolveIpfsUrlGateway(metadata.image);
+        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+        {
+
+            DownloadHandler handle = webRequest.downloadHandler;
+            await webRequest.SendWebRequest();
+
+            switch (webRequest.result)
             {
-
-                DownloadHandler handle = webRequest.downloadHandler;
-                await webRequest.SendWebRequest();
-
-                switch (webRequest.result)
-                {
-                    case UnityWebRequest.Result.DataProcessingError:
-                    case UnityWebRequest.Result.ConnectionError:
-                    case UnityWebRequest.Result.ProtocolError:
-                        Debug.LogWarning($"Error while downloading card image {entry.Key}: {webRequest.error}");
-                        return new KeyValuePair<ulong, Texture2D>(entry.Key, new Texture2D(8, 8));
-                }
-                Debug.Log("Download of card image successful. Card id: " + entry.Key);
-                Texture2D tex = DownloadHandlerTexture.GetContent(webRequest);
-                return new KeyValuePair<ulong, Texture2D>(entry.Key, tex);
+                case UnityWebRequest.Result.DataProcessingError:
+                case UnityWebRequest.Result.ConnectionError:
+                case UnityWebRequest.Result.ProtocolError:
+                    Debug.LogWarning($"Error while downloading card image {tokenId}: {webRequest.error}");
+                    cardTextures[tokenId] = new Texture2D(8, 8);
+                    return;
             }
-        }).ToList();
-
-        // Wait for all downloads
-        await Task.WhenAll(textureDownloadTasks);
-
-        // Add the textures to the cache
-        foreach (var task in textureDownloadTasks)
-        {
-            cardTextures[task.Result.Key] = task.Result.Value;
+            Debug.Log("Download of card image successful. Card id: " + tokenId);
+            cardTextures[tokenId] = DownloadHandlerTexture.GetContent(webRequest);
         }
     }
 

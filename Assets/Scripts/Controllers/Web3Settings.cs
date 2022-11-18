@@ -1,9 +1,12 @@
 ﻿using System;
 
 [Serializable]
-public struct Web3Settings
+public class Web3Settings
 {
     public Web3ChainConfig[] chains;
+    public int debugChainId = 31337;
+    public string debugRpcUrl = "http://localhost:8545";
+    public string debugPrivateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 
     [Serializable]
     public struct Web3ChainConfig

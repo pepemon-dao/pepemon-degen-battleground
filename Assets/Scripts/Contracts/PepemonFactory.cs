@@ -1,8 +1,14 @@
+using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Contracts.PepemonFactory.abi.ContractDefinition;
+using Nethereum.ABI.Model;
+using Nethereum.Contracts;
+using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Unity.Rpc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -22,7 +28,7 @@ class PepemonFactory
     {
         var request = new QueryUnityRequest<UriFunction, UriOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
         await request.Query(
             new UriFunction { Id = tokenId },
@@ -55,13 +61,13 @@ class PepemonFactory
     {
         var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
         // using NFTsOfUserUnityRequest fails because PepemonFactory uses ERC1155 but NFTsOfUserUnityRequest is for ERC721
         await request.Query(
             new BalanceOfBatchFunction
             {
-                Ids = tokenIds, 
+                Ids = tokenIds,
                 Owners = Enumerable.Repeat(address, tokenIds.Count).ToList()
             },
             Address);
@@ -72,6 +78,41 @@ class PepemonFactory
                 ownedCards.Add(tokenIds[i]);
 
         return ownedCards;
+    }
+
+    public static async Task<BigInteger> GetTokenSupply(ulong tokenId)
+    {
+        var request = new QueryUnityRequest<TotalSupplyFunction, TotalSupplyOutputDTO>(
+            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        await request.Query(new TotalSupplyFunction { Id = tokenId }, Address);
+        return request.Result.ReturnValue1;
+    }
+
+    public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 40)
+    {
+        ulong batch = 0;
+        ulong maxTokenId = 0;
+        ulong batchTokenMaxId = 0;
+
+        do
+        {
+            batchTokenMaxId = 0;
+            List<Task<ulong>> tasks = new List<Task<ulong>>();
+            for (ulong i = 0; i < parallelBatchSize; i++)
+            {
+                ulong tokenId = batch * parallelBatchSize + i;
+                tasks.Add(GetTokenSupply(tokenId).ContinueWith(supply => supply.Result > 0 ? tokenId : 0));
+            }
+            await Task.WhenAll(tasks);
+
+            batchTokenMaxId = tasks.Select(t => t.Result).Max();
+            maxTokenId = Math.Max(maxTokenId, batchTokenMaxId);
+            batch++;
+        } while (batchTokenMaxId > 0);
+
+        return maxTokenId;
     }
 
     [Serializable]

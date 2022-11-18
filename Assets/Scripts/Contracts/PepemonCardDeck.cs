@@ -20,7 +20,7 @@ public class PepemonCardDeck
     {
         var request = new QueryUnityRequest<GetBattleCardInDeckFunction, GetBattleCardInDeckOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
         await request.Query(
             new GetBattleCardInDeckFunction { DeckId = deckId },
@@ -33,7 +33,7 @@ public class PepemonCardDeck
     {
         var request = new QueryUnityRequest<GetAllSupportCardsInDeckFunction, GetAllSupportCardsInDeckOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
         await request.Query(
             new GetAllSupportCardsInDeckFunction { DeckId = deckId },
@@ -46,7 +46,7 @@ public class PepemonCardDeck
     {
         var getDeckCountRequest = new QueryUnityRequest<GetDeckCountFunction, GetDeckCountOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
         await getDeckCountRequest.Query(
             new GetDeckCountFunction { Player = address },
@@ -59,7 +59,7 @@ public class PepemonCardDeck
         {
             var playerToDecksRequest = new QueryUnityRequest<PlayerToDecksFunction, PlayerToDecksOutputDTO>(
                 Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-                Address);
+                Web3Controller.instance.SelectedAccountAddress);
 
             await playerToDecksRequest.Query(
                 new PlayerToDecksFunction()
@@ -79,7 +79,7 @@ public class PepemonCardDeck
     {
         var request = new QueryUnityRequest<MaxSupportCardsFunction, MaxSupportCardsOutputDTO>(
            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-           Address);
+           Web3Controller.instance.SelectedAccountAddress);
 
         // TODO: check request.Exception
         await request.Query(new MaxSupportCardsFunction(), Address);

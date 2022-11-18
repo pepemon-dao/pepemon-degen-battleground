@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1207,7 +1207,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 99.635, y: -377}
+  m_AnchoredPosition: {x: 99.63501, y: -377}
   m_SizeDelta: {x: 159.27, y: 238}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &235120619
@@ -4968,7 +4968,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 99.635, y: -635}
+  m_AnchoredPosition: {x: 99.63501, y: -635}
   m_SizeDelta: {x: 159.27, y: 238}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &830404166
@@ -5555,7 +5555,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 99.635, y: -377}
+  m_AnchoredPosition: {x: 99.63501, y: -377}
   m_SizeDelta: {x: 159.27, y: 238}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &904438528
@@ -10492,15 +10492,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a611e70d270696243b4eee8c2f54f623, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultChainId: 31337
-  _selectedAccountAddress: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-  currentChainId: 31337
   settings:
+    defaultChainId: 1
     chains:
     - chainId: 31337
       pepemonBattleAddress: 0xD3735cbb1D8D3c8E67e3d85CF3d5689455176ff3
       pepemonFactoryAddress: 0xa02e589d5a8e3c0f540ebb931fda0b91d742a79e
       pepemonCardDeckAddress: 0x17a405D74A3EA82123DB52590a8aE729827Bb3d8
+    debugChainId: 31337
+    debugRpcUrl: http://localhost:8545
+    debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
@@ -10540,7 +10541,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-  _isMetamaskInitialised: 0
 --- !u!4 &1335276443
 Transform:
   m_ObjectHideFlags: 0
@@ -16681,7 +16681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4516655868441590206, guid: fc741afba7f101345ad21e78c1b2b235, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 99.635
+      value: 99.63501
       objectReference: {fileID: 0}
     - target: {fileID: 4516655868441590206, guid: fc741afba7f101345ad21e78c1b2b235, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -16778,7 +16778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5025722707806686206, guid: dd4a9f714c0317249b44c42f0ff95578, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 99.635
+      value: 99.63501
       objectReference: {fileID: 0}
     - target: {fileID: 5025722707806686206, guid: dd4a9f714c0317249b44c42f0ff95578, type: 3}
       propertyPath: m_AnchoredPosition.y

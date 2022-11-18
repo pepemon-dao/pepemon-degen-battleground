@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
+[Obsolete]
 public interface IWeb3Provider
 {
     public Task<string> ConnectToWallet(Web3ConnectArgs args);

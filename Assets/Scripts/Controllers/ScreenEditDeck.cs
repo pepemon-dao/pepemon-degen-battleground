@@ -14,7 +14,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     public async void LoadAllCards()
     {
-        var account = FindObjectOfType<MainMenuController>().web3._selectedAccountAddress;
+        var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
         var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);
         _battleCardsListLoader.GetComponent<BattleCardListLoader>().ReloadAllBattleCards(ownedCardIds);
         _supportCardsListLoader.GetComponent<SupportCardListLoader>().ReloadAllSupportCards(ownedCardIds);
