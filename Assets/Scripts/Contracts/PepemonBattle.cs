@@ -1,10 +1,7 @@
 ﻿using Contracts.PepemonBattle.abi.ContractDefinition;
-using Nethereum.Hex.HexTypes;
 using Nethereum.Unity.Rpc;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -20,13 +17,13 @@ class PepemonBattle
     {
         var request = new QueryUnityRequest<BattleIdRNGSeedFunction, BattleIdRNGSeedOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Address);
+            Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(
+        var response = await request.QueryAsync(
             new BattleIdRNGSeedFunction { BattleId = battleId },
             Address);
 
-        return (ulong) request.Result.Seed;
+        return (ulong) response.Seed;
     }
 
     public static async Task<BattleInfo> WaitForNextBattleCreatedEvent(string address, int startingBlock, CancellationToken cancelToken)
