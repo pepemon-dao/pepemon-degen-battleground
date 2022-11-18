@@ -87,7 +87,7 @@ class PepemonFactory
             Web3Controller.instance.SelectedAccountAddress);
 
         await request.Query(new TotalSupplyFunction { Id = tokenId }, Address);
-        return request.Result.ReturnValue1;
+        return request.Result?.ReturnValue1 ?? 0;
     }
 
     public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 40)
