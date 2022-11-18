@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using Nethereum.Unity.Metamask;
 
 public class Web3Controller : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class Web3Controller : MonoBehaviour
 #if !DEBUG
         if (MetamaskInterop.IsMetamaskAvailable()) 
         {
-            return new MetamaskRequestRpcClientFactory(_selectedAccountAddress, null, 1000);
+            return new MetamaskRequestRpcClientFactory(SelectedAccountAddress, null, 1000);
         }
         else
         {
@@ -81,7 +82,7 @@ public class Web3Controller : MonoBehaviour
 #if !DEBUG
         if (MetamaskInterop.IsMetamaskAvailable())
         {
-            return new MetamaskTransactionUnityRequest(_selectedAccountAddress, GetUnityRpcRequestClientFactory());
+            return new MetamaskTransactionUnityRequest(SelectedAccountAddress, GetUnityRpcRequestClientFactory());
         }
         else
         {
