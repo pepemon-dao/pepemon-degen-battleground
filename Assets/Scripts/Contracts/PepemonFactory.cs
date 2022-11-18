@@ -1,10 +1,5 @@
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Contracts.PepemonFactory.abi.ContractDefinition;
-using Nethereum.ABI.Model;
-using Nethereum.Contracts;
-using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Unity.Rpc;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,18 +25,24 @@ class PepemonFactory
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(
-            new UriFunction { Id = tokenId },
-            Address);
-
-        // happens when tokenId was not found
-        if (request.Result == null)
+        UriOutputDTO response;
+        try
+        {
+            response = await request.QueryAsync(
+                        new UriFunction { Id = tokenId },
+                        Address);
+        }
+        catch (Exception e)
+        {
+            // Usually tokenId was not found
+            Debug.LogException(e);
             return null;
+        }
 
         // example of ReturnValue1:
         // data:application/json;base64\r\n\r\neyJwb29sIjogeyJuYW1lIjogInJvb3QiLCJwb2ludHMiOiAxfSwiZXh0ZXJuYWxfdXJsIjogImh0dHBzOi8vcGVwZW1vbi53b3JsZC8iLCJpbWFnZSI6ICJodHRwczovL2JhZnliZWljNmJkbnRoanA0djU0c3JtN3JvbHp0ZGRqaDRzb2dxajN1Y3V6eXVha3J1dHNqdjY3b21tLmlwZnMuZHdlYi5saW5rL2JmYWZueWNhcmQucG5nIiwibmFtZSI6ICJGYWZueSIsImRlc2NyaXB0aW9uIjogIkZhZm55IChCYXR0bGUgdmVyLikiLCJhdHRyaWJ1dGVzIjpbeyJ0cmFpdF90eXBlIjoiU2V0IiwidmFsdWUiOiJQZXBlbW9uIEJhdHRsZSJ9LHsidHJhaXRfdHlwZSI6IkxldmVsIiwidmFsdWUiOjF9LHsidHJhaXRfdHlwZSI6IkVsZW1lbnQiLCJ2YWx1ZSI6IkZpcmUifSx7InRyYWl0X3R5cGUiOiJXZWFrbmVzcyIsInZhbHVlIjoiV2F0ZXIifSx7InRyYWl0X3R5cGUiOiJSZXNpc3RhbmNlIiwidmFsdWUiOiJHcmFzcyJ9LHsidHJhaXRfdHlwZSI6IkhQIiwidmFsdWUiOjQwMH0seyJ0cmFpdF90eXBlIjoiU3BlZWQiLCJ2YWx1ZSI6NX0seyJ0cmFpdF90eXBlIjoiSW50ZWxsaWdlbmNlIiwidmFsdWUiOjZ9LHsidHJhaXRfdHlwZSI6IkRlZmVuc2UiLCJ2YWx1ZSI6MTJ9LHsidHJhaXRfdHlwZSI6IkF0dGFjayIsInZhbHVlIjo1fSx7InRyYWl0X3R5cGUiOiJTcGVjaWFsIEF0dGFjayIsInZhbHVlIjoyMH0seyJ0cmFpdF90eXBlIjoiU3BlY2lhbCBEZWZlbnNlIiwidmFsdWUiOjEyfV19
 
-        var regexGroups = Regex.Match(request.Result.ReturnValue1, "^data:application/json;base64[^\\w]+(.+)").Groups;
+        var regexGroups = Regex.Match(response.ReturnValue1, "^data:application/json;base64[^\\w]+(.+)").Groups;
         if (regexGroups.Count > 1)
         {
             var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(regexGroups[1].Value));
@@ -64,7 +65,7 @@ class PepemonFactory
             Web3Controller.instance.SelectedAccountAddress);
 
         // using NFTsOfUserUnityRequest fails because PepemonFactory uses ERC1155 but NFTsOfUserUnityRequest is for ERC721
-        await request.Query(
+        var response = await request.QueryAsync(
             new BalanceOfBatchFunction
             {
                 Ids = tokenIds,
@@ -73,8 +74,8 @@ class PepemonFactory
             Address);
 
         var ownedCards = new List<ulong>();
-        for (int i = 0; i < (request.Result?.ReturnValue1?.Count ?? 0); i++)
-            if (request.Result.ReturnValue1[i] > 0)
+        for (int i = 0; i < (response.ReturnValue1?.Count ?? 0); i++)
+            if (response.ReturnValue1[i] > 0)
                 ownedCards.Add(tokenIds[i]);
 
         return ownedCards;
@@ -86,8 +87,8 @@ class PepemonFactory
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(new TotalSupplyFunction { Id = tokenId }, Address);
-        return request.Result?.ReturnValue1 ?? 0;
+        var response = await request.QueryAsync(new TotalSupplyFunction { Id = tokenId }, Address);
+        return response.ReturnValue1;
     }
 
     public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 40)

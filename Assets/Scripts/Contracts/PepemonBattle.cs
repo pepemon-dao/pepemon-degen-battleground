@@ -19,11 +19,11 @@ class PepemonBattle
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(
+        var response = await request.QueryAsync(
             new BattleIdRNGSeedFunction { BattleId = battleId },
             Address);
 
-        return (ulong) request.Result.Seed;
+        return (ulong) response.Seed;
     }
 
     public static async Task<BattleInfo> WaitForNextBattleCreatedEvent(string address, int startingBlock, CancellationToken cancelToken)

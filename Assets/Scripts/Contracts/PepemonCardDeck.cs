@@ -22,11 +22,10 @@ public class PepemonCardDeck
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(
-            new GetBattleCardInDeckFunction { DeckId = deckId },
-            Address);
-
-        return (ulong)request.Result.ReturnValue1;
+        var response = await request.QueryAsync(
+                    new GetBattleCardInDeckFunction { DeckId = deckId },
+                    Address);
+        return (ulong)response.ReturnValue1;
     }
 
     public static async Task<List<ulong>> GetAllSupportCards(ulong deckId)
@@ -35,11 +34,11 @@ public class PepemonCardDeck
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await request.Query(
+        var response = await request.QueryAsync(
             new GetAllSupportCardsInDeckFunction { DeckId = deckId },
             Address);
 
-        return request.Result.SupportCards;
+        return response.SupportCards;
     }
 
     public static async Task<List<ulong>> GetPlayerDecks(string address)
@@ -48,11 +47,11 @@ public class PepemonCardDeck
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
-        await getDeckCountRequest.Query(
+        var getDeckCountResponse = await getDeckCountRequest.QueryAsync(
             new GetDeckCountFunction { Player = address },
             Address);
 
-        var deckCount = getDeckCountRequest.Result.DeckCount;
+        var deckCount = getDeckCountResponse.DeckCount;
 
         List<ulong> deckIds = new List<ulong>();
         for (ulong i = 0; i < deckCount; i++)
@@ -61,7 +60,7 @@ public class PepemonCardDeck
                 Web3Controller.instance.GetUnityRpcRequestClientFactory(),
                 Web3Controller.instance.SelectedAccountAddress);
 
-            await playerToDecksRequest.Query(
+            var playerToDecksResponse = await playerToDecksRequest.QueryAsync(
                 new PlayerToDecksFunction()
                 {
                     Player = address,
@@ -69,7 +68,7 @@ public class PepemonCardDeck
                 },
                 Address);
 
-            deckIds.Add((ulong)playerToDecksRequest.Result.DeckId);
+            deckIds.Add((ulong)playerToDecksResponse.DeckId);
         }
 
         return deckIds;
@@ -81,10 +80,8 @@ public class PepemonCardDeck
            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
            Web3Controller.instance.SelectedAccountAddress);
 
-        // TODO: check request.Exception
-        await request.Query(new MaxSupportCardsFunction(), Address);
-
-        return (ulong)request.Result.ReturnValue1;
+        var response = await request.QueryAsync(new MaxSupportCardsFunction(), Address);
+        return (ulong)response.ReturnValue1;
     }
 
     // reference implementation for Write operations: https://github.com/Nethereum/Nethereum.Unity.Webgl/blob/main/Assets/MetamaskController.cs
@@ -93,33 +90,25 @@ public class PepemonCardDeck
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         // note: deck is created using the sender's address
-        await request.SignAndSendTransaction(new CreateDeckFunction(), Address);
-        return request.Result;
+        return await request.SignAndSendTransactionAsync(new CreateDeckFunction(), Address);
     }
 
     public static async Task<string> SetBattleCard(ulong deckId, ulong battleCardId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransaction(
+        return await request.SignAndSendTransactionAsync(
             new AddBattleCardToDeckFunction()
             {
                 DeckId = deckId,
                 BattleCardId = battleCardId,
             },
             Address);
-        return request.Result;
     }
 
     public static async Task<string> RemoveBattleCard(ulong deckId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransaction(
-            new RemoveBattleCardFromDeckFunction()
-            {
-                DeckId = deckId
-            },
-            Address);
-        return request.Result;
+        return await request.SignAndSendTransactionAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
     }
 
     /// <summary>
@@ -130,14 +119,13 @@ public class PepemonCardDeck
     public static async Task<string> SetApprovalState(bool approved)
     {
         var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await approvalRequest.SignAndSendTransaction(
+        return await approvalRequest.SignAndSendTransactionAsync(
             new Contracts.PepemonFactory.abi.ContractDefinition.SetApprovalForAllFunction()
             {
                 Operator = Address,
                 Approved = approved
             },
             Web3Controller.instance.GetChainConfig().pepemonFactoryAddress);
-        return approvalRequest.Result;
     }
 
     /// <summary>
@@ -148,15 +136,13 @@ public class PepemonCardDeck
         // TODO: Check if max support cards will be reached
         // TODO: Check if the player has the cards
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransaction(
+        return await request.SignAndSendTransactionAsync(
             new AddSupportCardsToDeckFunction()
             {
                 DeckId = deckId,
                 SupportCards = new List<SupportCardRequest>(requests),
             },
             Address);
-
-        return request.Result;
     }
 
     /// <summary>
@@ -166,13 +152,12 @@ public class PepemonCardDeck
     {
         // TODO: Check if the deck has requested cards before removing
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransaction(
+        return await request.SignAndSendTransactionAsync(
             new RemoveSupportCardsFromDeckFunction()
             {
                 DeckId = deckId,
                 SupportCards = new List<SupportCardRequest>(requests),
             },
             Address);
-        return request.Result;
     }
 }
