@@ -91,7 +91,7 @@ class PepemonFactory
         return response.ReturnValue1;
     }
 
-    public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 40)
+    public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 5)
     {
         ulong batch = 0;
         ulong maxTokenId = 0;
@@ -101,6 +101,7 @@ class PepemonFactory
         {
             batchTokenMaxId = 0;
             List<Task<ulong>> tasks = new List<Task<ulong>>();
+            Debug.Log($"Checking supply of tokens {batch * parallelBatchSize}...{(batch + 1) * parallelBatchSize - 1}");
             for (ulong i = 0; i < parallelBatchSize; i++)
             {
                 ulong tokenId = batch * parallelBatchSize + i;

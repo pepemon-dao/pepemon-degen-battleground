@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10419,7 +10419,7 @@ MonoBehaviour:
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
       pepemonCardDeckAddress: 0x84057FFFc602F74C19848D86fC8e14D95Cd9DE35
     debugChainId: 80001
-    debugRpcUrl: https://matic-testnet-archive-rpc.bwarelabs.com
+    debugRpcUrl: https://rpc.ankr.com/polygon_mumbai
     debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
   onWalletConnected:
     m_PersistentCalls:

@@ -1,5 +1,6 @@
 using NBitcoin;
 using Nethereum.Unity;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +18,39 @@ class PepemonFactoryCardCache
     private static ConcurrentDictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new ConcurrentDictionary<ulong, PepemonFactory.CardMetadata>();
     public static List<ulong> CardsIds { get => cardMetadata.Keys.ToList(); }
 
-    public async Task PreloadAll()
+    public async Task PreloadAll(ulong parallelBatchSize = 5)
     {
-        Debug.Log("Discovering max token ID...");
-        ulong maxTokenId = await PepemonFactory.FindMaxTokenId();
+        Debug.Log($"Loading support and battle cards...");
 
-        Debug.Log($"Loading cards 1 to {maxTokenId}...");
-        List<Task> loadTasks = new List<Task>();
-        for (ulong i = 1; i <= maxTokenId; i++)
+        ulong batchStart = 1;
+        ulong batchEnd;
+        ulong batchLoadedCardsCount;
+
+        do
         {
-            ulong tokenId = i;
-            loadTasks.Add(PreloadToken(tokenId));
-        }
-        await Task.WhenAll(loadTasks);
+            batchEnd = batchStart + parallelBatchSize;
+            batchLoadedCardsCount = 0;
+
+            List<Task> batchLoadingTasks = new List<Task>();
+            for (ulong i = batchStart; i < batchEnd; i++)
+            {
+                ulong tokenId = i;
+                batchLoadingTasks.Add(PreloadToken(tokenId));
+            }
+            await Task.WhenAll(batchLoadingTasks);
+
+            for (ulong i = batchStart; i < batchEnd; i++)
+            {
+                if (cardMetadata.ContainsKey(i))
+                {
+                    batchLoadedCardsCount++;
+                }
+            }
+
+            batchStart += parallelBatchSize;
+        } while (batchLoadedCardsCount >= parallelBatchSize);
+
+        Debug.Log($"Finished loading {CardsIds.Count} cards.");
     }
 
     private async Task PreloadToken(ulong tokenId)
@@ -50,6 +71,11 @@ class PepemonFactoryCardCache
 
     private async Task PreloadTokenImage(ulong tokenId)
     {
+        if (!cardMetadata.ContainsKey(tokenId))
+        {
+            return;
+        }
+
         PepemonFactory.CardMetadata metadata = cardMetadata[tokenId];
         string url = IpfsUrlService.ResolveIpfsUrlGateway(metadata.image);
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
