@@ -77,7 +77,7 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         [Parameter("address[]", "_owners", 1)]
         public virtual List<string> Owners { get; set; }
         [Parameter("uint256[]", "_ids", 2)]
-        public virtual List<BigInteger> Ids { get; set; }
+        public virtual List<ulong> Ids { get; set; }
     }
 
     public partial class BurnFunction : BurnFunctionBase { }
@@ -504,7 +504,7 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     public class BalanceOfBatchOutputDTOBase : IFunctionOutputDTO 
     {
         [Parameter("uint256[]", "", 1)]
-        public virtual List<BigInteger> ReturnValue1 { get; set; }
+        public virtual List<ulong> ReturnValue1 { get; set; }
     }
 
 

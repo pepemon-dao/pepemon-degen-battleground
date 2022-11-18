@@ -18,6 +18,7 @@ class PepemonFactoryCardCache
     private const ulong MAX_TOKEN_ID = ulong.MaxValue;
     private static Dictionary<ulong, Texture2D> cardTextures = new Dictionary<ulong, Texture2D>();
     private static Dictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new Dictionary<ulong, PepemonFactory.CardMetadata>();
+    public static List<ulong> CardsIds { get => cardMetadata.Keys.ToList(); }
 
     public async Task PreloadAll()
     {
@@ -46,7 +47,6 @@ class PepemonFactoryCardCache
         }
     }
 
-    // TODO: fix this, its always returning HTTP 404
     private async Task PreloadAllImages()
     {
         // Start a task for image to download
@@ -65,10 +65,10 @@ class PepemonFactoryCardCache
                     case UnityWebRequest.Result.DataProcessingError:
                     case UnityWebRequest.Result.ConnectionError:
                     case UnityWebRequest.Result.ProtocolError:
-                        Debug.LogWarning("Error while downloading card image: " + webRequest.error);
-                        return new KeyValuePair<ulong, Texture2D>();
+                        Debug.LogWarning($"Error while downloading card image {entry.Key}: {webRequest.error}");
+                        return new KeyValuePair<ulong, Texture2D>(entry.Key, new Texture2D(8, 8));
                 }
-
+                Debug.Log("Download of card image successful. Card id: " + entry.Key);
                 Texture2D tex = DownloadHandlerTexture.GetContent(webRequest);
                 return new KeyValuePair<ulong, Texture2D>(entry.Key, tex);
             }
@@ -86,7 +86,7 @@ class PepemonFactoryCardCache
 
     public static Texture2D GetImage(ulong tokenId)
     {
-        return cardTextures[tokenId];
+        return cardTextures.TryGet(tokenId);
     }
 
     public static PepemonFactory.CardMetadata? GetMetadata(ulong tokenId)
