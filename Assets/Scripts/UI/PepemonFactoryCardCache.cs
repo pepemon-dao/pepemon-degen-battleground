@@ -35,7 +35,10 @@ class PepemonFactoryCardCache
             for (ulong i = batchStart; i < batchEnd; i++)
             {
                 ulong tokenId = i;
-                batchLoadingTasks.Add(PreloadToken(tokenId));
+                if (!cardMetadata.ContainsKey(tokenId))
+                {
+                    batchLoadingTasks.Add(PreloadToken(tokenId));
+                }
             }
             await Task.WhenAll(batchLoadingTasks);
 
