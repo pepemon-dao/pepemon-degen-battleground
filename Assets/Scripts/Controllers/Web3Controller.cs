@@ -43,8 +43,8 @@ public class Web3Controller : MonoBehaviour
         OpenMetamaskConnectDialog();
 #else
         Account debugAccount = new Account(settings.debugPrivateKey);
-        ChainChanged(string.Format("0x{0:X}", settings.debugChainId));
         NewAccountSelected(debugAccount.Address);
+        ChainChanged(string.Format("0x{0:X}", settings.debugChainId));
         onWalletConnected?.Invoke();
 #endif
     }
@@ -135,27 +135,11 @@ public class Web3Controller : MonoBehaviour
     }
 
     // callback from js
-    public void ChainChanged(string chainId)
+    public async void ChainChanged(string chainId)
     {
         CurrentChainId = (int)new HexBigInteger(chainId).Value;
         Debug.Log($"Changed chain to {CurrentChainId} (hex: {chainId})");
-        try
-        {
-            //simple workaround to show suported configured chains
-            print(CurrentChainId.ToString());
-            StartCoroutine(GetBlockNumber());
-        }
-        catch (Exception ex)
-        {
-            DisplayError(ex.Message);
-        }
-    }
-
-    private IEnumerator GetBlockNumber()
-    {
-        var blockNumberRequest = new EthBlockNumberUnityRequest(GetUnityRpcRequestClientFactory());
-        yield return blockNumberRequest.SendRequest();
-        print(blockNumberRequest.Result.Value);
+        await new PepemonFactoryCardCache().PreloadAll();
     }
 
     public void DisplayError(string errorMessage)

@@ -25,17 +25,23 @@ class PepemonFactoryCardCache
         ulong batchStart = 1;
         ulong batchEnd;
         ulong batchLoadedCardsCount;
+        ulong batchRequestedCardsCount;
 
         do
         {
             batchEnd = batchStart + parallelBatchSize;
             batchLoadedCardsCount = 0;
+            batchRequestedCardsCount = 0;
 
             List<Task> batchLoadingTasks = new List<Task>();
             for (ulong i = batchStart; i < batchEnd; i++)
             {
                 ulong tokenId = i;
-                batchLoadingTasks.Add(PreloadToken(tokenId));
+                if (!cardMetadata.ContainsKey(tokenId))
+                {
+                    batchLoadingTasks.Add(PreloadToken(tokenId));
+                    batchRequestedCardsCount++;
+                }
             }
             await Task.WhenAll(batchLoadingTasks);
 
@@ -48,7 +54,7 @@ class PepemonFactoryCardCache
             }
 
             batchStart += parallelBatchSize;
-        } while (batchLoadedCardsCount >= parallelBatchSize);
+        } while (batchLoadedCardsCount >= batchRequestedCardsCount);
 
         Debug.Log($"Finished loading {CardsIds.Count} cards.");
     }

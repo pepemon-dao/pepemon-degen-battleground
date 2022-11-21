@@ -16,16 +16,25 @@ public class CardPreview : MonoBehaviour
 
     public void LoadCardData(ulong cardId)
     {
-        var metadata = (CardMetadata)PepemonFactoryCardCache.GetMetadata(cardId);
+        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
         // set card image. blank if not found
         var tex = PepemonFactoryCardCache.GetImage(cardId);
         if (tex == null)
+        {
             Debug.LogWarning("Unable to locate texture for card " + cardId);
+        }
 
-        _cardImage.GetComponent<Image>().sprite =
-            Sprite.Create(tex ?? new Texture2D(8, 8), new Rect(0, 0, tex.width, tex.height), new Vector2());
+        if (metadata == null)
+        {
+            Debug.LogWarning("Unable to locate metadata for card " + cardId);
+        }
 
-        _text.GetComponent<Text>().text = metadata.name;
+        _cardImage.GetComponent<Image>().sprite = Sprite.Create(
+            tex != null ? tex : new Texture2D(8, 8),
+            new Rect(0, 0, tex.width, tex.height),
+            new Vector2());
+
+        _text.GetComponent<Text>().text = metadata?.name ?? "Unknown Card";
     }
 }
