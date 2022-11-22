@@ -31,15 +31,17 @@ public class BattleCardListLoader : MonoBehaviour
                 Debug.LogWarning("Invalid card");
                 continue;
             }
-            var metadata = (CardMetadata)PepemonFactoryCardCache.GetMetadata(cardId);
+            var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
             // skip support cards
-            if (!metadata.attributes.Contains(battleCardAttribute))
+            if (!metadata?.attributes.Contains(battleCardAttribute) ?? false)
             {
                 continue;
             }
 
             var battleCardInstance = Instantiate(_battleCardPrefab);
+            var cardPreviewComponent = battleCardInstance.GetComponent<CardPreview>();
+
             battleCardInstance.transform.SetParent(_battleCardList.transform, false);
             battleCardInstance.GetComponent<CardPreview>().LoadCardData(cardId);
 
@@ -48,34 +50,20 @@ public class BattleCardListLoader : MonoBehaviour
             // set checkmark
             if (isSelected)
             {
-                // has to be done this way, otherwise (ie. using SelectionItem.SetSelected)
-                // the internal state of SelectionGroup would not be correct
-                battleCardInstance.GetComponentInParent<SelectionGroup>().ToggleSelected(
-                    battleCardInstance.GetComponent<SelectionItem>());
+                cardPreviewComponent.ToggleSelected();
             }
 
             // gray out unavailable cards, unless it is from current deck
             if (unavailableCardIds.Contains(cardId) && !isSelected)
             {
-                battleCardInstance.GetComponent<CardPreview>().SetSelectionState(false);
+                cardPreviewComponent.Enabled(false);
             }
 
             // Only add this listener after setting it selected
             battleCardInstance.GetComponent<SelectionItem>().onSelected.AddListener(
                 delegate {
-                    saveDeckButtonHandler.setBattleCard(battleCardInstance.GetComponent<CardPreview>().cardId);
+                    saveDeckButtonHandler.setBattleCard(cardPreviewComponent.cardId);
                 });
-
-            /*
-            // not possible at the moment
-            battleCardInstance.GetComponent<SelectionItem>().onDeselected.AddListener(
-                delegate {
-                    if (battleCardInstance.GetComponent<CardPreview>().cardId == saveDeckButtonHandler.oldBattleCard)
-                    {
-                        saveDeckButtonHandler.setBattleCard(0);
-                    }
-                });
-            */
         }
     }
 }

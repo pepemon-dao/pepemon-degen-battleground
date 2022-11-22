@@ -43,9 +43,6 @@ public class SaveDeckButtonHandler : MonoBehaviour
     /// </summary>
     async void SetDeckCards()
     {
-        // verify cards ownership before attemping to add or remove from the deck
-        // await FilterOwnedCards();
-
 #if UNITY_EDITOR
         await PepemonCardDeck.SetApprovalState(true);
 #endif
@@ -84,51 +81,6 @@ public class SaveDeckButtonHandler : MonoBehaviour
 #if UNITY_EDITOR
         await PepemonCardDeck.SetApprovalState(false);
 #endif
-
-    }
-
-    private async Task FilterOwnedCards()
-    {
-        // get all owned cards
-        var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
-        var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);
-
-        // verify if new battlecard is owned or not
-        if (!ownedCardIds.Contains(newBattleCard) && newBattleCard != 0)
-        {
-            Debug.LogWarning($"Card {newBattleCard} cannot be set because its not owned by you");
-            newBattleCard = 0;
-        }
-        // also verify if the old battlecard is still owned or not
-        if (!ownedCardIds.Contains(oldBattleCard) && oldBattleCard != 0)
-        {
-            Debug.LogWarning($"Card {oldBattleCard} is not owned by you anymore");
-            oldBattleCard = 0;
-        }
-
-        var invalidCards = new List<ulong>();
-        foreach (var cardId in newSupportCards)
-        {
-            if (!ownedCardIds.Contains(cardId))
-            {
-                Debug.LogWarning($"Card {cardId} cannot be added because its not owned by you");
-                invalidCards.Add(cardId);
-            }
-        }
-        // cards that were part of a deck but happened to be transferred to someone else after the deck was loaded on-screen
-        foreach (var cardId in oldSupportCards)
-        {
-            if (!ownedCardIds.Contains(cardId))
-            {
-                Debug.LogWarning($"Card {cardId} cannot be used because its not owned by you anymore");
-                invalidCards.Add(cardId);
-            }
-        }
-        foreach (var invalidCardId in invalidCards)
-        {
-            newSupportCards.Remove(invalidCardId);
-            oldSupportCards.Remove(invalidCardId);
-        }
     }
 
     public void setBattleCard(ulong cardId)

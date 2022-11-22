@@ -15,10 +15,16 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
     public ulong cardId { get; private set; }
 
-    public void SetSelectionState(bool enabled)
+    public void Enabled(bool enabled)
     {
         _cardImage.color = new Color(1, 1, 1, enabled ? 1f : 0.3f);
         GetComponent<Button>().enabled = enabled;
+    }
+
+    public void ToggleSelected()
+    {
+        // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
+        GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
     }
 
     public void LoadCardData(ulong cardId)

@@ -31,31 +31,32 @@ public class SupportCardListLoader : MonoBehaviour
                 Debug.LogWarning("Invalid card");
                 continue;
             }
-            var metadata = (CardMetadata)PepemonFactoryCardCache.GetMetadata(cardId);
+            var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
             // skip battle cards
-            if (!metadata.attributes.Contains(supportCardAttribute))
+            if (!metadata?.attributes.Contains(supportCardAttribute) ?? false)
+            {
                 continue;
+            }
 
             var supportCardInstance = Instantiate(_supportCardPrefab);
+            var cardPreviewComponent = supportCardInstance.GetComponent<CardPreview>();
+
             supportCardInstance.transform.SetParent(_supportCardList.transform, false);
-            supportCardInstance.GetComponent<CardPreview>().LoadCardData(cardId);
+            cardPreviewComponent.LoadCardData(cardId);
 
             var isSelected = selectedSupportCards.Contains(cardId);
 
             // set checkmark
             if (isSelected)
             {
-                // has to be done this way, otherwise (ie. using SelectionItem.SetSelected)
-                // the internal state of SelectionGroup would not be correct
-                supportCardInstance.GetComponentInParent<SelectionGroup>().ToggleSelected(
-                    supportCardInstance.GetComponent<SelectionItem>());
+                cardPreviewComponent.ToggleSelected();
             }
 
             // gray out unavailable cards, unless it is from current deck
             if (unavailableCardIds.Contains(cardId) && !isSelected)
             {
-                supportCardInstance.GetComponent<CardPreview>().SetSelectionState(false);
+                cardPreviewComponent.Enabled(false);
             }
 
             // Only add these listeners after SetSelected
