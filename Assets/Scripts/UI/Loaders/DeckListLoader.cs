@@ -15,7 +15,7 @@ public class DeckListLoader : MonoBehaviour
     // Whether or not display the pen + transparency fade
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
-    [ReadOnly] public UnityEvent<int> onItemSelected;
+    [ReadOnly] public UnityEvent<ulong> onItemSelected;
     private bool loadingInProgress = false;
 
     /// <summary>
@@ -64,7 +64,7 @@ public class DeckListLoader : MonoBehaviour
             // handle the click event for each instantied deck element, passing the ID of the selected deck
             deckInstance.GetComponent<Button>().onClick.AddListener(
                 delegate { 
-                    onItemSelected?.Invoke((int)deckId);
+                    onItemSelected?.Invoke(deckId);
                 });
 
             // this should set each deck detail in parallel

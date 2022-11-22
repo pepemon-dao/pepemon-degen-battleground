@@ -18,7 +18,7 @@ public class MainMenuController : MonoBehaviour
     private int[] screenNavigationHistory = new int[10];
 
     private int selectedLeagueId = 0;
-    private int selectedDeckId = 0;
+    private ulong selectedDeckId = 0;
 
     private void Start()
     {
@@ -54,7 +54,7 @@ public class MainMenuController : MonoBehaviour
         selectedLeagueId = leagueId;
     }
 
-    public void SelectDeck(int deckId)
+    public void SelectDeck(ulong deckId)
     {
         selectedDeckId = deckId;
     }

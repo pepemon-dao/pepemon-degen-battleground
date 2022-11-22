@@ -16,10 +16,10 @@ public class ScreenManageDecks : MonoBehaviour
         _editDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
     }
 
-    public void SelectEditDeck(int deckId)
+    public void SelectEditDeck(ulong deckId)
     {
         Debug.Log("Editing deck: " + deckId);
-        _screenEditDeck.GetComponent<ScreenEditDeck>().LoadAllCards();
+        _screenEditDeck.GetComponent<ScreenEditDeck>().LoadAllCards(deckId);
         FindObjectOfType<MainMenuController>().ShowScreen(5);
     }
 

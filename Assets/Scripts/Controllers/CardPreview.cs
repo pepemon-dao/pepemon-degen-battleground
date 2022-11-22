@@ -13,9 +13,17 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
     [BoxGroup("Card Components"), SerializeField] public Text _text;
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
+    public ulong cardId { get; private set; }
+
+    public void SetSelectionState(bool enabled)
+    {
+        _cardImage.color = new Color(1, 1, 1, enabled ? 1f : 0.3f);
+        GetComponent<Button>().enabled = enabled;
+    }
 
     public void LoadCardData(ulong cardId)
     {
+        this.cardId = cardId;
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
         // set card image. blank if not found
