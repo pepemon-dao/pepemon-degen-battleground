@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -34,29 +35,32 @@ public class ScreenEditDeck : MonoBehaviour
             deckCards[deckId].selectedSupportCards);
 
         _battleCardsListLoader.GetComponent<BattleCardListLoader>().ReloadAllBattleCards(
-            ownedCardIds,
-            unavailableCardIds,
+            ownedCardIds.Keys.ToList(),
+            unavailableCardIds.Keys.ToList(),
             deckCards[deckId].selectedBattlecard);
 
         _supportCardsListLoader.GetComponent<SupportCardListLoader>().ReloadAllSupportCards(
-            ownedCardIds, 
+            ownedCardIds,
             unavailableCardIds,
             deckCards[deckId].selectedSupportCards);
     }
 
-    private List<ulong> GetUsedCards(ConcurrentDictionary<ulong, DeckCards> deckCards)
+    private Dictionary<ulong, int> GetUsedCards(ConcurrentDictionary<ulong, DeckCards> deckCards)
     {
-        var usedCards = new List<ulong>();
+        var usedCards = new Dictionary<ulong, int>();
         foreach (var deckId in deckCards.Keys)
         {
-            if (deckCards[deckId].selectedSupportCards.Count > 0)
+            foreach(var cardId in deckCards[deckId].selectedSupportCards.Keys)
             {
-                usedCards.AddRange(deckCards[deckId].selectedSupportCards);
+                if (!usedCards.TryAdd(cardId, deckCards[deckId].selectedSupportCards[cardId]))
+                {
+                    usedCards[cardId] += deckCards[deckId].selectedSupportCards[cardId];
+                }
             }
 
             if (deckCards[deckId].selectedBattlecard > 0)
             {
-                usedCards.Add(deckCards[deckId].selectedBattlecard);
+                usedCards[deckCards[deckId].selectedBattlecard] = 1;
             }
         }
         return usedCards;
@@ -88,6 +92,6 @@ public class ScreenEditDeck : MonoBehaviour
     public struct DeckCards
     {
         public ulong selectedBattlecard;
-        public List<ulong> selectedSupportCards;
+        public Dictionary<ulong, int> selectedSupportCards;
     }
 }

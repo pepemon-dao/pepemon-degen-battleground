@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 class SelectionGroup : MonoBehaviour
 {
+    public bool keepSelection = false;
     public bool multiSelect = false;
     public int maxSelected = 60;
 
@@ -32,13 +33,36 @@ class SelectionGroup : MonoBehaviour
         }
         else
         {
-            foreach (SelectionItem child in GetComponentsInChildren<SelectionItem>())
+            if (keepSelection)
             {
-                child.SetSelected(child == item);
+                foreach (SelectionItem child in GetComponentsInChildren<SelectionItem>())
+                {
+                    child.SetSelected(child == item);
+                }
+                selection.Clear();
+                selection.Add(item);
             }
-
-            selection.Clear();
-            selection.Add(item);
+            else // allows de-selecting currently selected item
+            {
+                foreach (SelectionItem child in GetComponentsInChildren<SelectionItem>())
+                {
+                    if (child == item && !selection.Contains(item))
+                    {
+                        child.SetSelected(true);
+                        selection.Clear();
+                        selection.Add(item);
+                    }
+                    else if(child == item && selection.Contains(item))
+                    {
+                        child.SetSelected(false);
+                        selection.Clear();
+                    }
+                    else
+                    {
+                        child.SetSelected(false);
+                    }
+                }
+            }
         }
     }
 }

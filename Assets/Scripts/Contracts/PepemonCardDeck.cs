@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Nethereum.Unity.Rpc;
@@ -28,7 +29,7 @@ public class PepemonCardDeck
         return (ulong)response.ReturnValue1;
     }
 
-    public static async Task<List<ulong>> GetAllSupportCards(ulong deckId)
+    public static async Task<Dictionary<ulong, int>> GetAllSupportCards(ulong deckId)
     {
         var request = new QueryUnityRequest<GetAllSupportCardsInDeckFunction, GetAllSupportCardsInDeckOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
@@ -38,7 +39,12 @@ public class PepemonCardDeck
             new GetAllSupportCardsInDeckFunction { DeckId = deckId },
             Address);
 
-        return response.SupportCards;
+        var result = new Dictionary<ulong, int>();
+        foreach (var card in response.SupportCards)
+        {
+            result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
+        }
+        return result;
     }
 
     public static async Task<List<ulong>> GetPlayerDecks(string address)

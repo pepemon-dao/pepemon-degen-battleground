@@ -15,16 +15,25 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
     public ulong cardId { get; private set; }
 
+    // This is necessary to have a reliable way to verify whether or not this card instance was previously selected, because
+    // SelectionGroup and SelectionItem use events which might be triggered after or before the internal HashSet cleanup,
+    // so verifying SelectionGroup.selection.contains(SelectionItem) doesn't works because the "selections" HashSet is clean
+    public bool isSelected { get; private set; } = false;
+
     public void Enabled(bool enabled)
     {
         _cardImage.color = new Color(1, 1, 1, enabled ? 1f : 0.3f);
         GetComponent<Button>().enabled = enabled;
     }
 
-    public void ToggleSelected()
+    public void ToggleSelected(bool updateSelectionGroup=true)
     {
-        // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
-        GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
+        if (updateSelectionGroup)
+        {
+            // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
+            GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
+        }
+        isSelected = !isSelected;
     }
 
     public void LoadCardData(ulong cardId)

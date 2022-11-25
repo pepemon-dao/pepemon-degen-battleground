@@ -50,6 +50,6 @@ public class DeckController : MonoBehaviour
         var deckName = metadata?.name == null ? "New Deck" : metadata?.name + " Deck";
         var supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
-        _deckDisplayName.text = $"{deckName} ({supportCards?.Count ?? 0})";
+        _deckDisplayName.text = $"{deckName} ({supportCards.Values?.Count ?? 0})";
     }
 }

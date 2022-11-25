@@ -12,7 +12,10 @@ public class BattleCardListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButtonHandler;
 
-    public void ReloadAllBattleCards(List<ulong> availableCardIds, List<ulong> unavailableCardIds, ulong selectedBattleCard)
+    public void ReloadAllBattleCards(
+        List<ulong> availableCardIds,
+        List<ulong> unavailableCardIds, 
+        ulong selectedBattleCard)
     {
         // destroy before re-creating
         foreach (var battlecard in _battleCardList.GetComponentsInChildren<Button>())
@@ -28,6 +31,7 @@ public class BattleCardListLoader : MonoBehaviour
         {
             if (cardId == 0)
             {
+                // if this shows up there could be a bug in the contract
                 Debug.LogWarning("Invalid card");
                 continue;
             }
@@ -43,14 +47,14 @@ public class BattleCardListLoader : MonoBehaviour
             var cardPreviewComponent = battleCardInstance.GetComponent<CardPreview>();
 
             battleCardInstance.transform.SetParent(_battleCardList.transform, false);
-            battleCardInstance.GetComponent<CardPreview>().LoadCardData(cardId);
+            cardPreviewComponent.LoadCardData(cardId);
 
             var isSelected = selectedBattleCard == cardId;
 
             // set checkmark
             if (isSelected)
             {
-                cardPreviewComponent.ToggleSelected();
+                cardPreviewComponent.ToggleSelected(updateSelectionGroup: true);
             }
 
             // gray out unavailable cards, unless it is from current deck
@@ -59,10 +63,22 @@ public class BattleCardListLoader : MonoBehaviour
                 cardPreviewComponent.Enabled(false);
             }
 
-            // Only add this listener after setting it selected
+            // Only add these listeners after ToggleSelected
             battleCardInstance.GetComponent<SelectionItem>().onSelected.AddListener(
                 delegate {
+                    cardPreviewComponent.ToggleSelected(updateSelectionGroup: false);
                     saveDeckButtonHandler.setBattleCard(cardPreviewComponent.cardId);
+                });
+
+            battleCardInstance.GetComponent<SelectionItem>().onDeselected.AddListener(
+                delegate {
+                    // TODO: fix cardPreviewComponent.isSelected which is somehow false but this IF thinks its ok (?)
+                    if (cardPreviewComponent.cardId == saveDeckButtonHandler.oldBattleCard
+                        && cardPreviewComponent.isSelected)
+                    {
+                        cardPreviewComponent.ToggleSelected(updateSelectionGroup: false);
+                        saveDeckButtonHandler.setBattleCard(0);
+                    }
                 });
         }
     }

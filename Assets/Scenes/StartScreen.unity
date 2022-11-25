@@ -3043,6 +3043,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069412d89b219e549a7fe36bd1c9d240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keepSelection: 0
   multiSelect: 0
   maxSelected: 1
   onSelectionChanged:
@@ -4075,6 +4076,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069412d89b219e549a7fe36bd1c9d240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keepSelection: 0
   multiSelect: 0
   maxSelected: 1
   onSelectionChanged:
@@ -14814,6 +14816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069412d89b219e549a7fe36bd1c9d240, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keepSelection: 0
   multiSelect: 1
   maxSelected: 60
   onSelectionChanged:
