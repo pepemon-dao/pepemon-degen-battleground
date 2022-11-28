@@ -47,10 +47,10 @@ public class ScreenEditDeck : MonoBehaviour
             out var supportCardsToBeAdded, 
             out var supportCardsToBeRemoved);
 
-        Debug.Log($"Adding {supportCardsToBeAdded.Count()} support cards to deck {currentDeckId}");
+        Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
         await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
 
-        Debug.Log($"Removing {supportCardsToBeRemoved.Count()} support cards from deck {currentDeckId}");
+        Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
         await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
 
         // TODO: make oldSupportCards contain the same values as newSupportCards

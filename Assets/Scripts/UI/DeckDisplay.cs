@@ -15,7 +15,7 @@ public class DeckDisplay : MonoBehaviour
 
     public ulong GetSelectedBattleCard()
     {
-        return _battleCardList.GetComponentsInChildren<CardPreview>().Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
+        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
     }
 
     public void ReloadAllBattleCards(List<ulong> availableCardIds, ulong selectedBattleCard)
@@ -55,7 +55,7 @@ public class DeckDisplay : MonoBehaviour
             // set checkmark
             if (isSelected)
             {
-                cardPreviewComponent.ToggleSelected(updateSelectionGroup: true);
+                cardPreviewComponent.ToggleSelected();
             }
         }
     }

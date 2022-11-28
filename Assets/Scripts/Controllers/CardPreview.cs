@@ -14,7 +14,7 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Text _text;
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
     public ulong cardId { get; private set; }
-    public bool isSelected { get =>  GetComponent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
+    public bool isSelected { get =>  GetComponentInParent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
 
     public void ToggleSelected()
     {
