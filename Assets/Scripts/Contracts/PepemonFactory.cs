@@ -58,7 +58,7 @@ class PepemonFactory
     /// <param name="address">User address</param>
     /// <param name="tokenIds">Card IDs to be checked</param>
     /// <returns>List of IDs of owned cards</returns>
-    public static async Task<List<ulong>> GetOwnedCards(string address, List<ulong> tokenIds)
+    public static async Task<Dictionary<ulong, int>> GetOwnedCards(string address, List<ulong> tokenIds)
     {
         var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
@@ -73,10 +73,10 @@ class PepemonFactory
             },
             Address);
 
-        var ownedCards = new List<ulong>();
+        var ownedCards = new Dictionary<ulong, int>();
         for (int i = 0; i < (response.ReturnValue1?.Count ?? 0); i++)
             if (response.ReturnValue1[i] > 0)
-                ownedCards.Add(tokenIds[i]);
+                ownedCards[tokenIds[i]] = (int)response.ReturnValue1[i];
 
         return ownedCards;
     }
