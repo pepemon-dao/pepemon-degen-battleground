@@ -32,7 +32,7 @@ public class ScreenEditDeck : MonoBehaviour
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
         supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
-        _deckDisplay.GetComponent<DeckDisplay>().ReloadAllBattleCards(ownedCardIds.Keys.ToList(), battleCard);
+        _deckDisplay.GetComponent<DeckDisplay>().ReloadAllBattleCards(ownedCardIds, battleCard);
         _deckDisplay.GetComponent<DeckDisplay>().ReloadAllSupportCards(ownedCardIds, supportCards);
     }
 
@@ -47,26 +47,85 @@ public class ScreenEditDeck : MonoBehaviour
             out var supportCardsToBeAdded, 
             out var supportCardsToBeRemoved);
 
-        Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
-        await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
+        try
+        {
+            Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
+            await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
 
-        Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
-        await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
+            // update supportCards with added cards in case of success
+            foreach (var card in supportCardsToBeAdded)
+            {
+                if (!supportCards.TryAdd((ulong)card.SupportCardId, (int)card.Amount))
+                {
+                    supportCards[(ulong)card.SupportCardId] += (int)card.Amount;
+                }
+            }
+        }
+        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+        {
+            Debug.LogError($"Unable to process transaction: {ex.Message}");
+            // TODO: display error toast
+        }
 
-        // TODO: make oldSupportCards contain the same values as newSupportCards
-        //new List<ulong>(supportCardsToBeRemoved).ForEach(i => oldSupportCards.Remove(i));
-        //new List<ulong>(supportCardsToBeAdded).ForEach(i => oldSupportCards.Add(i));
+        try
+        {
+            Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
+            await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
+
+            // update supportCards with removed cards in case of success
+            foreach (var card in supportCardsToBeRemoved)
+            {
+                if (supportCards.ContainsKey((ulong)card.SupportCardId))
+                {
+                    if (supportCards[(ulong)card.SupportCardId] - card.Amount == 0)
+                    {
+                        supportCards.Remove((ulong)card.SupportCardId);
+                    }
+                    else
+                    {
+                        supportCards[(ulong)card.SupportCardId] -= (int)card.Amount;
+                    }
+                }
+            }
+        }
+        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+        {
+            Debug.LogError($"Unable to process transaction: {ex.Message}");
+            // TODO: display error toast
+        }
 
         var newBattleCard = _deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard();
-
         if (newBattleCard != battleCard && newBattleCard != 0) // 0 is an invalid card
         {
-            Debug.Log($"Setting battlecard {newBattleCard} on deck {currentDeckId}");
-            await PepemonCardDeck.SetBattleCard(currentDeckId, newBattleCard);
+            try
+            {
+                Debug.Log($"Setting battlecard {newBattleCard} on deck {currentDeckId}");
+                await PepemonCardDeck.SetBattleCard(currentDeckId, newBattleCard);
+
+                // update currently selected battlecard in case of success
+                battleCard = newBattleCard;
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction: {ex.Message}");
+                // TODO: display error toast
+            }
         }
         if (newBattleCard == 0)
         {
-            await PepemonCardDeck.RemoveBattleCard(currentDeckId);
+            try
+            {
+                Debug.Log($"Removing battlecard {newBattleCard} on deck {currentDeckId}");
+                await PepemonCardDeck.RemoveBattleCard(currentDeckId);
+
+                // update currently selected battlecard in case of success
+                battleCard = newBattleCard;
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction: {ex.Message}");
+                // TODO: display error toast
+            }
         }
 
         await PepemonCardDeck.SetApprovalState(false);

@@ -18,7 +18,7 @@ public class DeckDisplay : MonoBehaviour
         return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
     }
 
-    public void ReloadAllBattleCards(List<ulong> availableCardIds, ulong selectedBattleCard)
+    public void ReloadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard)
     {
         // destroy before re-creating
         foreach (var battlecard in _battleCardList.GetComponentsInChildren<Button>())
@@ -26,37 +26,16 @@ public class DeckDisplay : MonoBehaviour
             Destroy(battlecard.gameObject);
         }
 
-        var battleCardAttribute = new CardAttribute { value = "Pepemon Battle", trait_type = "Set" };
-
-        foreach (var cardId in availableCardIds)
+        if (selectedBattleCard != 0)
         {
-            if (cardId == 0)
-            {
-                // if this shows up there could be a bug in the contract
-                Debug.LogWarning("Invalid card");
-                continue;
-            }
-            var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+            // selected card will appear first, makes it easier to de-select it
+            AddCard(selectedBattleCard, 1, true, isSupportCard: false);
+        }
 
-            // skip support cards
-            if (!metadata?.attributes.Contains(battleCardAttribute) ?? false)
-            {
-                continue;
-            }
-
-            var battleCardInstance = Instantiate(_battleCardPrefab);
-            var cardPreviewComponent = battleCardInstance.GetComponent<CardPreview>();
-
-            battleCardInstance.transform.SetParent(_battleCardList.transform, false);
-            cardPreviewComponent.LoadCardData(cardId);
-
-            var isSelected = selectedBattleCard == cardId;
-
-            // set checkmark
-            if (isSelected)
-            {
-                cardPreviewComponent.ToggleSelected();
-            }
+        // available cards appear after selected one
+        foreach (var cardId in availableCardIds.Keys)
+        {
+            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
         }
     }
 
@@ -85,17 +64,17 @@ public class DeckDisplay : MonoBehaviour
         // selected cards will appear first, makes it easier to de-select them
         foreach (var cardId in selectedSupportCards.Keys)
         {
-            AddSupportCard(cardId, selectedSupportCards[cardId], true);
+            AddCard(cardId, selectedSupportCards[cardId], true, true);
         }
 
         // available cards appear after selected ones
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddSupportCard(cardId, availableCardIds[cardId], false);
+            AddCard(cardId, availableCardIds[cardId], false, true);
         }
     }
 
-    private void AddSupportCard(ulong cardId, int count, bool isSelected)
+    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard)
     {
         if (cardId == 0)
         {
@@ -105,20 +84,32 @@ public class DeckDisplay : MonoBehaviour
         }
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
-        var supportCardAttribute = new CardAttribute { value = "Pepemon Support", trait_type = "Set" };
+        var cardAttribute = new CardAttribute 
+        { 
+            value = isSupportCard ? "Pepemon Support" : "Pepemon Battle",
+            trait_type = "Set" 
+        };
 
-        // skip battle cards
-        if (!metadata?.attributes.Contains(supportCardAttribute) ?? false)
+        // skip battlecards if isSupportCard=true and skip supportcards if isSupportCard=false
+        if (!metadata?.attributes.Contains(cardAttribute) ?? false)
         {
             return;
         }
 
+        var prefab = _battleCardPrefab;
+        var uiList = _battleCardList;
+        if(isSupportCard)
+        {
+            prefab = _supportCardPrefab;
+            uiList = _supportCardList;
+        }
+
         for (int i = 0; i < count; i++)
         {
-            var supportCardInstance = Instantiate(_supportCardPrefab);
-            var cardPreviewComponent = supportCardInstance.GetComponent<CardPreview>();
+            var cardInstance = Instantiate(prefab);
+            var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
 
-            supportCardInstance.transform.SetParent(_supportCardList.transform, false);
+            cardInstance.transform.SetParent(uiList.transform, false);
             cardPreviewComponent.LoadCardData(cardId);
 
             // set checkmark

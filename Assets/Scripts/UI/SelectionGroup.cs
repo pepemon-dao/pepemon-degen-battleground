@@ -46,17 +46,20 @@ class SelectionGroup : MonoBehaviour
             {
                 foreach (SelectionItem child in GetComponentsInChildren<SelectionItem>())
                 {
+                    // only leaving the selected child selected
                     if (child == item && !selection.Contains(item))
                     {
                         child.SetSelected(true);
                         selection.Clear();
                         selection.Add(item);
                     }
+                    // de-selecting the selected child if it was selected already
                     else if(child == item && selection.Contains(item))
                     {
                         child.SetSelected(false);
                         selection.Clear();
                     }
+                    // de-selecting everything else
                     else
                     {
                         child.SetSelected(false);
