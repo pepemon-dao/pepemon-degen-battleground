@@ -12,6 +12,7 @@ public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButtonHandler;
+    [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
     private ulong battleCard;
     private Dictionary<ulong, int> supportCards;
@@ -23,6 +24,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     public async void LoadAllCards(ulong deckId)
     {
+        SetUiLoadingState(true);
         currentDeckId = deckId;
         var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
 
@@ -34,6 +36,13 @@ public class ScreenEditDeck : MonoBehaviour
 
         _deckDisplay.GetComponent<DeckDisplay>().ReloadAllBattleCards(ownedCardIds, battleCard);
         _deckDisplay.GetComponent<DeckDisplay>().ReloadAllSupportCards(ownedCardIds, supportCards);
+        SetUiLoadingState(false);
+    }
+
+    public void SetUiLoadingState(bool loadingInProgress)
+    {
+        _textLoading.SetActive(loadingInProgress);
+        _deckDisplay.SetActive(!loadingInProgress);
     }
 
     public async void HandleSaveButtonClick()
