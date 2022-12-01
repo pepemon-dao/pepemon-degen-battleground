@@ -24,7 +24,12 @@ public class ScreenEditDeck : MonoBehaviour
 
     public async void LoadAllCards(ulong deckId)
     {
-        SetUiLoadingState(true);
+        var deckDisplayComponent = _deckDisplay.GetComponent<DeckDisplay>();
+
+        _textLoading.SetActive(true);
+        deckDisplayComponent.ClearBattleCardsList();
+        deckDisplayComponent.ClearSupportCardsList();
+
         currentDeckId = deckId;
         var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
 
@@ -34,15 +39,9 @@ public class ScreenEditDeck : MonoBehaviour
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
         supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
-        _deckDisplay.GetComponent<DeckDisplay>().ReloadAllBattleCards(ownedCardIds, battleCard);
-        _deckDisplay.GetComponent<DeckDisplay>().ReloadAllSupportCards(ownedCardIds, supportCards);
-        SetUiLoadingState(false);
-    }
-
-    public void SetUiLoadingState(bool loadingInProgress)
-    {
-        _textLoading.SetActive(loadingInProgress);
-        _deckDisplay.SetActive(!loadingInProgress);
+        deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
+        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
+        _textLoading.SetActive(false);
     }
 
     public async void HandleSaveButtonClick()
@@ -120,7 +119,7 @@ public class ScreenEditDeck : MonoBehaviour
                 // TODO: display error toast
             }
         }
-        if (newBattleCard == 0)
+        else if (newBattleCard != battleCard && newBattleCard == 0)
         {
             try
             {
