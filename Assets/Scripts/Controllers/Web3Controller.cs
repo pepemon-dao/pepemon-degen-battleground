@@ -18,7 +18,7 @@ public class Web3Controller : MonoBehaviour
     public int CurrentChainId { get; private set; } = 0;
     public string SelectedAccountAddress { get; private set; }
 
-#if !DEBUG
+#if !UNITY_EDITOR
     private bool _isMetamaskInitialised = false;
 #endif
 
@@ -39,7 +39,7 @@ public class Web3Controller : MonoBehaviour
     public void ConnectWallet()
     {
         Debug.Log("Trying to connect");
-#if !DEBUG
+#if !UNITY_EDITOR
         OpenMetamaskConnectDialog();
 #else
         Account debugAccount = new Account(settings.debugPrivateKey);
@@ -59,10 +59,10 @@ public class Web3Controller : MonoBehaviour
     /// </summary>
     public IUnityRpcRequestClientFactory GetUnityRpcRequestClientFactory()
     {
-#if !DEBUG
+#if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable()) 
         {
-            return new MetamaskRequestRpcClientFactory(SelectedAccountAddress, null, 1000);
+            return new MetamaskRequestRpcClientFactory(SelectedAccountAddress, null);
         }
         else
         {
@@ -79,7 +79,7 @@ public class Web3Controller : MonoBehaviour
     /// </summary>
     public IContractTransactionUnityRequest GetContractTransactionUnityRequest()
     {
-#if !DEBUG
+#if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable())
         {
             return new MetamaskTransactionUnityRequest(SelectedAccountAddress, GetUnityRpcRequestClientFactory());
@@ -100,7 +100,7 @@ public class Web3Controller : MonoBehaviour
     // connect wallet in WebGL
     private void OpenMetamaskConnectDialog()
     {
-#if !DEBUG
+#if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable())
         {
             MetamaskInterop.EnableEthereum(gameObject.name, nameof(EthereumEnabled), nameof(DisplayError));
@@ -115,7 +115,7 @@ public class Web3Controller : MonoBehaviour
     // callback from js
     public void EthereumEnabled(string addressSelected)
     {
-#if !DEBUG
+#if !UNITY_EDITOR
         if (!_isMetamaskInitialised)
         {
             MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));

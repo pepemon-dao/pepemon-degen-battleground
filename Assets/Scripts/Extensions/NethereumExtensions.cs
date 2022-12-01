@@ -3,6 +3,7 @@ using Nethereum.Contracts;
 using Nethereum.Unity.Contracts;
 using Nethereum.Unity.Rpc;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 public static class NethereumExtensions
 {
