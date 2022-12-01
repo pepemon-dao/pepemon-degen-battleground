@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// Downloads and caches PepemonFactory card information, including metadata 
@@ -88,8 +89,16 @@ class PepemonFactoryCardCache
         {
 
             DownloadHandler handle = webRequest.downloadHandler;
-            await webRequest.SendWebRequest();
-
+            try
+            {
+                await webRequest.SendWebRequest();
+            }
+            catch (UnityWebRequestException e)
+            {
+                Debug.LogWarning($"Error while downloading card image {tokenId}: {e.Message}");
+                cardTextures[tokenId] = new Texture2D(8, 8);
+                return;
+            }
             switch (webRequest.result)
             {
                 case UnityWebRequest.Result.DataProcessingError:
