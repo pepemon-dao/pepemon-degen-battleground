@@ -18,14 +18,24 @@ public class DeckDisplay : MonoBehaviour
         return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
     }
 
-    public void ReloadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard)
+    public void ClearBattleCardsList()
     {
-        // destroy before re-creating
         foreach (var battlecard in _battleCardList.GetComponentsInChildren<Button>())
         {
             Destroy(battlecard.gameObject);
         }
+    }
 
+    public void ClearSupportCardsList()
+    {
+        foreach (var battlecard in _supportCardList.GetComponentsInChildren<Button>())
+        {
+            Destroy(battlecard.gameObject);
+        }
+    }
+
+    public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard)
+    {
         if (selectedBattleCard != 0)
         {
             // selected card will appear first, makes it easier to de-select it
@@ -53,14 +63,8 @@ public class DeckDisplay : MonoBehaviour
         return result;
     }
 
-    public void ReloadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards)
+    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards)
     {
-        // destroy before re-creating
-        foreach (var battlecard in _supportCardList.GetComponentsInChildren<Button>())
-        {
-            Destroy(battlecard.gameObject);
-        }
-
         // selected cards will appear first, makes it easier to de-select them
         foreach (var cardId in selectedSupportCards.Keys)
         {
