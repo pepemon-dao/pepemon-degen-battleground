@@ -90,6 +90,21 @@ public class PepemonCardDeck
         return (ulong)response.ReturnValue1;
     }
 
+    public static async Task<bool> GetApprovalState()
+    {
+        var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
+           Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+           Web3Controller.instance.SelectedAccountAddress);
+        var response = await request.QueryAsync(
+            new IsApprovedForAllFunction()
+            {
+                Owner = Web3Controller.instance.SelectedAccountAddress,
+                Operator = Address
+            },
+            Address);
+        return response.ReturnValue1;
+    }
+
     // reference implementation for Write operations: https://github.com/Nethereum/Nethereum.Unity.Webgl/blob/main/Assets/MetamaskController.cs
 
     public static async Task<string> CreateDeck()

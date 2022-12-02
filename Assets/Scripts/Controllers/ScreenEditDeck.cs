@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -47,7 +48,12 @@ public class ScreenEditDeck : MonoBehaviour
     public async void HandleSaveButtonClick()
     {
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
-        await PepemonCardDeck.SetApprovalState(true);
+        // TODO: place this in an "approve" button
+        if (await PepemonCardDeck.GetApprovalState() == false)
+        {
+            // TODO: wait until completed, then check ApprovalState again
+            await PepemonCardDeck.SetApprovalState(true);
+        }
 
         GetSupportCardsDiff(
             supportCards,
@@ -55,54 +61,19 @@ public class ScreenEditDeck : MonoBehaviour
             out var supportCardsToBeAdded, 
             out var supportCardsToBeRemoved);
 
-        try
-        {
-            Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
-            await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
+        // using batch transactions might be a thing in the future, ie.: one confirmation window for multiple transactions
+        // https://ethereum.stackexchange.com/questions/18660/batch-transactions-for-metamask-using-sendasync
 
-            // update supportCards with added cards in case of success
-            foreach (var card in supportCardsToBeAdded)
-            {
-                if (!supportCards.TryAdd((ulong)card.SupportCardId, (int)card.Amount))
-                {
-                    supportCards[(ulong)card.SupportCardId] += (int)card.Amount;
-                }
-            }
-        }
-        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
-        {
-            Debug.LogError($"Unable to process transaction: {ex.Message}");
-            // TODO: display error toast
-        }
+        // this isnt working as expected. sometimes the error "Nonce too low. Expected nonce to be 29836 but got 29835."
+        // appears
+        List<Task> transactions = new List<Task>();
+        transactions.Add(UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved));
+        transactions.Add(UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard()));
+        await Task.WhenAll(transactions);
+    }
 
-        try
-        {
-            Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
-            await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
-
-            // update supportCards with removed cards in case of success
-            foreach (var card in supportCardsToBeRemoved)
-            {
-                if (supportCards.ContainsKey((ulong)card.SupportCardId))
-                {
-                    if (supportCards[(ulong)card.SupportCardId] - card.Amount == 0)
-                    {
-                        supportCards.Remove((ulong)card.SupportCardId);
-                    }
-                    else
-                    {
-                        supportCards[(ulong)card.SupportCardId] -= (int)card.Amount;
-                    }
-                }
-            }
-        }
-        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
-        {
-            Debug.LogError($"Unable to process transaction: {ex.Message}");
-            // TODO: display error toast
-        }
-
-        var newBattleCard = _deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard();
+    private async Task UpdateBattlecard(ulong newBattleCard)
+    {
         if (newBattleCard != battleCard && newBattleCard != 0) // 0 is an invalid card
         {
             try
@@ -135,8 +106,61 @@ public class ScreenEditDeck : MonoBehaviour
                 // TODO: display error toast
             }
         }
+    }
 
-        await PepemonCardDeck.SetApprovalState(false);
+    private async Task UpdateSupportCards(SupportCardRequest[] supportCardsToBeAdded, 
+                                         SupportCardRequest[] supportCardsToBeRemoved)
+    {
+        if (supportCardsToBeAdded.Count() > 0)
+        {
+            try
+            {
+                Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
+                await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
+
+                // update supportCards with added cards in case of success
+                foreach (var card in supportCardsToBeAdded)
+                {
+                    if (!supportCards.TryAdd((ulong)card.SupportCardId, (int)card.Amount))
+                    {
+                        supportCards[(ulong)card.SupportCardId] += (int)card.Amount;
+                    }
+                }
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction AddSupportCards: {ex.Message}");
+                // TODO: display error toast
+            }
+        }
+        if (supportCardsToBeRemoved.Count() > 0)
+        {
+            try
+            {
+                Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
+                await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
+                // update supportCards with removed cards in case of success
+                foreach (var card in supportCardsToBeRemoved)
+                {
+                    if (supportCards.ContainsKey((ulong)card.SupportCardId))
+                    {
+                        if (supportCards[(ulong)card.SupportCardId] - card.Amount == 0)
+                        {
+                            supportCards.Remove((ulong)card.SupportCardId);
+                        }
+                        else
+                        {
+                            supportCards[(ulong)card.SupportCardId] -= (int)card.Amount;
+                        }
+                    }
+                }
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction RemoveSupportCards: {ex.Message}");
+                // TODO: display error toast
+            }
+        }
     }
 
     public void GetSupportCardsDiff(Dictionary<ulong, int> oldSupportCards, 
