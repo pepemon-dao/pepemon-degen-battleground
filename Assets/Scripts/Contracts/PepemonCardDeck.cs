@@ -95,13 +95,16 @@ public class PepemonCardDeck
         var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
            Web3Controller.instance.SelectedAccountAddress);
+
         var response = await request.QueryAsync(
             new IsApprovedForAllFunction()
             {
                 Owner = Web3Controller.instance.SelectedAccountAddress,
                 Operator = Address
             },
-            Address);
+            // This is intentional. PepemonFactory does SafeTransfer which requires approval, not PepemonCardDeck
+            Web3Controller.instance.GetChainConfig().pepemonFactoryAddress);
+
         return response.ReturnValue1;
     }
 
@@ -134,6 +137,7 @@ public class PepemonCardDeck
 
     /// <summary>
     /// Approval is necessary to prevent this error in some cases: ERC1155#safeTransferFrom: INVALID_OPERATOR
+    /// Note: The contract that needs this is PepemonFactory, not PepemonCardDeck
     /// </summary>
     /// <param name="approved">Approval state to allow moving cards</param>
     /// <returns>Transaction result</returns>
@@ -141,6 +145,7 @@ public class PepemonCardDeck
     {
         var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
         return await approvalRequest.SignAndSendTransactionAsync(
+            // Using this ABI is intentional, see the note above
             new Contracts.PepemonFactory.abi.ContractDefinition.SetApprovalForAllFunction()
             {
                 Operator = Address,

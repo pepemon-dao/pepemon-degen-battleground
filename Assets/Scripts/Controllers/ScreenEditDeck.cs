@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ using UnityEngine.UI;
 public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
-    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButtonHandler;
+    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
     private ulong battleCard;
@@ -20,7 +21,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     public void Start()
     {
-        _saveDeckButtonHandler.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
+        _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
     }
 
     public async void LoadAllCards(ulong deckId)
@@ -47,29 +48,49 @@ public class ScreenEditDeck : MonoBehaviour
 
     public async void HandleSaveButtonClick()
     {
+        _saveDeckButton.GetComponent<Button>().interactable = false;
+
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
         // TODO: place this in an "approve" button
+        var approvalOk = true;
         if (await PepemonCardDeck.GetApprovalState() == false)
         {
-            // TODO: wait until completed, then check ApprovalState again
-            await PepemonCardDeck.SetApprovalState(true);
+            approvalOk = false;
+            var tx = await PepemonCardDeck.SetApprovalState(true);
+            try
+            {
+                var receipt = await Web3Controller.GetTransactionReceipt(tx);
+
+                // 1 for success, 0 for failure: https://docs.nethereum.com/en/latest/nethereum-receipt-status
+                if (receipt.Status == new Nethereum.Hex.HexTypes.HexBigInteger(1))
+                {
+                    if (await PepemonCardDeck.GetApprovalState())
+                    {
+                        approvalOk = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
+                approvalOk = false;
+            }
         }
 
-        GetSupportCardsDiff(
-            supportCards,
-            _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
-            out var supportCardsToBeAdded, 
-            out var supportCardsToBeRemoved);
+        if (approvalOk)
+        {
+            GetSupportCardsDiff(
+                supportCards,
+                _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
+                out var supportCardsToBeAdded,
+                out var supportCardsToBeRemoved);
 
-        // using batch transactions might be a thing in the future, ie.: one confirmation window for multiple transactions
-        // https://ethereum.stackexchange.com/questions/18660/batch-transactions-for-metamask-using-sendasync
+            // TODO: wait for transaction receipt
+            await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
+            await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
+        }
 
-        // this isnt working as expected. sometimes the error "Nonce too low. Expected nonce to be 29836 but got 29835."
-        // appears
-        List<Task> transactions = new List<Task>();
-        transactions.Add(UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved));
-        transactions.Add(UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard()));
-        await Task.WhenAll(transactions);
+        _saveDeckButton.GetComponent<Button>().interactable = true;
     }
 
     private async Task UpdateBattlecard(ulong newBattleCard)
