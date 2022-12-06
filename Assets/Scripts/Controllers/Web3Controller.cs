@@ -2,13 +2,14 @@
 using Nethereum.Unity.Contracts;
 using Nethereum.Unity.Rpc;
 using Nethereum.Web3.Accounts;
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+#if !UNITY_EDITOR
 using Nethereum.Unity.Metamask;
 using Nethereum.RPC.HostWallet;
 using System.Collections.Generic;
+#endif
+using Nethereum.RPC.Eth.DTOs;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 
@@ -181,5 +182,16 @@ public class Web3Controller : MonoBehaviour
     public void DisplayError(string errorMessage)
     {
         Debug.LogError(errorMessage);
+    }
+
+    public static async Task<TransactionReceipt> GetTransactionReceipt(string transactionHash)
+    {
+        var request = new TransactionReceiptPollingRequest(instance.GetUnityRpcRequestClientFactory());
+        await request.PollForReceipt(transactionHash, 0.25f);
+        if (request.Result != null)
+        {
+            return request.Result;
+        }
+        throw request.Exception;
     }
 }

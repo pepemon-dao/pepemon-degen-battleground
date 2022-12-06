@@ -8581,7 +8581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _deckDisplay: {fileID: 725896986}
-  _saveDeckButtonHandler: {fileID: 1986635108}
+  _saveDeckButton: {fileID: 1986635108}
   _textLoading: {fileID: 486681336}
 --- !u!1 &1168030655
 GameObject:

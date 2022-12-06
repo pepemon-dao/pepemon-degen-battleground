@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,7 +13,7 @@ using UnityEngine.UI;
 public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
-    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButtonHandler;
+    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
     private ulong battleCard;
@@ -19,7 +21,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     public void Start()
     {
-        _saveDeckButtonHandler.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
+        _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
     }
 
     public async void LoadAllCards(ulong deckId)
@@ -46,63 +48,55 @@ public class ScreenEditDeck : MonoBehaviour
 
     public async void HandleSaveButtonClick()
     {
+        _saveDeckButton.GetComponent<Button>().interactable = false;
+
+        var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
+
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
-        await PepemonCardDeck.SetApprovalState(true);
-
-        GetSupportCardsDiff(
-            supportCards,
-            _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
-            out var supportCardsToBeAdded, 
-            out var supportCardsToBeRemoved);
-
-        try
+        // TODO: place this in an "approve" button
+        var approvalOk = true;
+        if (await PepemonFactory.GetApprovalState(pepemonCardDeckAddress) == false)
         {
-            Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
-            await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
-
-            // update supportCards with added cards in case of success
-            foreach (var card in supportCardsToBeAdded)
+            approvalOk = false;
+            var tx = await PepemonFactory.SetApprovalState(true, pepemonCardDeckAddress);
+            try
             {
-                if (!supportCards.TryAdd((ulong)card.SupportCardId, (int)card.Amount))
-                {
-                    supportCards[(ulong)card.SupportCardId] += (int)card.Amount;
-                }
-            }
-        }
-        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
-        {
-            Debug.LogError($"Unable to process transaction: {ex.Message}");
-            // TODO: display error toast
-        }
+                var receipt = await Web3Controller.GetTransactionReceipt(tx);
 
-        try
-        {
-            Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
-            await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
-
-            // update supportCards with removed cards in case of success
-            foreach (var card in supportCardsToBeRemoved)
-            {
-                if (supportCards.ContainsKey((ulong)card.SupportCardId))
+                // 1 for success, 0 for failure: https://docs.nethereum.com/en/latest/nethereum-receipt-status
+                if (receipt.Status == new Nethereum.Hex.HexTypes.HexBigInteger(1))
                 {
-                    if (supportCards[(ulong)card.SupportCardId] - card.Amount == 0)
+                    if (await PepemonFactory.GetApprovalState(pepemonCardDeckAddress))
                     {
-                        supportCards.Remove((ulong)card.SupportCardId);
-                    }
-                    else
-                    {
-                        supportCards[(ulong)card.SupportCardId] -= (int)card.Amount;
+                        approvalOk = true;
                     }
                 }
             }
-        }
-        catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
-        {
-            Debug.LogError($"Unable to process transaction: {ex.Message}");
-            // TODO: display error toast
+            catch (Exception ex)
+            {
+                Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
+                approvalOk = false;
+            }
         }
 
-        var newBattleCard = _deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard();
+        if (approvalOk)
+        {
+            GetSupportCardsDiff(
+                supportCards,
+                _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
+                out var supportCardsToBeAdded,
+                out var supportCardsToBeRemoved);
+
+            // TODO: wait for transaction receipt
+            await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
+            await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
+        }
+
+        _saveDeckButton.GetComponent<Button>().interactable = true;
+    }
+
+    private async Task UpdateBattlecard(ulong newBattleCard)
+    {
         if (newBattleCard != battleCard && newBattleCard != 0) // 0 is an invalid card
         {
             try
@@ -135,8 +129,61 @@ public class ScreenEditDeck : MonoBehaviour
                 // TODO: display error toast
             }
         }
+    }
 
-        await PepemonCardDeck.SetApprovalState(false);
+    private async Task UpdateSupportCards(SupportCardRequest[] supportCardsToBeAdded, 
+                                         SupportCardRequest[] supportCardsToBeRemoved)
+    {
+        if (supportCardsToBeAdded.Count() > 0)
+        {
+            try
+            {
+                Debug.Log($"Adding {supportCardsToBeAdded.Count()} types of support cards to deck {currentDeckId}");
+                await PepemonCardDeck.AddSupportCards(currentDeckId, supportCardsToBeAdded);
+
+                // update supportCards with added cards in case of success
+                foreach (var card in supportCardsToBeAdded)
+                {
+                    if (!supportCards.TryAdd((ulong)card.SupportCardId, (int)card.Amount))
+                    {
+                        supportCards[(ulong)card.SupportCardId] += (int)card.Amount;
+                    }
+                }
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction AddSupportCards: {ex.Message}");
+                // TODO: display error toast
+            }
+        }
+        if (supportCardsToBeRemoved.Count() > 0)
+        {
+            try
+            {
+                Debug.Log($"Removing {supportCardsToBeRemoved.Count()} types of  support cards from deck {currentDeckId}");
+                await PepemonCardDeck.RemoveSupportCards(currentDeckId, supportCardsToBeRemoved);
+                // update supportCards with removed cards in case of success
+                foreach (var card in supportCardsToBeRemoved)
+                {
+                    if (supportCards.ContainsKey((ulong)card.SupportCardId))
+                    {
+                        if (supportCards[(ulong)card.SupportCardId] - card.Amount == 0)
+                        {
+                            supportCards.Remove((ulong)card.SupportCardId);
+                        }
+                        else
+                        {
+                            supportCards[(ulong)card.SupportCardId] -= (int)card.Amount;
+                        }
+                    }
+                }
+            }
+            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            {
+                Debug.LogError($"Unable to process transaction RemoveSupportCards: {ex.Message}");
+                // TODO: display error toast
+            }
+        }
     }
 
     public void GetSupportCardsDiff(Dictionary<ulong, int> oldSupportCards, 
