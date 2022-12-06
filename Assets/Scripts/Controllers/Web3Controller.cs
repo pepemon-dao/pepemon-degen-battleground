@@ -6,10 +6,12 @@ using UnityEngine;
 using UnityEngine.Events;
 #if !UNITY_EDITOR
 using Nethereum.Unity.Metamask;
+using Nethereum.RPC.HostWallet;
+using System.Collections.Generic;
 #endif
-using System.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 public class Web3Controller : MonoBehaviour
 {
@@ -47,7 +49,7 @@ public class Web3Controller : MonoBehaviour
 #else
         Account debugAccount = new Account(settings.debugPrivateKey);
         NewAccountSelected(debugAccount.Address);
-        ChainChanged(string.Format("0x{0:X}", settings.debugChainId));
+        ChainChanged(string.Format("0x{0:X}", settings.defaultChainId));
         onWalletConnected?.Invoke();
 #endif
     }
@@ -96,7 +98,7 @@ public class Web3Controller : MonoBehaviour
         return new TransactionSignedUnityRequest(
             url: settings.debugRpcUrl,
             privateKey: settings.debugPrivateKey,
-            chainId: settings.debugChainId);
+            chainId: settings.defaultChainId);
 #endif
     }
 
@@ -116,17 +118,20 @@ public class Web3Controller : MonoBehaviour
     }
 
     // callback from js
-    public void EthereumEnabled(string addressSelected)
+    public async void EthereumEnabled(string addressSelected)
     {
 #if !UNITY_EDITOR
         if (!_isMetamaskInitialised)
         {
+            await SwitchChain(settings.defaultChainId);
             MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
             MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
             _isMetamaskInitialised = true;
         }
         onWalletConnected?.Invoke();
         NewAccountSelected(addressSelected);
+#else
+        await Task.CompletedTask;
 #endif
     }
 
@@ -135,6 +140,35 @@ public class Web3Controller : MonoBehaviour
     {
         SelectedAccountAddress = accountAddress;
         Debug.Log($"Account changed to {SelectedAccountAddress}");
+    }
+
+    /// <summary>
+    /// Displays a popup in metamask asking the user to confirm changing the current network
+    /// </summary>
+    /// <param name="chainId">Network's chain id to switch to</param>
+    /// <returns>Task that must be awaited for the popup to appear</returns>
+    private async Task SwitchChain(int chainId)
+    {
+#if !UNITY_EDITOR
+        var addRequest = new WalletAddEthereumChainUnityRequest(GetUnityRpcRequestClientFactory());
+
+        var config = settings.GetChainConfig(chainId);
+        var chainParams = new AddEthereumChainParameter
+        {
+            ChainId = new HexBigInteger(chainId),
+            ChainName = config.chainName,
+            RpcUrls = new List<string> { config.rpcUrl },
+            NativeCurrency = new NativeCurrency
+            {
+                Name = config.chainCurrencyName,
+                Symbol = config.chainCurrencySymbol,
+                Decimals = config.chainCurrencyDecimals
+            }
+        };
+        await addRequest.SendRequest(chainParams);
+#else
+        await Task.CompletedTask;
+#endif
     }
 
     // callback from js
