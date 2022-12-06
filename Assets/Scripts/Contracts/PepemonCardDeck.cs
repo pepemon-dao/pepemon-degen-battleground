@@ -90,24 +90,6 @@ public class PepemonCardDeck
         return (ulong)response.ReturnValue1;
     }
 
-    public static async Task<bool> GetApprovalState()
-    {
-        var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
-           Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-           Web3Controller.instance.SelectedAccountAddress);
-
-        var response = await request.QueryAsync(
-            new IsApprovedForAllFunction()
-            {
-                Owner = Web3Controller.instance.SelectedAccountAddress,
-                Operator = Address
-            },
-            // This is intentional. PepemonFactory does SafeTransfer which requires approval, not PepemonCardDeck
-            Web3Controller.instance.GetChainConfig().pepemonFactoryAddress);
-
-        return response.ReturnValue1;
-    }
-
     // reference implementation for Write operations: https://github.com/Nethereum/Nethereum.Unity.Webgl/blob/main/Assets/MetamaskController.cs
 
     public static async Task<string> CreateDeck()
@@ -133,25 +115,6 @@ public class PepemonCardDeck
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         return await request.SignAndSendTransactionAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
-    }
-
-    /// <summary>
-    /// Approval is necessary to prevent this error in some cases: ERC1155#safeTransferFrom: INVALID_OPERATOR
-    /// Note: The contract that needs this is PepemonFactory, not PepemonCardDeck
-    /// </summary>
-    /// <param name="approved">Approval state to allow moving cards</param>
-    /// <returns>Transaction result</returns>
-    public static async Task<string> SetApprovalState(bool approved)
-    {
-        var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await approvalRequest.SignAndSendTransactionAsync(
-            // Using this ABI is intentional, see the note above
-            new Contracts.PepemonFactory.abi.ContractDefinition.SetApprovalForAllFunction()
-            {
-                Operator = Address,
-                Approved = approved
-            },
-            Web3Controller.instance.GetChainConfig().pepemonFactoryAddress);
     }
 
     /// <summary>

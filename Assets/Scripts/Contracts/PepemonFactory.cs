@@ -117,6 +117,46 @@ class PepemonFactory
         return maxTokenId;
     }
 
+    /// <summary>
+    /// Tells whether or not a contract/wallet can transfer NFTs
+    /// </summary>
+    /// <param name="operatorAddress">Address of the contract/wallet</param>
+    /// <returns>result of IsApprovedForAll</returns>
+    public static async Task<bool> GetApprovalState(string operatorAddress)
+    {
+        var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
+           Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+           Web3Controller.instance.SelectedAccountAddress);
+
+        var response = await request.QueryAsync(
+            new IsApprovedForAllFunction()
+            {
+                Owner = Web3Controller.instance.SelectedAccountAddress,
+                Operator = operatorAddress
+            },
+            Address);
+
+        return response.IsOperator;
+    }
+
+    /// <summary>
+    /// Approval is necessary to prevent this error in some cases: ERC1155#safeTransferFrom: INVALID_OPERATOR
+    /// </summary>
+    /// <param name="approved">Approval state to allow moving cards</param>
+    /// <param name="operatorAddress">Contract/wallet which will be given/revoked permission to transfer the NFTs</param>
+    /// <returns>Transaction hash</returns>
+    public static async Task<string> SetApprovalState(bool approved, string operatorAddress)
+    {
+        var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
+        return await approvalRequest.SignAndSendTransactionAsync(
+            new SetApprovalForAllFunction()
+            {
+                Operator = operatorAddress,
+                Approved = approved
+            },
+            Address);
+    }
+
     [Serializable]
     public struct CardMetadata
     {
