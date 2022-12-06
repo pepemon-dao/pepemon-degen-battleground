@@ -118,23 +118,6 @@ public class PepemonCardDeck
     }
 
     /// <summary>
-    /// Approval is necessary to prevent this error in some cases: ERC1155#safeTransferFrom: INVALID_OPERATOR
-    /// </summary>
-    /// <param name="approved">Approval state to allow moving cards</param>
-    /// <returns>Transaction result</returns>
-    public static async Task<string> SetApprovalState(bool approved)
-    {
-        var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await approvalRequest.SignAndSendTransactionAsync(
-            new Contracts.PepemonFactory.abi.ContractDefinition.SetApprovalForAllFunction()
-            {
-                Operator = Address,
-                Approved = approved
-            },
-            Web3Controller.instance.GetChainConfig().pepemonFactoryAddress);
-    }
-
-    /// <summary>
     /// Adds support card to deck. Requires prior Approval
     /// </summary>
     public static async Task<string> AddSupportCards(ulong deckId, params SupportCardRequest[] requests)
