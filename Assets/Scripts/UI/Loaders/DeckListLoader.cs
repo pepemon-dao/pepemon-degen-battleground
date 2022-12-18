@@ -60,9 +60,7 @@ public class DeckListLoader : MonoBehaviour
 
             // show or hide the pen overlay
             deckInstance.GetComponent<DeckController>().DisplayDeckEditMode = _deckEditMode;
-
-            // handle the click event for each instantied deck element, passing the ID of the selected deck
-            deckInstance.GetComponent<Button>().onClick.AddListener(
+            deckInstance.GetComponent<DeckController>().onEditButtonClicked.AddListener(
                 delegate { 
                     onItemSelected?.Invoke(deckId);
                 });

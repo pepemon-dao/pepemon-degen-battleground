@@ -18,7 +18,7 @@ public class ScreenManageDecks : MonoBehaviour
     {
         Debug.Log("Editing deck: " + deckId);
         _screenEditDeck.GetComponent<ScreenEditDeck>().LoadAllCards(deckId);
-        FindObjectOfType<MainMenuController>().ShowScreen(5);
+        FindObjectOfType<MainMenuController>().ShowScreen(6);
     }
 
     public void ReloadAllDecks()

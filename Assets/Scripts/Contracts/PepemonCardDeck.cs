@@ -92,17 +92,17 @@ public class PepemonCardDeck
 
     // reference implementation for Write operations: https://github.com/Nethereum/Nethereum.Unity.Webgl/blob/main/Assets/MetamaskController.cs
 
-    public static async Task<string> CreateDeck()
+    public static async Task CreateDeck()
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         // note: deck is created using the sender's address
-        return await request.SignAndSendTransactionAsync(new CreateDeckFunction(), Address);
+        await request.SendTransactionAndWaitForReceiptAsync(new CreateDeckFunction(), Address);
     }
 
-    public static async Task<string> SetBattleCard(ulong deckId, ulong battleCardId)
+    public static async Task SetBattleCard(ulong deckId, ulong battleCardId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await request.SignAndSendTransactionAsync(
+        await request.SendTransactionAndWaitForReceiptAsync(
             new AddBattleCardToDeckFunction()
             {
                 DeckId = deckId,
@@ -111,21 +111,21 @@ public class PepemonCardDeck
             Address);
     }
 
-    public static async Task<string> RemoveBattleCard(ulong deckId)
+    public static async Task RemoveBattleCard(ulong deckId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await request.SignAndSendTransactionAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
+        await request.SendTransactionAndWaitForReceiptAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
     }
 
     /// <summary>
     /// Adds support card to deck. Requires prior Approval
     /// </summary>
-    public static async Task<string> AddSupportCards(ulong deckId, params SupportCardRequest[] requests)
+    public static async Task AddSupportCards(ulong deckId, params SupportCardRequest[] requests)
     {
         // TODO: Check if max support cards will be reached
         // TODO: Check if the player has the cards
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await request.SignAndSendTransactionAsync(
+        await request.SendTransactionAndWaitForReceiptAsync(
             new AddSupportCardsToDeckFunction()
             {
                 DeckId = deckId,
@@ -137,11 +137,11 @@ public class PepemonCardDeck
     /// <summary>
     /// Removes support card from deck. Requires prior Approval
     /// </summary>
-    public static async Task<string> RemoveSupportCards(ulong deckId, params SupportCardRequest[] requests)
+    public static async Task RemoveSupportCards(ulong deckId, params SupportCardRequest[] requests)
     {
         // TODO: Check if the deck has requested cards before removing
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await request.SignAndSendTransactionAsync(
+        await request.SendTransactionAndWaitForReceiptAsync(
             new RemoveSupportCardsFromDeckFunction()
             {
                 DeckId = deckId,

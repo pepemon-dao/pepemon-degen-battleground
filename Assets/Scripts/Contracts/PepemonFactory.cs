@@ -22,7 +22,7 @@ class PepemonFactory
     public static async Task<CardMetadata?> GetCardMetadata(ulong tokenId)
     {
         var request = new QueryUnityRequest<UriFunction, UriOutputDTO>(
-            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
         UriOutputDTO response;
@@ -145,10 +145,10 @@ class PepemonFactory
     /// <param name="approved">Approval state to allow moving cards</param>
     /// <param name="operatorAddress">Contract/wallet which will be given/revoked permission to transfer the NFTs</param>
     /// <returns>Transaction hash</returns>
-    public static async Task<string> SetApprovalState(bool approved, string operatorAddress)
+    public static async Task SetApprovalState(bool approved, string operatorAddress)
     {
         var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
-        return await approvalRequest.SignAndSendTransactionAsync(
+        await approvalRequest.SendTransactionAndWaitForReceiptAsync(
             new SetApprovalForAllFunction()
             {
                 Operator = operatorAddress,

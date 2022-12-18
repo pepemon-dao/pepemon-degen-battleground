@@ -5,41 +5,54 @@ using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class DeckController : MonoBehaviour
 {
-    [BoxGroup("Deck Components"), SerializeField] private Text _deckDisplayName;
     [BoxGroup("Deck Components"), SerializeField] private Image _deckFrameImage;
-    [BoxGroup("Deck Components"), SerializeField] private Image _fade;
-    [BoxGroup("Deck Components"), SerializeField] private Text _pencil;
-    [BoxGroup("Deck Components"), SerializeField] private Text _checkmark;
+    [BoxGroup("Deck Components"), SerializeField] private Button _editButton;
+    [BoxGroup("Deck Components"), SerializeField] private Button _selectButton;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _deckName;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _battleCard;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _supportCardCount;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _winCount;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _lossCount;
+
+    public UnityEvent onEditButtonClicked;
 
     /// <summary>
-    /// Show/Hide pencil+fade when selecting or editing a deck
+    /// Show/Hide edit/select depending on the screen
     /// </summary>
-    public bool DisplayDeckEditMode  {
-        set => _fade.enabled = _pencil.enabled = value;
-        get => _fade.enabled;
+    public bool DisplayDeckEditMode
+    {
+        set
+        {
+            _editButton.gameObject.SetActive(value);
+            _selectButton.gameObject.SetActive(!value);
+        }
+
+        get => _editButton.gameObject.activeSelf;
     }
 
     void Start()
     {
-        GetComponent<Button>().onClick.AddListener(OnButtonClicked);
+        _editButton.onClick.AddListener(OnEditClicked);
+        _selectButton.onClick.AddListener(OnSelectClicked);
         // set on unity editor, doesn't works if set here
         // GetComponent<SelectionItem>().onDeselected.AddListener(onDeselected);
         // GetComponent<SelectionItem>().onSelected.AddListener(onSelected);
     }
 
-    void OnButtonClicked()
+    void OnEditClicked()
     {
-        // if not in edit mode, then it is in selection mode
-        if (!DisplayDeckEditMode)
-        {
-            GetComponent<SelectionItem>().ToggleSelected();
-        }
+        onEditButtonClicked?.Invoke();
     }
 
+    void OnSelectClicked()
+    {
+        GetComponent<SelectionItem>().ToggleSelected();
+    }
 
     public async Task LoadDeckInfo(ulong deckId)
     {
@@ -47,9 +60,12 @@ public class DeckController : MonoBehaviour
         var battleCard = await PepemonCardDeck.GetBattleCard(deckId);
 
         var metadata = PepemonFactoryCardCache.GetMetadata(battleCard);
-        var deckName = metadata?.name == null ? "New Deck" : metadata?.name + " Deck";
         var supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
-        _deckDisplayName.text = $"{deckName} ({supportCards.Values?.Count ?? 0})";
+        // TODO: Populate wins/losses
+        // TODO: Use on-chain MAX_SUPPORT_CARDS value
+        _deckName.text = (metadata?.name ?? "New") + " Deck";
+        _battleCard.text = metadata?.name ?? "None";
+        _supportCardCount.text = (supportCards.Values?.Count ?? 0) + " / " + 60;
     }
 }

@@ -10,6 +10,7 @@ class SelectionGroup : MonoBehaviour
 
     public HashSet<SelectionItem> selection;
     public UnityEvent onSelectionChanged;
+    public UnityEvent onSelectionEmpty;
 
     private void Start()
     {
@@ -66,6 +67,15 @@ class SelectionGroup : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if (selection.Count == 0)
+        {
+            onSelectionEmpty?.Invoke();
+        }
+        else
+        {
+            onSelectionChanged?.Invoke();
         }
     }
 }
