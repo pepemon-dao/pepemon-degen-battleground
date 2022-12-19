@@ -6587,7 +6587,7 @@ MonoBehaviour:
       rpcUrl: https://rpc.ankr.com/polygon_mumbai
       pepemonBattleAddress: 0xf8f6DF81b66Cb0d1Bd629E35a740Fa01DC285727
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
-      pepemonCardDeckAddress: 0x84057FFFc602F74C19848D86fC8e14D95Cd9DE35
+      pepemonCardDeckAddress: 0xa784b4fcFe0cF627aD2Be650d5467597FCFBFf67
     - chainId: 31337
       chainName: hardhat
       chainCurrencyName: ETH

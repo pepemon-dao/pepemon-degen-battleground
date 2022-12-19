@@ -62,7 +62,7 @@ class PepemonFactoryCardCache
 
     public static async Task PreloadAllImages(ulong parallelBatchSize, Action<ulong> cardLoadedCallback = null)
     {
-        var cardList = cardMetadata.Values.ToList();
+        var cardList = cardMetadata.ToList();
 
         for (int batchStart = 0; batchStart < cardList.Count; batchStart += (int)parallelBatchSize)
         {
@@ -71,7 +71,7 @@ class PepemonFactoryCardCache
             List<Task> imageLoadingTasks = new List<Task>();
             for (int i = batchStart; i < batchEnd; i++)
             {
-                imageLoadingTasks.Add(PreloadTokenImage((ulong)i, cardLoadedCallback));
+                imageLoadingTasks.Add(PreloadTokenImage(cardList[i].Key, cardLoadedCallback));
             }
             await Task.WhenAll(imageLoadingTasks);
         }
