@@ -131,7 +131,6 @@ public class Web3Controller : MonoBehaviour
 #if !UNITY_EDITOR
         if (!_isMetamaskInitialised)
         {
-            await SwitchChain(settings.defaultChainId);
             MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
             MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
             _isMetamaskInitialised = true;
@@ -180,10 +179,16 @@ public class Web3Controller : MonoBehaviour
     }
 
     // callback from js
-    public void ChainChanged(string chainId)
+    public async void ChainChanged(string chainId)
     {
         CurrentChainId = (int)new HexBigInteger(chainId).Value;
         Debug.Log($"Changed chain to {CurrentChainId} (hex: {chainId})");
+
+        if (CurrentChainId != settings.defaultChainId)
+        {
+            Debug.Log($"Attempting to switch chain to {settings.defaultChainId}");
+            await SwitchChain(settings.defaultChainId);
+        }
     }
 
     public void DisplayError(string errorMessage)

@@ -40,9 +40,10 @@ public class CardPreview : MonoBehaviour
             Debug.LogWarning("Unable to locate metadata for card " + cardId);
         }
 
+        Texture2D cardTexture = tex == null ? new Texture2D(8, 8) : tex;
         _cardImage.sprite = Sprite.Create(
-            tex != null ? tex : new Texture2D(8, 8),
-            new Rect(0, 0, tex.width, tex.height),
+            cardTexture,
+            new Rect(0, 0, cardTexture.width, cardTexture.height),
             new Vector2());
 
         _text.text = metadata?.name ?? "Unknown Card";
