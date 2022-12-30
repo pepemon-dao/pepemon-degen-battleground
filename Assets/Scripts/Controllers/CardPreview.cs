@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static PepemonFactory;
@@ -11,7 +12,7 @@ using static PepemonFactory;
 public class CardPreview : MonoBehaviour
 {
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
-    [BoxGroup("Card Components"), SerializeField] public Text _text;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _text;
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
     public ulong cardId { get; private set; }
     public bool isSelected { get =>  GetComponentInParent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
@@ -39,11 +40,12 @@ public class CardPreview : MonoBehaviour
             Debug.LogWarning("Unable to locate metadata for card " + cardId);
         }
 
-        _cardImage.GetComponent<Image>().sprite = Sprite.Create(
-            tex != null ? tex : new Texture2D(8, 8),
-            new Rect(0, 0, tex.width, tex.height),
+        Texture2D cardTexture = tex == null ? new Texture2D(8, 8) : tex;
+        _cardImage.sprite = Sprite.Create(
+            cardTexture,
+            new Rect(0, 0, cardTexture.width, cardTexture.height),
             new Vector2());
 
-        _text.GetComponent<Text>().text = metadata?.name ?? "Unknown Card";
+        _text.text = metadata?.name ?? "Unknown Card";
     }
 }

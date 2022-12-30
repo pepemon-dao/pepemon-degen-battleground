@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,15 +16,16 @@ public class MintDeckButtonHandler : MonoBehaviour
     async void OnButtonClicked()
     {
         GetComponent<Button>().interactable = false;
-        var tx = await PepemonCardDeck.CreateDeck();
-        // TODO: show error label on failure
-        if (!string.IsNullOrEmpty(tx))
+        try
         {
-            // TODO: enum screens
-            FindObjectOfType<MainMenuController>().ShowScreen(5);
+            await PepemonCardDeck.CreateDeck();
         }
-        GetComponent<Button>().interactable = true;
+        catch (Exception e)
+        {
+            Debug.LogError("Unable to mint new deck: " + e.Message);
+        }
 
+        GetComponent<Button>().interactable = true;
         _deckList.GetComponent<DeckListLoader>().ReloadAllDecks();
     }
 }

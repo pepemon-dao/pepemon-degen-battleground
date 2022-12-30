@@ -7,6 +7,7 @@ public class Web3Settings
     public int defaultChainId = 31337;
     public string debugRpcUrl = "http://localhost:8545";
     public string debugPrivateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+    public string readOnlyRpcUrl = "";
 
     [Serializable]
     public struct Web3ChainConfig

@@ -18,7 +18,6 @@ public class Web3Controller : MonoBehaviour
     public static Web3Controller instance;
 
     public Web3Settings settings;
-    public IWeb3Provider provider;
     public UnityEvent onWalletConnected;
     public int CurrentChainId { get; private set; } = 0;
     public string SelectedAccountAddress { get; private set; }
@@ -27,7 +26,7 @@ public class Web3Controller : MonoBehaviour
     private bool _isMetamaskInitialised = false;
 #endif
 
-    private void Start()
+    private void Awake()
     {
         if (instance == null)
         {
@@ -39,6 +38,7 @@ public class Web3Controller : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        CurrentChainId = settings.defaultChainId;
     }
 
     public void ConnectWallet()
@@ -77,6 +77,14 @@ public class Web3Controller : MonoBehaviour
 #else
         return new UnityWebRequestRpcClientFactory(settings.debugRpcUrl);
 #endif
+    }
+
+    /// <summary>
+    /// Used with QueryUnityRequest to query contract functions (READ operations)
+    /// </summary>
+    public IUnityRpcRequestClientFactory GetReadOnlyRpcRequestClientFactory()
+    {
+        return new UnityWebRequestRpcClientFactory(settings.readOnlyRpcUrl);
     }
 
     /// <summary>
@@ -123,7 +131,6 @@ public class Web3Controller : MonoBehaviour
 #if !UNITY_EDITOR
         if (!_isMetamaskInitialised)
         {
-            await SwitchChain(settings.defaultChainId);
             MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
             MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
             _isMetamaskInitialised = true;
@@ -176,7 +183,12 @@ public class Web3Controller : MonoBehaviour
     {
         CurrentChainId = (int)new HexBigInteger(chainId).Value;
         Debug.Log($"Changed chain to {CurrentChainId} (hex: {chainId})");
-        await new PepemonFactoryCardCache().PreloadAll();
+
+        if (CurrentChainId != settings.defaultChainId)
+        {
+            Debug.Log($"Attempting to switch chain to {settings.defaultChainId}");
+            await SwitchChain(settings.defaultChainId);
+        }
     }
 
     public void DisplayError(string errorMessage)

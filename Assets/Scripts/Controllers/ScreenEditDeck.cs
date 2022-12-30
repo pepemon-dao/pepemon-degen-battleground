@@ -49,33 +49,21 @@ public class ScreenEditDeck : MonoBehaviour
     public async void HandleSaveButtonClick()
     {
         _saveDeckButton.GetComponent<Button>().interactable = false;
-
         var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
 
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
         // TODO: place this in an "approve" button
-        var approvalOk = true;
-        if (await PepemonFactory.GetApprovalState(pepemonCardDeckAddress) == false)
+        var approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
+        if (!approvalOk)
         {
-            approvalOk = false;
-            var tx = await PepemonFactory.SetApprovalState(true, pepemonCardDeckAddress);
             try
             {
-                var receipt = await Web3Controller.GetTransactionReceipt(tx);
-
-                // 1 for success, 0 for failure: https://docs.nethereum.com/en/latest/nethereum-receipt-status
-                if (receipt.Status == new Nethereum.Hex.HexTypes.HexBigInteger(1))
-                {
-                    if (await PepemonFactory.GetApprovalState(pepemonCardDeckAddress))
-                    {
-                        approvalOk = true;
-                    }
-                }
+                await PepemonFactory.SetApprovalState(true, pepemonCardDeckAddress);
+                approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
             }
             catch (Exception ex)
             {
                 Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
-                approvalOk = false;
             }
         }
 
