@@ -21,6 +21,7 @@ public class Web3Settings
         public string pepemonBattleAddress;
         public string pepemonFactoryAddress;
         public string pepemonCardDeckAddress;
+        public string[] pepemonMatchmakerAddresses;
     }
 
     public Web3ChainConfig GetChainConfig(int chainId)

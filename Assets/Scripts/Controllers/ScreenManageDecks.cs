@@ -11,7 +11,7 @@ public class ScreenManageDecks : MonoBehaviour
 
     private void Start()
     {
-        _editDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectEditDeck);
+        _editDeckListLoader.GetComponent<DeckListLoader>().onEditDeck.AddListener(SelectEditDeck);
     }
 
     public void SelectEditDeck(ulong deckId)

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
-class PepemonFactory
+class PepemonFactory : ERC1155Common
 {
     /// <summary>
     /// PepemonFactory address (Support cards, Battle cards)
@@ -124,19 +124,7 @@ class PepemonFactory
     /// <returns>result of IsApprovedForAll</returns>
     public static async Task<bool> GetApprovalState(string operatorAddress)
     {
-        var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
-           Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-           Web3Controller.instance.SelectedAccountAddress);
-
-        var response = await request.QueryAsync(
-            new IsApprovedForAllFunction()
-            {
-                Owner = Web3Controller.instance.SelectedAccountAddress,
-                Operator = operatorAddress
-            },
-            Address);
-
-        return response.IsOperator;
+        return await GetApproval(Address, operatorAddress);
     }
 
     /// <summary>
@@ -147,14 +135,7 @@ class PepemonFactory
     /// <returns>Transaction hash</returns>
     public static async Task SetApprovalState(bool approved, string operatorAddress)
     {
-        var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await approvalRequest.SendTransactionAndWaitForReceiptAsync(
-            new SetApprovalForAllFunction()
-            {
-                Operator = operatorAddress,
-                Approved = approved
-            },
-            Address);
+        await SetApproval(Address, approved, operatorAddress);
     }
 
     [Serializable]

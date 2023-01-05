@@ -12,10 +12,10 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _deckPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _deckList;
     [TitleGroup("Component References"), SerializeField] GameObject _loadingMessage;
-    // Whether or not display the pen + transparency fade
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
-    [ReadOnly] public UnityEvent<ulong> onItemSelected;
+    [ReadOnly] public UnityEvent<ulong> onEditDeck;
+    [ReadOnly] public UnityEvent<ulong> onSelectDeck;
     private bool loadingInProgress = false;
 
     /// <summary>
@@ -58,11 +58,15 @@ public class DeckListLoader : MonoBehaviour
             var deckInstance = Instantiate(_deckPrefab);
             deckInstance.transform.SetParent(_deckList.transform, false);
 
-            // show or hide the pen overlay
+            // show or hide the edit mode
             deckInstance.GetComponent<DeckController>().DisplayDeckEditMode = _deckEditMode;
             deckInstance.GetComponent<DeckController>().onEditButtonClicked.AddListener(
-                delegate { 
-                    onItemSelected?.Invoke(deckId);
+                delegate {
+                    onEditDeck?.Invoke(deckId);
+                });
+            deckInstance.GetComponent<DeckController>().onSelectButtonClicked.AddListener(
+                delegate {
+                    onSelectDeck?.Invoke(deckId);
                 });
 
             // this should set each deck detail in parallel

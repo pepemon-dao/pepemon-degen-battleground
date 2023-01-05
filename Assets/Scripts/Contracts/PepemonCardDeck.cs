@@ -9,7 +9,7 @@ using Nethereum.Unity.Rpc;
 // Note: The generated code requires some small changes to work, like renaming the class pepemonCardDeck.abiDeployment to pepemonCardDeckAbiDeployment
 // as well as removing the .abiService.cs C# code, which is not used because relies on Web3 namespace, which is incompatible with WebGL.
 
-public class PepemonCardDeck
+public class PepemonCardDeck : ERC1155Common
 {
     /// <summary>
     /// PepemonCardDeck Contract Address
@@ -90,7 +90,18 @@ public class PepemonCardDeck
         return (ulong)response.ReturnValue1;
     }
 
+    public static async Task<bool> GetApprovalState(string operatorAddress)
+    {
+        return await GetApproval(Address, operatorAddress);
+    }
+
+
     // reference implementation for Write operations: https://github.com/Nethereum/Nethereum.Unity.Webgl/blob/main/Assets/MetamaskController.cs
+    
+    public static async Task SetApprovalState(bool approved, string operatorAddress)
+    {
+        await SetApproval(Address, approved, operatorAddress);
+    }
 
     public static async Task CreateDeck()
     {
