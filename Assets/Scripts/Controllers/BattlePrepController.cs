@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class BattlePrepController : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _searchForOpponentButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _exitButton;
     [TitleGroup("Component References"), SerializeField] GameObject _deckList;
 
     [ReadOnly] private PepemonMatchmaker.PepemonLeagues selectedLeague;
@@ -19,6 +20,7 @@ public class BattlePrepController : MonoBehaviour
     void Start()
     {
         _searchForOpponentButton.GetComponent<Button>().onClick.AddListener(OnSearchForOpponentButtonClick);
+        _exitButton.GetComponent<Button>().onClick.AddListener(onExitButtonClick);
         _deckList.GetComponent<DeckListLoader>().onSelectDeck.AddListener(OnDeckSelected);
     }
 
@@ -45,16 +47,32 @@ public class BattlePrepController : MonoBehaviour
 
         FindObjectOfType<MainMenuController>().ShowScreen(7);
 
-        Debug.Log("battle start");
-        await PepemonMatchmaker.EnterBattle(selectedLeague, selectedDeck);
+        Debug.Log("Looking for battle");
+        await PepemonMatchmaker.Enter(selectedLeague, selectedDeck);
 
-        Debug.Log("waiting events");
+        _exitButton.GetComponent<Button>().interactable = true;
+
+        Debug.Log("Waiting for CreatedBattle events");
         var battleId = await PepemonBattle.WaitForCreatedBattle(
             Web3Controller.instance.SelectedAccountAddress,
             nextBlock);
-        Debug.Log("battlid:" + battleId);
+        Debug.Log("Received battle event. BattlId:" + battleId);
+    }
 
-        Debug.Log("battle ended");
+    private async void onExitButtonClick()
+    {
+        try
+        {
+            _exitButton.GetComponent<Button>().interactable = false;
+            Debug.Log("Trying to exit matchmaking");
+            await PepemonMatchmaker.Exit(selectedLeague, selectedDeck);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("Matchmaking Exit failed: " + ex.Message);
+        }
+
+        FindObjectOfType<MainMenuController>().ShowScreen(4);
     }
 
     private async Task EnsureDeckTransferApproved()

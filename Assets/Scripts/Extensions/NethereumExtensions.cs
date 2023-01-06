@@ -81,6 +81,22 @@ public static class NethereumExtensions
         return blockParamInstance;
     }
 
+    public static async Task<List<EventLog<_IEventDTO>>> GetEventsAsync<_IEventDTO>(this NewFilterInput eventFilter)
+        where _IEventDTO : IEventDTO, new()
+    {
+        var getLogsRequest = new EthGetLogsUnityRequest(Web3Controller.instance.GetUnityRpcRequestClientFactory());
+        Debug.Log($"Getting events: {typeof(_IEventDTO).Name} " +
+            $"with {eventFilter.Topics.Length} filter params " +
+            $"from blocks {eventFilter.FromBlock.BlockNumber} - {eventFilter.ToBlock.BlockNumber}");
+
+        List<EventLog<_IEventDTO>> eventLogs;
+        await getLogsRequest.SendRequest(eventFilter);
+        eventLogs = getLogsRequest.Result.DecodeAllEvents<_IEventDTO>();
+
+        Debug.Log("Events received: " + eventLogs.Count);
+        return eventLogs;
+    }
+
     public static async Task<List<EventLog<_IEventDTO>>> WaitForEventAsync<_IEventDTO>(
         this NewFilterInput eventFilter,
         int millisecondsToWait = EVENT_POLLING_INTERVAL_MS,
