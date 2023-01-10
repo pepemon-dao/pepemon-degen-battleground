@@ -9,6 +9,7 @@ using UnityEngine;
 using Nethereum.Contracts.QueryHandlers.MultiCall;
 using System.Collections.Generic;
 using System.Threading;
+using System;
 
 public static class NethereumExtensions
 {
@@ -107,21 +108,29 @@ public static class NethereumExtensions
         var getLogsRequest = new EthGetLogsUnityRequest(Web3Controller.instance.GetUnityRpcRequestClientFactory());
 
         Debug.Log($"Waiting for event: {typeof(_IEventDTO).Name} " +
-            $"with {eventFilter.Topics.Length} filter params " +
-            $"at block {eventFilter.FromBlock.BlockNumber}");
+            $"with {eventFilter.Topics.Length} topics " +
+            $"from block {eventFilter.FromBlock.BlockNumber}");
 
         List<EventLog<_IEventDTO>> eventLogs;
         do
         {
             await getLogsRequest.SendRequest(eventFilter);
             eventLogs = getLogsRequest.Result.DecodeAllEvents<_IEventDTO>();
-
+            
             if (eventLogs.Count == 0)
             {
-                await UniTask.Delay(millisecondsToWait, cancellationToken: token);
+                try
+                {
+                    await UniTask.Delay(millisecondsToWait, cancellationToken: token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Debug.Log("Stopped waiting event " + typeof(_IEventDTO).Name);
+                    break;
+                }
             }
         }
-        while (eventLogs.Count == 0 || token.IsCancellationRequested);
+        while (eventLogs.Count == 0);
 
         Debug.Log("Events received: " + eventLogs.Count);
 

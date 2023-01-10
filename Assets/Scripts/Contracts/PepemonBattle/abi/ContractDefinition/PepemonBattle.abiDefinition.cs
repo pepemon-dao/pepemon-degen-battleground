@@ -148,8 +148,12 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
         public virtual string Player1Addr { get; set; }
         [Parameter("address", "player2Addr", 2, true )]
         public virtual string Player2Addr { get; set; }
-        [Parameter("uint256", "battleId", 3, false )]
+        [Parameter("uint256", "battleId", 3, false)]
         public virtual BigInteger BattleId { get; set; }
+        [Parameter("uint256", "p1DeckId", 4, false)]
+        public virtual BigInteger Player1Deck { get; set; }
+        [Parameter("uint256", "p2DeckId", 5, false)]
+        public virtual BigInteger Player2Deck { get; set; }
     }
 
 

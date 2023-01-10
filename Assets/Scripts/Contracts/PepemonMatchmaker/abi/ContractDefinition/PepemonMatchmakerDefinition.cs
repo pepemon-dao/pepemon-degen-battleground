@@ -41,7 +41,7 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
     public class DeckOwnerFunctionBase : FunctionMessage
     {
         [Parameter("uint256", "", 1)]
-        public virtual BigInteger ReturnValue1 { get; set; }
+        public virtual BigInteger DeckId { get; set; }
     }
 
     public partial class EnterFunction : EnterFunctionBase { }
