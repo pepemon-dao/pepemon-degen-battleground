@@ -12,7 +12,6 @@ using UnityEngine.UI;
 
 public class BattlePrepController : MonoBehaviour
 {
-
     [TitleGroup("Component References"), SerializeField] GameObject _searchForOpponentButton;
     [TitleGroup("Component References"), SerializeField] GameObject _exitButton;
     [TitleGroup("Component References"), SerializeField] GameObject _deckList;
@@ -149,8 +148,7 @@ public class BattlePrepController : MonoBehaviour
         }
     }
 
-    [Serializable]
-    public struct BattleData
+    public class BattleData
     {
         public BigInteger battleRngSeed;
         public ulong player1BattleCard;
@@ -158,5 +156,4 @@ public class BattlePrepController : MonoBehaviour
         public Dictionary<ulong, int> player1SupportCards;
         public Dictionary<ulong, int> player2SupportCards;
     }
-
 }

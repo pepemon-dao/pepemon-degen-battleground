@@ -9,7 +9,6 @@ using UnityEngine;
 using Nethereum.RPC.Eth.DTOs;
 using System.Linq;
 using System.Numerics;
-using static PepemonFactory;
 
 class PepemonBattle
 {
