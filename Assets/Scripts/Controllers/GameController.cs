@@ -21,8 +21,12 @@ public class GameController : MonoBehaviour
     [BoxGroup("Pepemon Controller")] public PepemonCardController player1Controller;
     [BoxGroup("Pepemon Controller")] public PepemonCardController player2Controller;
 
+    [TitleGroup("Scriptable objects list"), SerializeField] DataContainer CardsScriptableObjsData;
+
     private void Start()
     {
+        PrepareDecksBeforeBattle();
+
         player1Controller.PopulateCard(_player1.PlayerPepemon);
         player2Controller.PopulateCard(_player2.PlayerPepemon);
 
@@ -30,6 +34,25 @@ public class GameController : MonoBehaviour
         {
             InitFirstRound();
             StartCoroutine(LoopGame());
+        }
+    }
+
+    private void PrepareDecksBeforeBattle()
+    {
+        // might be null if ran from unity editor
+        if (BattlePrepController.battleData != null)
+        {
+            _player1.SetPlayerDeck(
+                pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player1BattleCard.ToString()),
+                supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player1SupportCards));
+
+            _player2.SetPlayerDeck(
+                pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player2BattleCard.ToString()),
+                supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
+        }
+        else
+        {
+            Debug.LogWarning("Battle data was not set");
         }
     }
 

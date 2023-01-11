@@ -21,6 +21,13 @@ public class Player
         StartingIndex = index;
     }
 
+    public void SetPlayerDeck(Pepemon pepemon, IEnumerable<Card> supportCards)
+    {
+        PlayerPepemon = pepemon;
+        PlayerDeck.ClearDeck();
+        PlayerDeck.GetDeck().AddRange(supportCards);
+    }
+
     public void GetAndShuffelDeck(int seed)
     {
         // Get local copy of deck and shuffle

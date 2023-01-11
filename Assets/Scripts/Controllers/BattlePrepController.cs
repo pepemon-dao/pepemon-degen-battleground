@@ -20,8 +20,8 @@ public class BattlePrepController : MonoBehaviour
     [ReadOnly] private ulong selectedDeck;
     [ReadOnly] private CancellationTokenSource _cancellationTokenSource;
 
-    // loaded on GameController
-    public static BattleData battleData;
+    // used on GameController on the battle scene
+    public static BattleData battleData { get; private set; }
 
     void Start()
     {
@@ -52,10 +52,10 @@ public class BattlePrepController : MonoBehaviour
         // filter events starting from the next block, to avoid possibly getting the last battle of the player
         var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());
 
+        // show the "Waiting for player" screen
         FindObjectOfType<MainMenuController>().ShowScreen(7);
 
-
-        Debug.Log("Looking for battle");
+        Debug.Log("Entering the matchmaker");
         await PepemonMatchmaker.Enter(selectedLeague, selectedDeck);
 
         var deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
@@ -63,36 +63,56 @@ public class BattlePrepController : MonoBehaviour
         string player1addr = Web3Controller.instance.SelectedAccountAddress, 
                player2addr = null;
 
-        // If the player is in the waitlist, then its because a battle has Not started yet, the current player's address will
+        // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
-        // However if the battle has started, the player's address will be in the first parameter of the BattleCreated event
+        // However if the battle *has* started, the player's address will be in the first parameter of the BattleCreated event
         if (deckOwner == player1addr)
         {
             player2addr = player1addr;
             player1addr = null;
         }
 
-        _exitButton.GetComponent<Button>().interactable = true;
-
         Debug.Log("Waiting for CreatedBattle events");
 
-        _cancellationTokenSource = new CancellationTokenSource();
+        // if the current player initiated the battle, the BattleCreated event was emitted already after the
+        // "Enter" transaction was processed, otherwise, the player is in the wait list, and this WaitForCreatedBattle
+        // call will return null, because there are no events and the CancellationToken will expire in 100ms
+        _cancellationTokenSource = new CancellationTokenSource(100);
         var battleEvent = await PepemonBattle.WaitForCreatedBattle(
                 player1addr,
                 player2addr,
                 nextBlock, 
                 _cancellationTokenSource.Token);
 
+        // initiate the battle immediatelly if the player initiated the battle
         if (battleEvent != null)
         {
-            Debug.Log("Received battle event. BattleId: " + battleEvent?.BattleId);
+            await InitBattleScene((PepemonBattle.BattleCreatedEventData) battleEvent);
+        }
+        else
+        {
+            // the Exit button must only be enabled once we are sure that the current player is in the wait list of the Matchmaker,
+            // which is the case if the previous call to WaitForCreatedBattle returned null
+            _exitButton.GetComponent<Button>().interactable = true;
 
-            await PrepareBattleScene((PepemonBattle.BattleCreatedEventData) battleEvent);
+            _cancellationTokenSource = new CancellationTokenSource();
+            battleEvent = await PepemonBattle.WaitForCreatedBattle(
+                    player1addr,
+                    player2addr,
+                    nextBlock,
+                    _cancellationTokenSource.Token);
+
+            // null if the player clicked on the exit button
+            if (battleEvent != null)
+            {
+                await InitBattleScene((PepemonBattle.BattleCreatedEventData)battleEvent);
+            }
         }
     }
 
-    private async Task PrepareBattleScene(PepemonBattle.BattleCreatedEventData battleEventData)
+    private async Task InitBattleScene(PepemonBattle.BattleCreatedEventData battleEventData)
     {
+        Debug.Log("Received battle event. BattleId: " + battleEventData.BattleId);
         Debug.Log("Loading battle data..");
 
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
@@ -109,6 +129,8 @@ public class BattlePrepController : MonoBehaviour
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
+
+        FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }
 
     private async void onExitButtonClick()
@@ -148,12 +170,13 @@ public class BattlePrepController : MonoBehaviour
         }
     }
 
+    // container for the battle data which is used to display the battle in GameController
     public class BattleData
     {
-        public BigInteger battleRngSeed;
-        public ulong player1BattleCard;
-        public ulong player2BattleCard;
-        public Dictionary<ulong, int> player1SupportCards;
-        public Dictionary<ulong, int> player2SupportCards;
+        public BigInteger battleRngSeed { get; set; }
+        public ulong player1BattleCard { get; set; }
+        public ulong player2BattleCard { get; set; }
+        public Dictionary<ulong, int> player1SupportCards { get; set; }
+        public Dictionary<ulong, int> player2SupportCards { get; set; }
     }
 }

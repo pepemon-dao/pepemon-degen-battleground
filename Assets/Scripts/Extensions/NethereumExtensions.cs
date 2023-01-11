@@ -105,7 +105,7 @@ public static class NethereumExtensions
     )
     where _IEventDTO : IEventDTO, new()
     {
-        var getLogsRequest = new EthGetLogsUnityRequest(Web3Controller.instance.GetUnityRpcRequestClientFactory());
+        EthGetLogsUnityRequest getLogsRequest;
 
         Debug.Log($"Waiting for event: {typeof(_IEventDTO).Name} " +
             $"with {eventFilter.Topics.Length} topics " +
@@ -114,6 +114,7 @@ public static class NethereumExtensions
         List<EventLog<_IEventDTO>> eventLogs;
         do
         {
+            getLogsRequest = new EthGetLogsUnityRequest(Web3Controller.instance.GetUnityRpcRequestClientFactory());
             await getLogsRequest.SendRequest(eventFilter);
             eventLogs = getLogsRequest.Result.DecodeAllEvents<_IEventDTO>();
             

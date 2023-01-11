@@ -14,6 +14,12 @@ class PepemonBattle
 {
     private static string Address => Web3Controller.instance.GetChainConfig().pepemonBattleAddress;
 
+    /// <summary>
+    /// Retrieves the random seed generated during a new Battle.
+    /// The "ulong" type cannot be used as a return type because it cannot handle the generated seed's size
+    /// </summary>
+    /// <param name="battleId">ID of the battle</param>
+    /// <returns>The uint256 seed if the battle exists, 0 if the battle does not exists</returns>
     public static async Task<BigInteger> GetBattleRNGSeed(ulong battleId)
     {
         var request = new QueryUnityRequest<BattleIdRNGSeedFunction, BattleIdRNGSeedOutputDTO>(
@@ -27,6 +33,15 @@ class PepemonBattle
         return response.Seed;
     }
 
+    /// <summary>
+    /// Tries to get events based off two player's addresses, if the event is not found, keeps polling for events
+    /// and checking them until an event is found or cancellationToken is triggered
+    /// </summary>
+    /// <param name="playerAddr1">Address of the 1st player, ignored when Null</param>
+    /// <param name="playerAddr2">Address of the 2nd player, ignored when Null</param>
+    /// <param name="from">Filter from a specific block</param>
+    /// <param name="cancellationToken">Stops waiting for the event</param>
+    /// <returns>Data of the BattleCreated event if an event was found, null if cancellationToken was triggered</returns>
     public static async Task<BattleCreatedEventData?> WaitForCreatedBattle(
         string playerAddr1,
         string playerAddr2,
