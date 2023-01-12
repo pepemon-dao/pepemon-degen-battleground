@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Numerics;
+using Nethereum.ABI;
+using Nethereum.RLP;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -14,19 +17,21 @@ public class Deck
 
     // This uses the Fisher-Yates shuffle algorithm to randomly sort elements.
     // It is an accurate, effective shuffling method for all array types.
-    public void ShuffelDeck(int seed)
+    public void ShuffelDeck(BigInteger seed)
     {
-        System.Random _random = new System.Random(seed);
-        Card _cacheCard;
+        // calculate random seed like in solidity
+        var abiEncode = new ABIEncode();
 
-        int n = AllCards.Count;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < AllCards.Count; i++)
         {
-            // NextDouble returns a random number between 0 and 1 ..It is equivalent to Math.random()
-            int r = i + (int)(_random.NextDouble() * (n - i));
-            _cacheCard = AllCards[r];
-            AllCards[r] = AllCards[i];
-            AllCards[i] = _cacheCard;
+            var n = i + seed % (AllCards.Count - i);
+            var temp = AllCards[(int)n];
+            AllCards[(int)n] = AllCards[i];
+            AllCards[i] = temp;
+
+            seed = abiEncode
+                .GetSha3ABIEncodedPacked(new ABIValue("uint256", seed))
+                .ToBigIntegerFromRLPDecoded();
         }
     }
 

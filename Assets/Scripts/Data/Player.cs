@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System.Numerics;
+using Nethereum.ABI;
+using Nethereum.RLP;
 
 [System.Serializable]
 public class Player
@@ -28,12 +31,20 @@ public class Player
         PlayerDeck.GetDeck().AddRange(supportCards);
     }
 
-    public void GetAndShuffelDeck(int seed)
+    public void GetAndShuffelDeck(BigInteger seed, BigInteger currentTurn, BigInteger battleRng)
     {
         // Get local copy of deck and shuffle
         CurrentDeck.ClearDeck();
         CurrentDeck.GetDeck().AddRange(PlayerDeck.GetDeck());
-        CurrentDeck.ShuffelDeck(seed);
+
+        // calculate random seed like in solidity
+        var abiEncode = new ABIEncode();
+        CurrentDeck.ShuffelDeck(
+            abiEncode.GetSha3ABIEncodedPacked(
+                new ABIValue("uint256", seed),
+                new ABIValue("uint256", currentTurn),
+                new ABIValue("uint256", battleRng)
+             ).ToBigIntegerFromRLPDecoded());
     }
 
     public void DrawNewHand()

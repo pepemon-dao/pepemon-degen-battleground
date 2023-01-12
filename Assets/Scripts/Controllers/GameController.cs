@@ -75,13 +75,13 @@ public class GameController : MonoBehaviour
     // Each player shuffles their deck and draws cards equal to pepemon intelligence 
     void InitFirstRound()
     {
-        _roundNumber = 1;
+        _roundNumber = 0;
         _player1.Initialise(1);
         _player2.Initialise(2);
         _uiController.InitialiseGame(_player1, _player2);
 
-        _player1.GetAndShuffelDeck(2); // todo: pass in seed from client connection index
-        _player2.GetAndShuffelDeck(1); // todo: pass in seed from client connection index
+        _player1.GetAndShuffelDeck(69, _roundNumber, BattlePrepController.battleData.battleRngSeed);
+        _player2.GetAndShuffelDeck(420, _roundNumber, BattlePrepController.battleData.battleRngSeed);
 
         // Calculate first attacker
         _attackFirstIndex = _player1.PlayerPepemon.Speed > _player2.PlayerPepemon.Speed ? 1 : 2;
@@ -117,8 +117,8 @@ public class GameController : MonoBehaviour
         // Check if we passed 5 and if so reshuffel decks
         if (_roundNumber >= 5)
         {
-            _player1.GetAndShuffelDeck(2 + _roundNumber); // todo: pass in seed from client connection index
-            _player2.GetAndShuffelDeck(1 + _roundNumber); // todo: pass in seed from client connection index
+            _player1.GetAndShuffelDeck(69, _roundNumber, BattlePrepController.battleData.battleRngSeed);
+            _player2.GetAndShuffelDeck(420, _roundNumber, BattlePrepController.battleData.battleRngSeed);
         }
 
         Debug.Log("<b>DRAWING HANDS</b>");
@@ -188,6 +188,8 @@ public class GameController : MonoBehaviour
 
                     if (_player1.CurrentHP <= 0) Winner(_player2);
                 }
+                Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
+                Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
                 Debug.Log("waiting 2f");
                 yield return new WaitForSeconds(1f);
