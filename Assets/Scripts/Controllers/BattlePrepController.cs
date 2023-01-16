@@ -55,9 +55,20 @@ public class BattlePrepController : MonoBehaviour
         // show the "Waiting for player" screen
         FindObjectOfType<MainMenuController>().ShowScreen(7);
 
-        Debug.Log("Entering the matchmaker");
-        await PepemonMatchmaker.Enter(selectedLeague, selectedDeck);
+        bool failedToEnter = false;
+        try
+        {
+            Debug.Log("Entering the matchmaker");
+            await PepemonMatchmaker.Enter(selectedLeague, selectedDeck);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Unable to enter the matchmaker: " + e);
+            failedToEnter = true;
+        }
 
+        // check if the current player's deck is in the matchmaker list of deck owners, if it is, then we can assume the player
+        // is in the waitlist
         var deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
 
         string player1addr = Web3Controller.instance.SelectedAccountAddress, 
@@ -66,18 +77,23 @@ public class BattlePrepController : MonoBehaviour
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
         // However if the battle *has* started, the player's address will be in the first parameter of the BattleCreated event
-        if (deckOwner == player1addr)
+        if (deckOwner == Web3Controller.instance.SelectedAccountAddress)
         {
             player2addr = player1addr;
             player1addr = null;
+            // the Exit button must only be enabled once we are sure that the current player is in the wait list of the Matchmaker
+            _exitButton.GetComponent<Button>().interactable = true;
+        }
+        else if (failedToEnter)
+        {
+            // go back to deck selection since the player could not enter nor is already waiting
+            FindObjectOfType<MainMenuController>().ShowScreen(4);
+            return;
         }
 
         Debug.Log("Waiting for CreatedBattle events");
 
-        // if the current player initiated the battle, the BattleCreated event was emitted already after the
-        // "Enter" transaction was processed, otherwise, the player is in the wait list, and this WaitForCreatedBattle
-        // call will return null, because there are no events and the CancellationToken will expire in 100ms
-        _cancellationTokenSource = new CancellationTokenSource(100);
+        _cancellationTokenSource = new CancellationTokenSource();
         var battleEvent = await PepemonBattle.WaitForCreatedBattle(
                 player1addr,
                 player2addr,
@@ -88,25 +104,6 @@ public class BattlePrepController : MonoBehaviour
         if (battleEvent != null)
         {
             await InitBattleScene((PepemonBattle.BattleCreatedEventData) battleEvent);
-        }
-        else
-        {
-            // the Exit button must only be enabled once we are sure that the current player is in the wait list of the Matchmaker,
-            // which is the case if the previous call to WaitForCreatedBattle returned null
-            _exitButton.GetComponent<Button>().interactable = true;
-
-            _cancellationTokenSource = new CancellationTokenSource();
-            battleEvent = await PepemonBattle.WaitForCreatedBattle(
-                    player1addr,
-                    player2addr,
-                    nextBlock,
-                    _cancellationTokenSource.Token);
-
-            // null if the player clicked on the exit button
-            if (battleEvent != null)
-            {
-                await InitBattleScene((PepemonBattle.BattleCreatedEventData)battleEvent);
-            }
         }
     }
 

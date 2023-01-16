@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System.Linq;
+using System;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -66,7 +68,7 @@ public class GameController : MonoBehaviour
     void ResetGame()
     {
         _gameHasFinished = false;
-        _attackFirstIndex = 0;
+        _attackFirstIndex = 1;
         _roundNumber = 0;
         _player1.Reset();
         _player2.Reset();
@@ -115,10 +117,18 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(.3f);
 
         // Check if we passed 5 and if so reshuffel decks
-        if (_roundNumber >= 5)
+        if (_roundNumber % 5 == 0)
         {
             _player1.GetAndShuffelDeck(69, _roundNumber, BattlePrepController.battleData.battleRngSeed);
             _player2.GetAndShuffelDeck(420, _roundNumber, BattlePrepController.battleData.battleRngSeed);
+        }
+        else
+        {
+            //Don't need to refresh cards now
+
+            // Get temp support info of previous turn's hands and calculate their effect for the new turn
+            _player1.CalcSupportCardsOnTable(_player2);
+            _player2.CalcSupportCardsOnTable(_player1);
         }
 
         Debug.Log("<b>DRAWING HANDS</b>");
@@ -134,7 +144,7 @@ public class GameController : MonoBehaviour
         //! need to think of a better way to display the cards being played
 
         _isPlayingRound = true;
-        Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
+        //Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
         for (int i = 0; i < 2; i++)
         {
             if (_gameHasFinished == false)
@@ -143,11 +153,15 @@ public class GameController : MonoBehaviour
                 int attackingIndex = _attackFirstIndex;
 
 
-                int totalAttackPower = attackingIndex == 1 ? _player1.CurrentHand.GetTotalAttackPower(_player1.PlayerPepemon.Attack) : _player2.CurrentHand.GetTotalAttackPower(_player2.PlayerPepemon.Attack);
-                int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower(_player2.PlayerPepemon.Defense) : _player1.CurrentHand.GetTotalDefensePower(_player1.PlayerPepemon.Defense);
-                int delta = totalAttackPower - totalDefensePower;
+                int totalAttackPower = attackingIndex == 1 ? _player1.CurrentPepemonStats.atk : _player2.CurrentPepemonStats.atk;
+                int totalDefensePower = attackingIndex == 1 ? _player2.CurrentPepemonStats.def : _player1.CurrentPepemonStats.def;
+                //int delta = totalAttackPower - totalDefensePower;
+                Debug.Log("fight current round =" + _roundNumber);
+                Debug.Log("fight attackingIndex == 1? " + (attackingIndex == 1));
+                Debug.Log("fight totalAttackPower=" + totalAttackPower);
+                Debug.Log("fight totalDefensePower=" + totalDefensePower);
 
-                Debug.Log("Who is attacking: " + attackingIndex);
+                //Debug.Log("Who is attacking: " + attackingIndex);
                 // Remove played cards from current hand
                 if (attackingIndex == 1)
                 {
@@ -160,9 +174,9 @@ public class GameController : MonoBehaviour
 
                     yield return new WaitForSeconds(2f);
 
-                    _player2.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-                    _player2.CurrentHand.RemoveAllDefenseCards();
-                    _player1.CurrentHand.RemoveAllOffenseCards();
+                    _player2.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    // _player2.CurrentHand.RemoveAllDefenseCards();
+                    // _player1.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -178,9 +192,9 @@ public class GameController : MonoBehaviour
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
 
                     yield return new WaitForSeconds(1f);
-                    _player1.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-                    _player1.CurrentHand.RemoveAllDefenseCards();
-                    _player2.CurrentHand.RemoveAllOffenseCards();
+                    _player1.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    //_player1.CurrentHand.RemoveAllDefenseCards();
+                    //_player2.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -191,21 +205,305 @@ public class GameController : MonoBehaviour
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
-                Debug.Log("waiting 2f");
+                //Debug.Log("waiting 2f");
                 yield return new WaitForSeconds(1f);
 
                 // cleanup UI
                 _uiController.FlipCards(3);
-                Debug.Log(" after slow");
+                //Debug.Log(" after slow");
 
 
                 _attackFirstIndex = _attackFirstIndex == 1 ? 2 : 1;
             }
         }
-        Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
+        //Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
         _roundNumber++;
         _isPlayingRound = false;
     }
+
+
+    // We calculate the effect of every card in the player's hand
+    private void CalcSupportCardsInHand(Player atkPlayer, Player defPlayer)
+    {
+        // If this card is included in player's hand, adds an additional power equal to the total of
+        // all normal offense/defense cards
+        bool isPower0CardIncluded = false;
+
+        // Total sum of normal support cards
+        int totalNormalPower = 0;
+
+        // used to check whether or not an unstackable card was already used
+        var unstackableCards = new List<int>();
+
+        // Calc attacker hand
+        // Loop through every card the attacker has in his hand
+        foreach (var card in atkPlayer.CurrentHand.GetCardsInHand)
+        {
+            if (card.Type == PlayCardType.Offense)
+            {
+                // Card type is OFFENSE.
+                // Calc effects of EffectOne array
+                foreach (var effectOne in card.effectOnes)
+                {
+                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                    if (isTriggered)
+                    {
+                        //use triggeredPower if triggered
+                        atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower * multiplier;
+                        totalNormalPower += effectOne.triggeredPower * multiplier;
+                    }
+                    else
+                    {
+                        //use basePower if not
+                        atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
+                        totalNormalPower += effectOne.basePower;
+                    }
+                }
+            }
+            else if (card.Type == PlayCardType.SpecialOffense)
+            {
+                // Card type is STRONG OFFENSE.
+                //Make sure unstackable cards can't be stacked
+                if (card.Unstackable)
+                {
+                    // Check if card is new to previous cards
+                    if (unstackableCards.Contains(card.ID) ||
+                        // Check if card is new to temp support info cards
+                        atkPlayer.CurrentHand.GetCardsInHand.Any(c => c.ID == card.ID))
+                    {
+                        // If it isn't being used for the first time - skip card
+                        continue;
+                    }
+                    unstackableCards.Add(card.ID);
+                }
+
+                // Calc effects of EffectOne array
+                foreach (var effectOne in card.effectOnes)
+                {
+                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                    if (isTriggered)
+                    {
+                        if (multiplier > 1)
+                        {
+                            atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower * multiplier;
+                        }
+                        else
+                        {
+                            if (effectOne.effectTo == EffectTo.SpecialAttack)
+                            {
+                                // If it's a use Special Attack instead of Attack card
+                                atkPlayer.CurrentPepemonStats.atk = atkPlayer.CurrentPepemonStats.sAtk;
+                                continue;
+                            }
+                            else if (effectOne.triggeredPower == 0)
+                            {
+                                // We have a card that says ATK is increased by amount
+                                // Equal to the total of all offense cards in the current turn
+                                isPower0CardIncluded = true;
+                                continue;
+                            }
+                            atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower;
+                        }
+                    }
+                    else
+                    {
+                        //If not triggered: use base power instead
+                        atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
+                        totalNormalPower += effectOne.basePower;
+                    }
+                }
+
+                // If card lasts for >1 turns, Add card to table if <5 on table currently
+                if (card.effectMany.power != 0 && atkPlayer.CurrentHand.GetCardsInHand.Count < 5)
+                {
+                    // todo: add animation to display card being added
+                    atkPlayer.CurrentHand.AddCardToHand(card);
+                }
+            }
+
+        }
+
+        if (isPower0CardIncluded)
+        {
+            //If we have a card that says ATK is increased by amount equal to total of all offense cards
+            atkPlayer.CurrentPepemonStats.atk += totalNormalPower;
+        }
+
+        // Calc defense hand
+        isPower0CardIncluded = false;
+        totalNormalPower = 0;
+        unstackableCards.Clear();
+
+        foreach (var card in defPlayer.CurrentHand.GetCardsInHand)
+        {
+            if (card.Type == PlayCardType.Defense)
+            {
+                // Card type is OFFENSE.
+                // Calc effects of EffectOne array
+                foreach (var effectOne in card.effectOnes)
+                {
+                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                    if (isTriggered)
+                    {
+                        //use triggeredPower if triggered
+                        defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * multiplier;
+                        totalNormalPower += effectOne.triggeredPower * multiplier;
+                    }
+                    else
+                    {
+                        //use basePower if not
+                        defPlayer.CurrentPepemonStats.def += effectOne.basePower;
+                        totalNormalPower += effectOne.basePower;
+                    }
+                }
+            }
+            else if (card.Type == PlayCardType.SpecialDefense)
+            {
+                // Card type is STRONG DEFENSE
+                //Make sure unstackable cards can't be stacked
+                if (card.Unstackable)
+                {
+                    // Check if card is new to previous cards
+                    if (unstackableCards.Contains(card.ID) ||
+                        // Check if card is new to temp support info cards
+                        defPlayer.CurrentHand.GetCardsInHand.Any(c => c.ID == card.ID))
+                    {
+                        // If it isn't being used for the first time - skip card
+                        continue;
+                    }
+                    unstackableCards.Add(card.ID);
+                }
+
+                // Calc effects of EffectOne array
+                foreach (var effectOne in card.effectOnes)
+                {
+                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                    if (isTriggered)
+                    {
+                        if (multiplier > 1)
+                        {
+                            defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * multiplier;
+                        }
+                        else
+                        {
+                            if (effectOne.effectTo == EffectTo.SpecialDefense)
+                            {
+                                // If it's a use Special Defense instead of Defense card
+                                defPlayer.CurrentPepemonStats.def = defPlayer.CurrentPepemonStats.sDef;
+                                continue;
+                            }
+                            else if (effectOne.triggeredPower == 0)
+                            {
+                                // Equal to the total of all defense cards in the current turn
+                                isPower0CardIncluded = true;
+                                continue;
+                            }
+                            defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower;
+                        }
+                    }
+                    else
+                    {
+                        //If not triggered: use base power instead
+                        defPlayer.CurrentPepemonStats.def += effectOne.basePower;
+                        totalNormalPower += effectOne.basePower;
+                    }
+                }
+
+                // If card lasts for >1 turns, Add card to table if <5 on table currently
+                if (card.effectMany.power != 0 && defPlayer.CurrentHand.GetCardsInHand.Count < 5)
+                {
+                    // todo: add animation to display card being added
+                    defPlayer.CurrentHand.AddCardToHand(card);
+                }
+            }
+        }
+
+        if (isPower0CardIncluded)
+        {
+            //If we have a card that says DEF is increased by amount equal to total of all defense cards
+            defPlayer.CurrentPepemonStats.def += totalNormalPower;
+        }
+    }
+
+
+    /// <summary>
+    /// Checks if the requirements are satisfied for a certain code
+    /// </summary>
+    /// <returns>bool telling if a requirement was satisfied, and a multiplier for the card's attack power</returns>
+    private static Tuple<bool, int> CheckReqCode(Player atkPlayer, Player defPlayer, int reqCode, bool isAttacker)
+    {
+        bool isTriggered = false;
+        int multiplier = 1;
+        switch (reqCode)
+        {
+            case 0:
+                // No requirement
+                isTriggered = true;
+                break;
+            case 1:
+                // Intelligence of offense pepemon <= 5.
+                isTriggered = atkPlayer.CurrentPepemonStats.inte <= 5;
+                break;
+            case 2:
+                // Number of defense cards of defense pepemon is 0.
+                isTriggered = defPlayer.CurrentHand.AllDefenseCards.Count == 0;
+                break;
+            case 3:
+                // Each +2 offense cards of offense pepemon.
+                multiplier = atkPlayer.CurrentHand.AllOffenseCards.Count(
+                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 2).effectTo == EffectTo.Attack);
+                isTriggered = multiplier > 0;
+                break;
+            case 4:
+                // Each +3 offense cards of offense pepemon.
+                multiplier = atkPlayer.CurrentHand.AllOffenseCards.Count(
+                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 3).effectTo == EffectTo.Attack);
+                isTriggered = multiplier > 0;
+                break;
+            case 5:
+                // Each offense card of offense pepemon.
+                multiplier = atkPlayer.CurrentHand.AllOffenseCards.Count;
+                isTriggered = multiplier > 0;
+                break;
+            case 6:
+                // Each +3 defense card of defense pepemon.
+                multiplier = defPlayer.CurrentHand.AllOffenseCards.Count(
+                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 3).effectTo == EffectTo.Defense);
+                isTriggered = multiplier > 0;
+                break;
+            case 7:
+                // Each +3 defense card of defense pepemon.
+                multiplier = defPlayer.CurrentHand.AllOffenseCards.Count(
+                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 4).effectTo == EffectTo.Defense);
+                isTriggered = multiplier > 0;
+                break;
+            case 8:
+                // Intelligence of defense pepemon <= 5.
+                isTriggered = (defPlayer.CurrentPepemonStats.inte <= 5);
+                break;
+            case 9:
+                // Intelligence of defense pepemon >= 7.
+                isTriggered = (defPlayer.CurrentPepemonStats.inte >= 7);
+                break;
+            case 10:
+                // Offense pepemon is using strong attack
+                isTriggered = atkPlayer.CurrentHand.AllSpecialOffenseCards.Count > 0;
+                break;
+            case 11:
+                // The current HP is less than 50% of max HP.
+                var player = defPlayer;
+                if (isAttacker)
+                {
+                    player = atkPlayer;
+                }
+                isTriggered = player.CurrentHP * 2 <= player.PlayerPepemon.HealthPoints;
+                break;
+            default:
+                break;
+        }
+        return new(isTriggered, multiplier);
+    }
+
 
     // Plays out each round split (offense & defense) lead by the attacking index
     void PlayHand(int attackingIndex)

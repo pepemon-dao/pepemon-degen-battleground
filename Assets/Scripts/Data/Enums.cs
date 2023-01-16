@@ -6,7 +6,6 @@ public enum PlayCardType
     SpecialDefense
 }
 
-
 public enum PepemonType
 {
     Plant,
@@ -27,4 +26,20 @@ public enum CardRarity
     Common,
     Rare,
     Epic
+}
+
+public enum EffectTo
+{
+    Attack,
+    SpecialAttack,
+    Defense,
+    SpecialDefense,
+    Speed,
+    Intelligence
+}
+
+public enum EffectFor
+{
+    Me,
+    Enemy
 }
