@@ -4,10 +4,20 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using System.Linq;
 using System;
+using System.Numerics;
+using Nethereum.ABI;
+using Nethereum.RLP;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
 {
+    //Attacker can either be PLAYER_ONE or PLAYER_TWO
+    private enum Attacker
+    {
+        PLAYER_ONE,
+        PLAYER_TWO
+    }
+
     [TitleGroup("Component References"), SerializeField] UIController _uiController;
 
     [TitleGroup("Opponents"), SerializeField] Player _player1;
@@ -15,7 +25,7 @@ public class GameController : MonoBehaviour
 
     [TitleGroup("Behaviour"), SerializeField] bool playAutomatically;
 
-    [TitleGroup("Debug"), ShowInInspector, ReadOnly] int _attackFirstIndex; // index of player who is attacking first 1 : 2
+    [TitleGroup("Debug"), ShowInInspector, ReadOnly] Attacker _currentAttacker; // Resolve attacker in the current turn
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] int _roundNumber;
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] bool _gameHasFinished;
     [TitleGroup("Debug"), ShowInInspector, ReadOnly] bool _isPlayingRound;
@@ -24,6 +34,8 @@ public class GameController : MonoBehaviour
     [BoxGroup("Pepemon Controller")] public PepemonCardController player2Controller;
 
     [TitleGroup("Scriptable objects list"), SerializeField] DataContainer CardsScriptableObjsData;
+
+    [ReadOnly] private BigInteger battleSeed;
 
     private void Start()
     {
@@ -51,10 +63,14 @@ public class GameController : MonoBehaviour
             _player2.SetPlayerDeck(
                 pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player2BattleCard.ToString()),
                 supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
+
+            battleSeed = BattlePrepController.battleData.battleRngSeed;
         }
         else
         {
-            Debug.LogWarning("Battle data was not set");
+            // when ran from Unity Editor. Set battleSeed and GameController cards to simulate a specific battle
+            Debug.LogWarning("Battle data not set from BattlePrepController");
+            battleSeed = 1;
         }
     }
 
@@ -68,7 +84,7 @@ public class GameController : MonoBehaviour
     void ResetGame()
     {
         _gameHasFinished = false;
-        _attackFirstIndex = 1;
+        _currentAttacker = Attacker.PLAYER_ONE;
         _roundNumber = 0;
         _player1.Reset();
         _player2.Reset();
@@ -82,11 +98,8 @@ public class GameController : MonoBehaviour
         _player2.Initialise(2);
         _uiController.InitialiseGame(_player1, _player2);
 
-        _player1.GetAndShuffelDeck(69, _roundNumber, BattlePrepController.battleData.battleRngSeed);
-        _player2.GetAndShuffelDeck(420, _roundNumber, BattlePrepController.battleData.battleRngSeed);
-
-        // Calculate first attacker
-        _attackFirstIndex = _player1.PlayerPepemon.Speed > _player2.PlayerPepemon.Speed ? 1 : 2;
+        _player1.GetAndShuffelDeck(69, _roundNumber, battleSeed);
+        _player2.GetAndShuffelDeck(420, _roundNumber, battleSeed);
     }
 
     IEnumerator LoopGame()
@@ -116,11 +129,26 @@ public class GameController : MonoBehaviour
         _uiController.HideNewRoundDisplay();
         yield return new WaitForSeconds(.3f);
 
-        // Check if we passed 5 and if so reshuffel decks
+        //Reset both players' hand infos to base stats
+        _player1.ResetCurrentPepemonStats();
+        _player2.ResetCurrentPepemonStats();
+
+        //Refresh cards every 5 turns
         if (_roundNumber % 5 == 0)
         {
-            _player1.GetAndShuffelDeck(69, _roundNumber, BattlePrepController.battleData.battleRngSeed);
-            _player2.GetAndShuffelDeck(420, _roundNumber, BattlePrepController.battleData.battleRngSeed);
+            //Need to refresh decks
+
+            // Shuffle player1 support cards
+            _player1.GetAndShuffelDeck(69, _roundNumber, battleSeed);
+
+            //Reset played card count
+            _player1.PlayedCardCount = 0;
+
+            // Shuffle player2 support cards
+            _player2.GetAndShuffelDeck(420, _roundNumber, battleSeed);
+
+            //Reset played card count
+            _player2.PlayedCardCount = 0;
         }
         else
         {
@@ -144,26 +172,26 @@ public class GameController : MonoBehaviour
         //! need to think of a better way to display the cards being played
 
         _isPlayingRound = true;
-        //Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
+        Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
         for (int i = 0; i < 2; i++)
         {
             if (_gameHasFinished == false)
             {
-                // PlayHand(_attackFirstIndex);
-                int attackingIndex = _attackFirstIndex;
+                _currentAttacker = ResolveAttacker(_currentAttacker, _player1, _player2, i == 1);
 
+                var atkPlayer = _currentAttacker == Attacker.PLAYER_ONE ? _player1 : _player2;
+                var defPlayer = _currentAttacker == Attacker.PLAYER_ONE ? _player2 : _player1;
 
-                int totalAttackPower = attackingIndex == 1 ? _player1.CurrentPepemonStats.atk : _player2.CurrentPepemonStats.atk;
-                int totalDefensePower = attackingIndex == 1 ? _player2.CurrentPepemonStats.def : _player1.CurrentPepemonStats.def;
-                //int delta = totalAttackPower - totalDefensePower;
-                Debug.Log("fight current round =" + _roundNumber);
-                Debug.Log("fight attackingIndex == 1? " + (attackingIndex == 1));
+                CalcSupportCardsInHand(atkPlayer, defPlayer);
+
+                int totalAttackPower = atkPlayer.CurrentPepemonStats.atk;
+                int totalDefensePower = defPlayer.CurrentPepemonStats.def;
+
+                Debug.Log("fight currentAttacker=" + _currentAttacker);
                 Debug.Log("fight totalAttackPower=" + totalAttackPower);
                 Debug.Log("fight totalDefensePower=" + totalDefensePower);
 
-                //Debug.Log("Who is attacking: " + attackingIndex);
-                // Remove played cards from current hand
-                if (attackingIndex == 1)
+                if (_currentAttacker == Attacker.PLAYER_ONE)
                 {
                     _uiController.FlipCards(1);
 
@@ -175,8 +203,6 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(2f);
 
                     _player2.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
-                    // _player2.CurrentHand.RemoveAllDefenseCards();
-                    // _player1.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -193,8 +219,6 @@ public class GameController : MonoBehaviour
 
                     yield return new WaitForSeconds(1f);
                     _player1.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
-                    //_player1.CurrentHand.RemoveAllDefenseCards();
-                    //_player2.CurrentHand.RemoveAllOffenseCards();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -205,23 +229,67 @@ public class GameController : MonoBehaviour
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
-                //Debug.Log("waiting 2f");
+                Debug.Log("waiting 2f");
                 yield return new WaitForSeconds(1f);
 
                 // cleanup UI
                 _uiController.FlipCards(3);
-                //Debug.Log(" after slow");
-
-
-                _attackFirstIndex = _attackFirstIndex == 1 ? 2 : 1;
+                Debug.Log(" after slow");
             }
         }
-        //Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
+        Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
         _roundNumber++;
         _isPlayingRound = false;
     }
 
+    // Note: Same logic of the contract PepemonBattle.sol
+    // This method gets the current attacker
+    private Attacker ResolveAttacker(Attacker currentAttacker, Player player1, Player player2, bool isTurnOnSecondHalf)
+    {
+        if (!isTurnOnSecondHalf)
+        {
+            //Player with highest speed card goes first
+            if (player1.CurrentPepemonStats.spd > player2.CurrentPepemonStats.spd)
+            {
+                return Attacker.PLAYER_ONE;
+            }
+            else if (player1.CurrentPepemonStats.spd < player2.CurrentPepemonStats.spd)
+            {
+                return Attacker.PLAYER_TWO;
+            }
+            else
+            {
+                //Tiebreak: intelligence
+                if (player1.CurrentPepemonStats.inte > player2.CurrentPepemonStats.inte)
+                {
+                    return Attacker.PLAYER_ONE;
+                }
+                else if (player1.CurrentPepemonStats.inte < player2.CurrentPepemonStats.inte)
+                {
+                    return Attacker.PLAYER_TWO;
+                }
+                else
+                {
+                    //Second tiebreak: use RNG
 
+                    // calculate random seed like in solidity
+                    var abiEncode = new ABIEncode();
+                    var rand = abiEncode.GetSha3ABIEncodedPacked(
+                        new ABIValue("uint256", 69420),
+                        new ABIValue("uint256", _roundNumber),
+                        new ABIValue("uint256", battleSeed)).ToBigIntegerFromRLPDecoded();
+
+                    return rand % 2 == 0 ? Attacker.PLAYER_ONE : Attacker.PLAYER_TWO;
+                }
+            }
+        }
+        else
+        {
+            return currentAttacker == Attacker.PLAYER_ONE ? Attacker.PLAYER_TWO : Attacker.PLAYER_ONE;
+        }
+    }
+
+    // Note: Same logic of the contract PepemonBattle.sol
     // We calculate the effect of every card in the player's hand
     private void CalcSupportCardsInHand(Player atkPlayer, Player defPlayer)
     {
@@ -428,6 +496,7 @@ public class GameController : MonoBehaviour
 
     /// <summary>
     /// Checks if the requirements are satisfied for a certain code
+    /// Note: Same logic of the contract PepemonBattle.sol
     /// </summary>
     /// <returns>bool telling if a requirement was satisfied, and a multiplier for the card's attack power</returns>
     private static Tuple<bool, int> CheckReqCode(Player atkPlayer, Player defPlayer, int reqCode, bool isAttacker)
@@ -502,63 +571,6 @@ public class GameController : MonoBehaviour
                 break;
         }
         return new(isTriggered, multiplier);
-    }
-
-
-    // Plays out each round split (offense & defense) lead by the attacking index
-    void PlayHand(int attackingIndex)
-    {
-        int totalAttackPower = attackingIndex == 1 ? _player1.CurrentHand.GetTotalAttackPower(_player1.PlayerPepemon.Attack) : _player2.CurrentHand.GetTotalAttackPower(_player2.PlayerPepemon.Attack);
-        int totalDefensePower = attackingIndex == 1 ? _player2.CurrentHand.GetTotalDefensePower(_player2.PlayerPepemon.Defense) : _player1.CurrentHand.GetTotalDefensePower(_player1.PlayerPepemon.Defense);
-        int delta = totalAttackPower - totalDefensePower;
-
-        Debug.Log("Who is attacking: " + attackingIndex);
-
-        //      Debug.Log("<b>STARTING HAND </b>");
-        //      Debug.Log("attacker: " + attackingIndex);
-        //      Debug.Log("totalAP: " + totalAttackPower);
-        //      Debug.Log("totalDP: " + totalDefensePower);
-        //      Debug.Log("p1hp: " + _player1.CurrentHP);
-        //      Debug.Log("p2hp: " + _player2.CurrentHP);
-        //      Debug.Log("delta: " + delta);
-
-        // Remove played cards from current hand
-        if (attackingIndex == 1)
-        {
-            _player2.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-            _player2.CurrentHand.RemoveAllDefenseCards();
-            _player1.CurrentHand.RemoveAllOffenseCards();
-
-            _uiController.FlipCards(1);
-            _uiController.UpdateUI();
-            player1Controller.UpdateCard(_player1);
-            player2Controller.UpdateCard(_player2);
-
-            if (_player2.CurrentHP <= 0) Winner(_player1);
-        }
-        else
-        {
-            _player1.CurrentHP -= delta > 0 ? (totalAttackPower - totalDefensePower) : 1;
-            _player1.CurrentHand.RemoveAllDefenseCards();
-            _player2.CurrentHand.RemoveAllOffenseCards();
-
-            _uiController.FlipCards(2);
-            _uiController.UpdateUI();
-            player1Controller.UpdateCard(_player1);
-            player2Controller.UpdateCard(_player2);
-
-            if (_player1.CurrentHP <= 0) Winner(_player2);
-        }
-
-        // cleanup UI
-        _uiController.FlipCards(3);
-        Debug.Log(" after slow");
-
-        //   Debug.Log("attacker: " + attackingIndex);
-        //   Debug.Log("totalAP: " + totalAttackPower);
-        //   Debug.Log("totalDP: " + totalDefensePower);
-        //   Debug.Log("p1hp: " + _player1.CurrentHP);
-        //   Debug.Log("p2hp: " + _player2.CurrentHP);
     }
 
     public int GetRoundNumber() => _roundNumber;

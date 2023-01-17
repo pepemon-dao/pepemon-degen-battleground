@@ -1,6 +1,6 @@
 ﻿
 using System;
-using UnityEngine;
+using Sirenix.OdinInspector;
 
 //spd, inte, def, atk, sAtk, sDef - Current stats of battle card (with powerups included)
 //Each param can go into the negatives
@@ -21,21 +21,21 @@ public struct EffectOne
     // If power is 0, it is equal to the total of all normal offense/defense cards in the current turn.
 
     //basePower = power if req not met
-    [SerializeField] public int basePower { get; set; }
+    [ShowInInspector] public int basePower { get; set; }
 
     //triggeredPower = power if req met
-    [SerializeField] public int triggeredPower { get; set; }
-    [SerializeField] public EffectTo effectTo { get; set; }
-    [SerializeField] public EffectFor effectFor { get; set; }
-    [SerializeField] public int reqCode { get; set; } //requirement code
+    [ShowInInspector] public int triggeredPower { get; set; }
+    [ShowInInspector] public EffectTo effectTo { get; set; }
+    [ShowInInspector] public EffectFor effectFor { get; set; }
+    [ShowInInspector] public int reqCode { get; set; } //requirement code
 }
 
 [Serializable]
 public struct EffectMany
 {
-    [SerializeField] public int power { get; set; }
-    [SerializeField] public int numTurns { get; set; }
-    [SerializeField] public EffectTo effectTo { get; set; }
-    [SerializeField] public EffectFor effectFor { get; set; }
-    [SerializeField] public int reqCode { get; set; } //requirement code
+    [ShowInInspector] public int power { get; set; }
+    [ShowInInspector] public int numTurns { get; set; }
+    [ShowInInspector] public EffectTo effectTo { get; set; }
+    [ShowInInspector] public EffectFor effectFor { get; set; }
+    [ShowInInspector] public int reqCode { get; set; } //requirement code
 }

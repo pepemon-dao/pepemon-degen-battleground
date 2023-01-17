@@ -17,6 +17,7 @@ public class Player
     [BoxGroup("Runtime")] public Deck CurrentDeck;
     [BoxGroup("Runtime")] public Hand CurrentHand;
     [BoxGroup("Runtime")] public int StartingIndex;
+    [BoxGroup("Runtime")] public int PlayedCardCount;
     [BoxGroup("Runtime")] public CurrentBattleCardStats CurrentPepemonStats = new(); // all stats of the player's battle cards currently
 
 
@@ -66,18 +67,13 @@ public class Player
         CurrentHand.ClearHand();
 
         // Draw cards to hand
-        List<Card> cacheList = new List<Card>();
-        for (int i = 0; i < PlayerPepemon.Intelligence; i++)
+        // Note: Same logic of the contract PepemonBattle.sol
+        for (int i = 0; i < CurrentPepemonStats.inte; i++)
         {
-            if (i >= 0 && i < CurrentDeck.GetDeck().Count)
-            {
-                CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[i]);
-                cacheList.Add(CurrentDeck.GetDeck()[i]);
-            }
+            CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[(i + PlayedCardCount) % CurrentDeck.GetDeck().Count]);
         }
 
-        // Cleanup working decks
-        foreach (var item in cacheList) CurrentDeck.RemoveCard(item);
+        PlayedCardCount += CurrentPepemonStats.inte;
     }
 
 
@@ -110,6 +106,7 @@ public class Player
     }
 #endif
 
+    // Note: Same logic of the contract PepemonBattle.sol
     // This method calculates the battle card's stats after taking into consideration all the support cards currently being played
     public void CalcSupportCardsOnTable(Player opponent)
     {
