@@ -153,7 +153,7 @@ public class Player
                 // Decrease effect numTurns by 1 since 1 turn has already passed
                 effect.numTurns--;
 
-                // Delete this one from tableSupportCardStat if all turns of the card have been exhausted
+                // Delete this one if all turns of the card have been exhausted
                 if (effect.numTurns == 0)
                 {
                     toBeRemoved.Add(card);

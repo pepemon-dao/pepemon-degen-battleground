@@ -11,6 +11,10 @@ using Nethereum.RLP;
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
 {
+    private const int PLAYER1_SEED = 69;
+    private const int PLAYER2_SEED = 420;
+    private const int TIEBREAK_SEED = 69420;
+
     //Attacker can either be PLAYER_ONE or PLAYER_TWO
     private enum Attacker
     {
@@ -98,8 +102,8 @@ public class GameController : MonoBehaviour
         _player2.Initialise(2);
         _uiController.InitialiseGame(_player1, _player2);
 
-        _player1.GetAndShuffelDeck(69, _roundNumber, battleSeed);
-        _player2.GetAndShuffelDeck(420, _roundNumber, battleSeed);
+        _player1.GetAndShuffelDeck(PLAYER1_SEED, _roundNumber, battleSeed);
+        _player2.GetAndShuffelDeck(PLAYER2_SEED, _roundNumber, battleSeed);
     }
 
     IEnumerator LoopGame()
@@ -139,13 +143,13 @@ public class GameController : MonoBehaviour
             //Need to refresh decks
 
             // Shuffle player1 support cards
-            _player1.GetAndShuffelDeck(69, _roundNumber, battleSeed);
+            _player1.GetAndShuffelDeck(PLAYER1_SEED, _roundNumber, battleSeed);
 
             //Reset played card count
             _player1.PlayedCardCount = 0;
 
             // Shuffle player2 support cards
-            _player2.GetAndShuffelDeck(420, _roundNumber, battleSeed);
+            _player2.GetAndShuffelDeck(PLAYER2_SEED, _roundNumber, battleSeed);
 
             //Reset played card count
             _player2.PlayedCardCount = 0;
@@ -275,7 +279,7 @@ public class GameController : MonoBehaviour
                     // calculate random seed like in solidity
                     var abiEncode = new ABIEncode();
                     var rand = abiEncode.GetSha3ABIEncodedPacked(
-                        new ABIValue("uint256", 69420),
+                        new ABIValue("uint256", TIEBREAK_SEED),
                         new ABIValue("uint256", _roundNumber),
                         new ABIValue("uint256", battleSeed)).ToBigIntegerFromRLPDecoded();
 

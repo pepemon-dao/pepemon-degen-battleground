@@ -103,6 +103,10 @@ public class BattlePrepController : MonoBehaviour
         // initiate the battle immediatelly if the player initiated the battle
         if (battleEvent != null)
         {
+            // prevent player from clicking on the Exit button if BattleCreated event was captured
+            _exitButton.GetComponent<Button>().interactable = false;
+            
+            // proceed into the next scene
             await InitBattleScene((PepemonBattle.BattleCreatedEventData) battleEvent);
         }
     }
