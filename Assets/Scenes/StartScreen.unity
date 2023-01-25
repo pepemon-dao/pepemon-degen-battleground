@@ -6764,11 +6764,11 @@ MonoBehaviour:
       chainCurrencySymbol: MATIC
       chainCurrencyDecimals: 18
       rpcUrl: https://rpc.ankr.com/polygon_mumbai
-      pepemonBattleAddress: 0x04bB7b7d7fb2E8e37095b65cB828Ced8a7b5A01D
+      pepemonBattleAddress: 0x16018De06b116b044f257Fe58d915e5da048CE14
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
       pepemonCardDeckAddress: 0xa784b4fcFe0cF627aD2Be650d5467597FCFBFf67
       pepemonMatchmakerAddresses:
-      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
+      - 0x0941517e79a5898B46318B2C66634aa5928fC70f
     - chainId: 31337
       chainName: hardhat
       chainCurrencyName: ETH
