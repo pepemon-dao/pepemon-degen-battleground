@@ -22,6 +22,7 @@ MonoBehaviour:
   CardEffectSprite: {fileID: 21300000, guid: 6f870ae8e22a4354faac7f7c9d229294, type: 3}
   AttackPower: 0
   DefensePower: 0
+  effectOnes: []
   Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0

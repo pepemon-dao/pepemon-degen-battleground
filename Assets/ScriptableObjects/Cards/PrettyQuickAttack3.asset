@@ -10,19 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
-  m_Name: ThinkLessStrikeHarder
+  m_Name: PrettyQuickAttack3
   m_EditorClassIdentifier: 
-  UID: bf1e9e3a-fdce-4996-8170-452eae4ba743
+  UID: bfb2add8-08d7-40b1-ab03-303c8bfb2e0f
   Icon: {fileID: 0}
-  ID: 24
-  DisplayName: Think Less Strike Harder
-  CardDescription: "If the Pepemon\u2019s Intelligence is 5 or less, then until end
-    of turn, the Pepemon receives an additional Attack Power equal to the total of
-    all the offense cards used by its player this turn (excluding offense card bonuses)."
-  Rarity: 2
-  Type: 3
-  CardEffectSprite: {fileID: 21300000, guid: 799aa18debc0f7a44b9f1ac3e947f5a2, type: 3}
-  AttackPower: 0
+  ID: 15
+  DisplayName: Pretty Quick Attack
+  CardDescription: Pepemon adds +2 to its Attack Power until end of turn.
+  Rarity: 0
+  Type: 0
+  CardEffectSprite: {fileID: 21300000, guid: d95fed4a4095d1f4b9306bb8735a0d1b, type: 3}
+  AttackPower: 2
   DefensePower: 0
   effectOnes: []
   Unstackable: 0

@@ -26,7 +26,7 @@ MonoBehaviour:
   HealthPoints: 350
   Speed: 20
   Intelligence: 5
-  Attack: 5
+  Attack: 50
   Defense: 10
   SAttack: 15
   SDeffense: 10

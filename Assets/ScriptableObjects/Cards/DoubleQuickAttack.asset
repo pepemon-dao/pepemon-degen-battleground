@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: b94ce64f-e67c-4395-97ae-67e2e73cb56c
   Icon: {fileID: 0}
-  ID: 17
+  ID: 14
   DisplayName: Double Quick Attack
   CardDescription: Pepemon adds +4 to its Attack Power until end of turn.
   Rarity: 0
