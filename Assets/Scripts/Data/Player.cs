@@ -113,7 +113,7 @@ public class Player
         var toBeRemoved = new List<Card>();
 
         //Loop through every support card currently played
-        foreach (var card in CurrentHand.GetCardsInHand)
+        foreach (var card in CurrentHand.GetTableSupportCards)
         {
             //Get the effect of that support card
             var effect = card.effectMany;
@@ -163,7 +163,7 @@ public class Player
 
         foreach (var card in toBeRemoved)
         {
-            CurrentHand.RemoveCardFromHand(card);
+            CurrentHand.RemoveCardFromTable(card);
         }
     }
 }

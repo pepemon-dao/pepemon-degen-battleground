@@ -55,10 +55,43 @@ public class GameController : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
+    /// <summary>
+    /// Used for debugging battles to ensure its synced with the blockchain results
+    /// </summary>
+    private void PrepareSimulatedBattle()
+    {
+        // prevent overriding real battles
+        if (BattlePrepController.battleData.battleRngSeed != 0)
+        {
+            return;
+        }
+        // add console.log calls in the PepemonBattle.sol contract to get this seed
+        BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
+            "68188038832262297884772284640717549873770515354422947402145954532168121309549");
+        BattlePrepController.battleData.player1BattleCard = 1;
+        BattlePrepController.battleData.player1SupportCards = new Dictionary<ulong, int>()
+        {
+            [12] = 1,
+            [28] = 2
+        };
+        BattlePrepController.battleData.player2BattleCard = 2;
+        BattlePrepController.battleData.player2SupportCards = new Dictionary<ulong, int>()
+        {
+            [12] = 1,
+            [29] = 1,
+            [21] = 1
+        };
+    }
+#endif
+
     private void PrepareDecksBeforeBattle()
     {
-        // might be null if ran from unity editor
-        if (BattlePrepController.battleData != null)
+#if UNITY_EDITOR
+        PrepareSimulatedBattle();
+#endif
+        // might be zero if ran from unity editor
+        if (BattlePrepController.battleData.battleRngSeed != 0)
         {
             _player1.SetPlayerDeck(
                 pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player1BattleCard.ToString()),
@@ -109,9 +142,9 @@ public class GameController : MonoBehaviour
     IEnumerator LoopGame()
     {
         yield return new WaitForSeconds(1f);
-        while (_gameHasFinished == false)
+        while (!_gameHasFinished)
         {
-            yield return new WaitUntil(() => _isPlayingRound == false);
+            yield return new WaitUntil(() => !_isPlayingRound);
             yield return StartCoroutine(StartRound());
         }
     }
@@ -124,7 +157,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator StartRound()
     {
-        if (_gameHasFinished == true)
+        if (_gameHasFinished)
         {
             yield return null;
         }
@@ -179,7 +212,7 @@ public class GameController : MonoBehaviour
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
         for (int i = 0; i < 2; i++)
         {
-            if (_gameHasFinished == false)
+            if (!_gameHasFinished)
             {
                 _currentAttacker = ResolveAttacker(_currentAttacker, _player1, _player2, i == 1);
 
@@ -188,7 +221,7 @@ public class GameController : MonoBehaviour
 
                 CalcSupportCardsInHand(atkPlayer, defPlayer);
 
-                int totalAttackPower = atkPlayer.CurrentPepemonStats.atk;
+                int totalAttackPower = atkPlayer.CurrentPepemonStats.atk + CalcResistanceWeakness(atkPlayer, defPlayer);
                 int totalDefensePower = defPlayer.CurrentPepemonStats.def;
 
                 Debug.Log("fight currentAttacker=" + _currentAttacker);
@@ -311,12 +344,13 @@ public class GameController : MonoBehaviour
         // Loop through every card the attacker has in his hand
         foreach (var card in atkPlayer.CurrentHand.GetCardsInHand)
         {
+            var effectOne = card.effectOne;
+
             if (card.Type == PlayCardType.Offense)
             {
                 // Card type is OFFENSE.
-                // Calc effects of EffectOne array
-                foreach (var effectOne in card.effectOnes)
-                {
+                // Calc effects of EffectOne
+                
                     (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
                     if (isTriggered)
                     {
@@ -330,8 +364,8 @@ public class GameController : MonoBehaviour
                         atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
                         totalNormalPower += effectOne.basePower;
                     }
+                
                 }
-            }
             else if (card.Type == PlayCardType.SpecialOffense)
             {
                 // Card type is STRONG OFFENSE.
@@ -341,7 +375,7 @@ public class GameController : MonoBehaviour
                     // Check if card is new to previous cards
                     if (unstackableCards.Contains(card.ID) ||
                         // Check if card is new to temp support info cards
-                        atkPlayer.CurrentHand.GetCardsInHand.Any(c => c.ID == card.ID))
+                        atkPlayer.CurrentHand.GetTableSupportCards.Any(c => c.ID == card.ID))
                     {
                         // If it isn't being used for the first time - skip card
                         continue;
@@ -349,9 +383,8 @@ public class GameController : MonoBehaviour
                     unstackableCards.Add(card.ID);
                 }
 
-                // Calc effects of EffectOne array
-                foreach (var effectOne in card.effectOnes)
-                {
+                // Calc effects of EffectOne
+
                     (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
                     if (isTriggered)
                     {
@@ -383,13 +416,13 @@ public class GameController : MonoBehaviour
                         atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
                         totalNormalPower += effectOne.basePower;
                     }
-                }
+
 
                 // If card lasts for >1 turns, Add card to table if <5 on table currently
                 if (card.effectMany.power != 0 && atkPlayer.CurrentHand.GetCardsInHand.Count < 5)
                 {
                     // todo: add animation to display card being added
-                    atkPlayer.CurrentHand.AddCardToHand(card);
+                    atkPlayer.CurrentHand.AddCardToTable(card);
                 }
             }
 
@@ -408,12 +441,13 @@ public class GameController : MonoBehaviour
 
         foreach (var card in defPlayer.CurrentHand.GetCardsInHand)
         {
+            var effectOne = card.effectOne;
+
             if (card.Type == PlayCardType.Defense)
             {
                 // Card type is OFFENSE.
-                // Calc effects of EffectOne array
-                foreach (var effectOne in card.effectOnes)
-                {
+                // Calc effects of EffectOne
+                
                     (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
                     if (isTriggered)
                     {
@@ -427,6 +461,7 @@ public class GameController : MonoBehaviour
                         defPlayer.CurrentPepemonStats.def += effectOne.basePower;
                         totalNormalPower += effectOne.basePower;
                     }
+                
                 }
             }
             else if (card.Type == PlayCardType.SpecialDefense)
@@ -446,9 +481,8 @@ public class GameController : MonoBehaviour
                     unstackableCards.Add(card.ID);
                 }
 
-                // Calc effects of EffectOne array
-                foreach (var effectOne in card.effectOnes)
-                {
+                // Calc effects of EffectOne
+                
                     (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
                     if (isTriggered)
                     {
@@ -479,13 +513,13 @@ public class GameController : MonoBehaviour
                         defPlayer.CurrentPepemonStats.def += effectOne.basePower;
                         totalNormalPower += effectOne.basePower;
                     }
-                }
+
 
                 // If card lasts for >1 turns, Add card to table if <5 on table currently
                 if (card.effectMany.power != 0 && defPlayer.CurrentHand.GetCardsInHand.Count < 5)
                 {
                     // todo: add animation to display card being added
-                    defPlayer.CurrentHand.AddCardToHand(card);
+                    defPlayer.CurrentHand.AddCardToTable(card);
                 }
             }
         }
@@ -497,6 +531,19 @@ public class GameController : MonoBehaviour
         }
     }
 
+    // Note: Same logic of "resistanceWeaknessCal" in PepemonBattle.sol
+    private int CalcResistanceWeakness(Player atkPlayer, Player defPlayer)
+    {
+        if (atkPlayer.PlayerPepemon.Type == defPlayer.PlayerPepemon.Weakness)
+        {
+            return 2;
+        }
+        else if (atkPlayer.PlayerPepemon.Type == defPlayer.PlayerPepemon.Resistence)
+        {
+            return -2;
+        }
+        return 0;
+    }
 
     /// <summary>
     /// Checks if the requirements are satisfied for a certain code
@@ -524,13 +571,13 @@ public class GameController : MonoBehaviour
             case 3:
                 // Each +2 offense cards of offense pepemon.
                 multiplier = atkPlayer.CurrentHand.AllOffenseCards.Count(
-                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 2).effectTo == EffectTo.Attack);
+                    card => card.effectOne.basePower == 2 && card.effectOne.effectTo == EffectTo.Attack);
                 isTriggered = multiplier > 0;
                 break;
             case 4:
                 // Each +3 offense cards of offense pepemon.
                 multiplier = atkPlayer.CurrentHand.AllOffenseCards.Count(
-                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 3).effectTo == EffectTo.Attack);
+                    card => card.effectOne.basePower == 3 && card.effectOne.effectTo == EffectTo.Attack);
                 isTriggered = multiplier > 0;
                 break;
             case 5:
@@ -541,13 +588,13 @@ public class GameController : MonoBehaviour
             case 6:
                 // Each +3 defense card of defense pepemon.
                 multiplier = defPlayer.CurrentHand.AllOffenseCards.Count(
-                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 3).effectTo == EffectTo.Defense);
+                    card => card.effectOne.basePower == 3 && card.effectOne.effectTo == EffectTo.Defense);
                 isTriggered = multiplier > 0;
                 break;
             case 7:
                 // Each +3 defense card of defense pepemon.
                 multiplier = defPlayer.CurrentHand.AllOffenseCards.Count(
-                    card => card.effectOnes.FirstOrDefault(e => e.basePower == 4).effectTo == EffectTo.Defense);
+                    card => card.effectOne.basePower == 4 && card.effectOne.effectTo == EffectTo.Defense);
                 isTriggered = multiplier > 0;
                 break;
             case 8:

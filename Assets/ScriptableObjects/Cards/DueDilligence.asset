@@ -20,12 +20,23 @@ MonoBehaviour:
     2, Unresettable 2) Effects do not stack or reset with another card of the same
     name.
   Rarity: 2
-  Type: 3
+  Type: 1
   CardEffectSprite: {fileID: 21300000, guid: beb5ea5b2d4548a4c84f48eb9f6f25da, type: 3}
   AttackPower: 0
   DefensePower: 0
-  effectOnes: []
+  effectOne:
+    basePower: 0
+    triggeredPower: 4
+    effectTo: 3
+    effectFor: 1
+    reqCode: 9
+  effectMany:
+    power: 1
+    numTurns: 0
+    effectTo: 0
+    effectFor: 1
+    reqCode: 1
   Unstackable: 1
-  Unresettable: 1
-  UnstackableAmount: 2
+  Unresettable: 0
+  UnstackableAmount: 0
   UnresettableAmount: 2

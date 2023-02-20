@@ -21,11 +21,10 @@ public class BattlePrepController : MonoBehaviour
     [ReadOnly] private CancellationTokenSource _cancellationTokenSource;
 
     // used on GameController on the battle scene
-    public static BattleData battleData { get; private set; }
+    public static BattleData battleData { get; private set; } = new BattleData();
 
     void Start()
     {
-        battleData ??= new BattleData();
         _searchForOpponentButton.GetComponent<Button>().onClick.AddListener(OnSearchForOpponentButtonClick);
         _exitButton.GetComponent<Button>().onClick.AddListener(onExitButtonClick);
         _deckList.GetComponent<DeckListLoader>().onSelectDeck.AddListener(OnDeckSelected);
