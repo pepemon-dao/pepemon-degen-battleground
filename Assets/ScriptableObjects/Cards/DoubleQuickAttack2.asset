@@ -10,32 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
-  m_Name: FoundAnOpening
+  m_Name: DoubleQuickAttack2
   m_EditorClassIdentifier: 
-  UID: b8e79265-fd2d-4f63-ad56-67fc386ec5ff
+  UID: b94ce64f-e67c-4395-97ae-67e2e73cb56c
   Icon: {fileID: 0}
-  ID: 19
-  DisplayName: Found An Opening
-  CardDescription: Pepemon adds +1 to its Attack Power until end of turn. If the
-    player of the defending Pepemon does not lay any Defense cards, Pepemon adds
-    an additional +7 to its Attack Power until end of turn.
-  Rarity: 1
+  ID: 17
+  DisplayName: Double Quick Attack
+  CardDescription: Pepemon adds +4 to its Attack Power until end of turn.
+  Rarity: 0
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 21b3e2254ddcf2548872f1b6dd0afafe, type: 3}
-  AttackPower: 8
+  CardEffectSprite: {fileID: 21300000, guid: 61e53dfc2f3ad6e46b302965f29cacf3, type: 3}
+  AttackPower: 4
   DefensePower: 0
   effectOne:
     basePower: 2
-    triggeredPower: 1
-    effectTo: 3
+    triggeredPower: 2
+    effectTo: 4
     effectFor: 1
     reqCode: 4
   effectMany:
     power: 3
-    numTurns: 2
+    numTurns: 1
     effectTo: 0
-    effectFor: 1
-    reqCode: 8
+    effectFor: 0
+    reqCode: 3
   Unstackable: 1
   Unresettable: 0
   UnstackableAmount: 0

@@ -50,7 +50,7 @@ public class Card : ScriptableObject
     [ShowIf("@this.Type == PlayCardType.Defense || this.Type == PlayCardType.SpecialDefense")] public int DefensePower;
 
     [TitleGroup("Properties")]
-    public EffectOne[] effectOnes;
+    public EffectOne effectOne;
 
     [TitleGroup("Properties")]
     public EffectMany effectMany;

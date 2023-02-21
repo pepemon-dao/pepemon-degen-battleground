@@ -19,11 +19,23 @@ MonoBehaviour:
   CardDescription: Pepemon gets +1 to its Attack Power until end of turn, while the
     target defending Pepemon gets -4 to its Defense Power until end of turn.
   Rarity: 1
-  Type: 0
+  Type: 1
   CardEffectSprite: {fileID: 21300000, guid: 66bcc350d628be24d85e59188bc10885, type: 3}
   AttackPower: 0
   DefensePower: 0
-  Unstackable: 0
+  effectOne:
+    basePower: 4
+    triggeredPower: 2
+    effectTo: 3
+    effectFor: 0
+    reqCode: 2
+  effectMany:
+    power: 4
+    numTurns: 1
+    effectTo: 0
+    effectFor: 1
+    reqCode: 11
+  Unstackable: 1
   Unresettable: 0
   UnstackableAmount: 0
   UnresettableAmount: 0

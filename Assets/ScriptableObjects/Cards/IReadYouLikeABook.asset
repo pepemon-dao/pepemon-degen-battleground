@@ -20,10 +20,22 @@ MonoBehaviour:
     adds an additional +10 to its Defense Power until end of turn, if the attacking
     Pepemon used its strong attack this turn.
   Rarity: 1
-  Type: 3
+  Type: 1
   CardEffectSprite: {fileID: 21300000, guid: 86f3adde04f43a041ac6d8aefe951833, type: 3}
   AttackPower: 0
   DefensePower: 12
+  effectOne:
+    basePower: 1
+    triggeredPower: 4
+    effectTo: 4
+    effectFor: 0
+    reqCode: 11
+  effectMany:
+    power: 4
+    numTurns: 0
+    effectTo: 2
+    effectFor: 0
+    reqCode: 10
   Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0

@@ -20,10 +20,22 @@ MonoBehaviour:
     of turn, the Pepemon receives an additional Attack Power equal to the total of
     all the offense cards used by its player this turn (excluding offense card bonuses)."
   Rarity: 2
-  Type: 3
+  Type: 1
   CardEffectSprite: {fileID: 21300000, guid: 799aa18debc0f7a44b9f1ac3e947f5a2, type: 3}
   AttackPower: 0
   DefensePower: 0
+  effectOne:
+    basePower: 4
+    triggeredPower: 0
+    effectTo: 5
+    effectFor: 0
+    reqCode: 1
+  effectMany:
+    power: 0
+    numTurns: 2
+    effectTo: 2
+    effectFor: 0
+    reqCode: 5
   Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0

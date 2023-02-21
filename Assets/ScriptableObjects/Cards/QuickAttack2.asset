@@ -10,32 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
-  m_Name: Parry
+  m_Name: QuickAttack2
   m_EditorClassIdentifier: 
-  UID: 5e370533-afa6-425b-b31f-58e3797b4e66
+  UID: 14b52bdf-2a95-4c30-8347-b7305b49ea31
   Icon: {fileID: 0}
-  ID: 31
-  DisplayName: Perry
-  CardDescription: Pepemon adds +5 to its Defense Power for each +4 Defense card
-    used by the player during this turn
-  Rarity: 1
+  ID: 16
+  DisplayName: Quick Attack
+  CardDescription: Pepemon adds +3 to its Attack Power until end of turn.
+  Rarity: 0
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 43d8d0120a29e0546aa2d86d7a1a44ce, type: 3}
-  AttackPower: 0
-  DefensePower: 5
+  CardEffectSprite: {fileID: 21300000, guid: 04831dff486ee6544ba0a7d83363e3a5, type: 3}
+  AttackPower: 3
+  DefensePower: 0
   effectOne:
-    basePower: 2
-    triggeredPower: 0
-    effectTo: 1
+    basePower: 1
+    triggeredPower: 4
+    effectTo: 0
     effectFor: 1
-    reqCode: 3
+    reqCode: 10
   effectMany:
-    power: 4
-    numTurns: 1
-    effectTo: 2
-    effectFor: 1
+    power: 2
+    numTurns: 2
+    effectTo: 4
+    effectFor: 0
     reqCode: 0
-  Unstackable: 0
-  Unresettable: 0
+  Unstackable: 1
+  Unresettable: 1
   UnstackableAmount: 0
   UnresettableAmount: 0
