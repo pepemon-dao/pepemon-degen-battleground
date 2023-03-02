@@ -14,6 +14,8 @@ public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _mintCardButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _previousScreenButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
     private ulong battleCard;
@@ -22,6 +24,7 @@ public class ScreenEditDeck : MonoBehaviour
     public void Start()
     {
         _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
+        _mintCardButton.GetComponent<Button>().onClick.AddListener(HandleMintCardButtonClick);
     }
 
     public async void LoadAllCards(ulong deckId)
@@ -46,9 +49,31 @@ public class ScreenEditDeck : MonoBehaviour
         _textLoading.SetActive(false);
     }
 
-    public async void HandleSaveButtonClick()
+    private void setButtonsInteractibleState(bool interactible)
     {
-        _saveDeckButton.GetComponent<Button>().interactable = false;
+        _saveDeckButton.GetComponent<Button>().interactable = interactible;
+        _previousScreenButton.GetComponent<Button>().interactable = interactible;
+        _mintCardButton.GetComponent<Button>().interactable = interactible;
+    }
+
+    public async void HandleMintCardButtonClick()
+    {
+        setButtonsInteractibleState(false);
+        try
+        {
+            await PepemonCardDeck.MintRandomCard();
+            LoadAllCards(currentDeckId);
+        } 
+        finally
+        {
+            setButtonsInteractibleState(true);
+        }
+    }
+
+   public async void HandleSaveButtonClick()
+    {
+        setButtonsInteractibleState(false);
+
         var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
 
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
@@ -80,7 +105,7 @@ public class ScreenEditDeck : MonoBehaviour
             await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
         }
 
-        _saveDeckButton.GetComponent<Button>().interactable = true;
+        setButtonsInteractibleState(true);
     }
 
     private async Task UpdateBattlecard(ulong newBattleCard)

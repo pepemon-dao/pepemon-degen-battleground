@@ -187,6 +187,14 @@ namespace Contracts.PepemonCardDeck.abi.ContractDefinition
         public virtual string Operator { get; set; }
     }
 
+    public partial class MintRandomCardFunction : MintRandomCardFunctionBase { }
+
+    [Function("mintRandomCard")]
+    public class MintRandomCardFunctionBase : FunctionMessage
+    {
+
+    }
+
     public partial class NameFunction : NameFunctionBase { }
 
     [Function("name", "string")]
@@ -349,6 +357,15 @@ namespace Contracts.PepemonCardDeck.abi.ContractDefinition
     {
         [Parameter("uint256", "_minSupportCards", 1)]
         public virtual BigInteger MinSupportCards { get; set; }
+    }
+
+    public partial class SetMintingRandomCardsFunction : SetMintingRandomCardsFunctionBase { }
+
+    [Function("setMintingRandomCards")]
+    public class SetMintingRandomCardsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "maxCard", 1)]
+        public virtual BigInteger MaxCard { get; set; }
     }
 
     public partial class SetSupportCardAddressFunction : SetSupportCardAddressFunctionBase { }
