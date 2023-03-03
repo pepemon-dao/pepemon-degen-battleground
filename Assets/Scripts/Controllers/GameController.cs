@@ -463,7 +463,6 @@ public class GameController : MonoBehaviour
                     }
                 
                 }
-            }
             else if (card.Type == PlayCardType.SpecialDefense)
             {
                 // Card type is STRONG DEFENSE
