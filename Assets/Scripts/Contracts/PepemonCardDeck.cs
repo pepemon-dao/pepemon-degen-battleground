@@ -103,10 +103,10 @@ public class PepemonCardDeck : ERC1155Common
         await SetApproval(Address, approved, operatorAddress);
     }
 
-    public static async Task MintRandomCard()
+    public static async Task MintCards()
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SendTransactionAndWaitForReceiptAsync(new MintRandomCardFunction(), Address);
+        await request.SendTransactionAndWaitForReceiptAsync(new MintCardsFunction(), Address);
     }
 
     public static async Task CreateDeck()

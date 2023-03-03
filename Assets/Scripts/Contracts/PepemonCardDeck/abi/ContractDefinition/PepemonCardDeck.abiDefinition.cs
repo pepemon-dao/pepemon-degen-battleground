@@ -187,10 +187,10 @@ namespace Contracts.PepemonCardDeck.abi.ContractDefinition
         public virtual string Operator { get; set; }
     }
 
-    public partial class MintRandomCardFunction : MintRandomCardFunctionBase { }
+    public partial class MintCardsFunction : MintCardsFunctionBase { }
 
-    [Function("mintRandomCard")]
-    public class MintRandomCardFunctionBase : FunctionMessage
+    [Function("mintCards")]
+    public class MintCardsFunctionBase : FunctionMessage
     {
 
     }

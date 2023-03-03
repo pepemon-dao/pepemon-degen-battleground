@@ -1102,7 +1102,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Mint card
+  m_Text: Mint cards
 --- !u!222 &411141036
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5495,7 +5495,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _deckDisplay: {fileID: 725896986}
   _saveDeckButton: {fileID: 1986635108}
-  _mintCardButton: {fileID: 1406872818}
+  _mintCardsButton: {fileID: 1406872818}
   _previousScreenButton: {fileID: 727523883}
   _textLoading: {fileID: 486681336}
 --- !u!114 &1157378621
@@ -7730,7 +7730,7 @@ GameObject:
   - component: {fileID: 1406872821}
   - component: {fileID: 1406872820}
   m_Layer: 5
-  m_Name: Button_MintCard
+  m_Name: Button_MintCards
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -14,7 +14,7 @@ public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
-    [TitleGroup("Component References"), SerializeField] GameObject _mintCardButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _mintCardsButton;
     [TitleGroup("Component References"), SerializeField] GameObject _previousScreenButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
@@ -24,7 +24,7 @@ public class ScreenEditDeck : MonoBehaviour
     public void Start()
     {
         _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
-        _mintCardButton.GetComponent<Button>().onClick.AddListener(HandleMintCardButtonClick);
+        _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
     public async void LoadAllCards(ulong deckId)
@@ -53,15 +53,15 @@ public class ScreenEditDeck : MonoBehaviour
     {
         _saveDeckButton.GetComponent<Button>().interactable = interactible;
         _previousScreenButton.GetComponent<Button>().interactable = interactible;
-        _mintCardButton.GetComponent<Button>().interactable = interactible;
+        _mintCardsButton.GetComponent<Button>().interactable = interactible;
     }
 
-    public async void HandleMintCardButtonClick()
+    public async void HandleMintCardsButtonClick()
     {
         setButtonsInteractibleState(false);
         try
         {
-            await PepemonCardDeck.MintRandomCard();
+            await PepemonCardDeck.MintCards();
             LoadAllCards(currentDeckId);
         } 
         finally
