@@ -18,23 +18,23 @@ MonoBehaviour:
   DisplayName: Sucker Punch
   CardDescription: Opposing Pepemon gets -5 to its Defense Power until end of turn
   Rarity: 1
-  Type: 1
+  Type: 0
   CardEffectSprite: {fileID: 21300000, guid: 6f870ae8e22a4354faac7f7c9d229294, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:
-    basePower: 1
-    triggeredPower: 1
-    effectTo: 3
+    basePower: -5
+    triggeredPower: 0
+    effectTo: 2
     effectFor: 1
-    reqCode: 2
+    reqCode: 0
   effectMany:
     power: 0
     numTurns: 0
-    effectTo: 3
-    effectFor: 1
-    reqCode: 8
-  Unstackable: 1
-  Unresettable: 1
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  Unstackable: 0
+  Unresettable: 0
   UnstackableAmount: 0
   UnresettableAmount: 0

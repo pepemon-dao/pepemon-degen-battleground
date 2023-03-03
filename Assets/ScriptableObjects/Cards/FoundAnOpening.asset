@@ -20,23 +20,23 @@ MonoBehaviour:
     player of the defending Pepemon does not lay any Defense cards, Pepemon adds
     an additional +7 to its Attack Power until end of turn.
   Rarity: 1
-  Type: 1
+  Type: 0
   CardEffectSprite: {fileID: 21300000, guid: 21b3e2254ddcf2548872f1b6dd0afafe, type: 3}
   AttackPower: 8
   DefensePower: 0
   effectOne:
-    basePower: 2
-    triggeredPower: 1
-    effectTo: 3
-    effectFor: 1
-    reqCode: 4
+    basePower: 1
+    triggeredPower: 8
+    effectTo: 2
+    effectFor: 0
+    reqCode: 2
   effectMany:
-    power: 3
-    numTurns: 2
+    power: 0
+    numTurns: 0
     effectTo: 0
-    effectFor: 1
-    reqCode: 8
-  Unstackable: 1
+    effectFor: 0
+    reqCode: 0
+  Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0
   UnresettableAmount: 0

@@ -20,23 +20,23 @@ MonoBehaviour:
     turn and the next 2 turns. (Unstackable 2, Unresettable 2). Effects do not stack
     with another card of the same name.
   Rarity: 1
-  Type: 1
+  Type: 3
   CardEffectSprite: {fileID: 21300000, guid: 6fc863e8f9486784dbe6a383f3c3c5c2, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:
-    basePower: 2
-    triggeredPower: 2
-    effectTo: 2
-    effectFor: 0
-    reqCode: 7
+    basePower: -3
+    triggeredPower: 0
+    effectTo: 0
+    effectFor: 1
+    reqCode: 0
   effectMany:
-    power: 2
-    numTurns: 1
-    effectTo: 1
-    effectFor: 0
-    reqCode: 11
-  Unstackable: 0
+    power: -3
+    numTurns: 2
+    effectTo: 0
+    effectFor: 1
+    reqCode: 0
+  Unstackable: 1
   Unresettable: 1
   UnstackableAmount: 2
   UnresettableAmount: 0

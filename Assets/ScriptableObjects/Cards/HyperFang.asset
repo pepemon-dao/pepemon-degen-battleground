@@ -24,18 +24,18 @@ MonoBehaviour:
   AttackPower: 6
   DefensePower: 0
   effectOne:
-    basePower: 3
-    triggeredPower: 4
+    basePower: 6
+    triggeredPower: 3
     effectTo: 1
-    effectFor: 1
-    reqCode: 7
-  effectMany:
-    power: 2
-    numTurns: 0
-    effectTo: 1
-    effectFor: 1
+    effectFor: 0
     reqCode: 4
-  Unstackable: 1
-  Unresettable: 1
+  effectMany:
+    power: 0
+    numTurns: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  Unstackable: 0
+  Unresettable: 0
   UnstackableAmount: 0
   UnresettableAmount: 0

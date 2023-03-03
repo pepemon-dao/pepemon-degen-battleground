@@ -19,22 +19,22 @@ MonoBehaviour:
   CardDescription: Pepemon adds +6 to its Defense Power for each +3 Defense card
     used by its player during this turn.
   Rarity: 1
-  Type: 1
+  Type: 2
   CardEffectSprite: {fileID: 21300000, guid: 4f4b8256b75048849b0ff38168541a17, type: 3}
   AttackPower: 0
   DefensePower: 6
   effectOne:
-    basePower: 2
-    triggeredPower: 4
-    effectTo: 5
+    basePower: 6
+    triggeredPower: 6
+    effectTo: 2
     effectFor: 0
-    reqCode: 1
+    reqCode: 6
   effectMany:
-    power: 3
-    numTurns: 2
-    effectTo: 5
-    effectFor: 1
-    reqCode: 3
+    power: 0
+    numTurns: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
   Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0

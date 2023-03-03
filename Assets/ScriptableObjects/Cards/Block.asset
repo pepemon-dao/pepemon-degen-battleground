@@ -18,23 +18,23 @@ MonoBehaviour:
   DisplayName: Block
   CardDescription: Pepemon adds +3 to its Defense Power until end of turn
   Rarity: 0
-  Type: 1
+  Type: 2
   CardEffectSprite: {fileID: 21300000, guid: 615e4be81ceb6494b90a43580122d31e, type: 3}
   AttackPower: 0
   DefensePower: 3
   effectOne:
-    basePower: 1
+    basePower: 3
     triggeredPower: 0
-    effectTo: 1
-    effectFor: 1
+    effectTo: 2
+    effectFor: 0
     reqCode: 0
   effectMany:
-    power: 2
-    numTurns: 2
-    effectTo: 3
+    power: 0
+    numTurns: 0
+    effectTo: 0
     effectFor: 0
-    reqCode: 10
+    reqCode: 0
   Unstackable: 0
-  Unresettable: 1
+  Unresettable: 0
   UnstackableAmount: 0
   UnresettableAmount: 0
