@@ -23,7 +23,7 @@ MonoBehaviour:
   Weakness: 5
   Resistence: 3
   Rarity: 0
-  HealthPoints: 20
+  HealthPoints: 400
   Speed: 10
   Intelligence: 10
   Attack: 10
