@@ -6860,13 +6860,37 @@ MonoBehaviour:
       rpcUrl: http://localhost:8545
       pepemonBattleAddress: 0x3DF3b26eE45f131960383323b2f9988E73967300
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
-      pepemonCardDeckAddress: 0x1b5A60703C73E261633FeD34B6316B9485C51AA2
+      pepemonCardDeckAddress: 0xDA116D9Bc40195371B833fA8280dee2b190aCB49
       pepemonMatchmakerAddresses:
-      - 0x014D30E03f242fcB8B5cF9B1e50efCfF8B7c5213
-    defaultChainId: 80001
-    debugRpcUrl: https://rpc.ankr.com/polygon_mumbai
+      - 0x47E2B6189436D064a291d61a3f0822356823E26D
+    - chainId: 4002
+      chainName: Fantom testnet
+      chainCurrencyName: FTM
+      chainCurrencySymbol: FTM
+      chainCurrencyDecimals: 18
+      rpcUrl: https://rpc.ankr.com/fantom_testnet
+      pepemonBattleAddress: 0xCBfA151dfCA576EA333C04497B5D723ffEEf1559
+      pepemonFactoryAddress: 0x9460DfaAD34Bc55ee564A6851c58DFC390D7d4ac
+      pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
+      pepemonMatchmakerAddresses:
+      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
+    - chainId: 250
+      chainName: Fantom Opera
+      chainCurrencyName: FTM
+      chainCurrencySymbol: FTM
+      chainCurrencyDecimals: 18
+      rpcUrl: https://rpc.ankr.com/fantom
+      pepemonBattleAddress: 0x99dC834eB9cE894eE1142B5aCc6eEdD27cA14887
+      pepemonFactoryAddress: 0x888c830242caaa352dc506a2c79d38b3e86102ad
+      pepemonCardDeckAddress: 0x665688de6296956f3c7264961511412e02b24070
+      pepemonMatchmakerAddresses:
+      - 0x0EA739B3c290E6194d37ba579948794cA0662705
+      - 0x0EA739B3c290E6194d37ba579948794cA0662705
+      - 0x0EA739B3c290E6194d37ba579948794cA0662705
+    defaultChainId: 4002
+    debugRpcUrl: https://rpc.ankr.com/fantom_testnet
     debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-    readOnlyRpcUrl: https://rpc.ankr.com/polygon_mumbai/cab889d3f2bdcc3b1ffb5cfb42887e057d52115cf019da315946f77eb50e3d27
+    readOnlyRpcUrl: https://rpc.ankr.com/fantom
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
