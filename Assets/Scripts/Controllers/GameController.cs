@@ -482,12 +482,12 @@ public class GameController : MonoBehaviour
 
                 // Calc effects of EffectOne
                 
-                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                (bool isTriggered, int num) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
                     if (isTriggered)
                     {
-                        if (multiplier > 1)
+                    if (num > 0)
                         {
-                            defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * multiplier;
+                        defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * num;
                         }
                         else
                         {
