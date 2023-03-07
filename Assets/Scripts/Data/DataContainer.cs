@@ -11,7 +11,7 @@ public class DataContainer : ScriptableObject
     public List<Card> Cards;
 
     // returns all cards (repeating them when necessary)
-    public IEnumerable<Card> GetAllCardsByIds(Dictionary<ulong, int> cards)
+    public IEnumerable<Card> GetAllCardsByIds(IDictionary<ulong, int> cards)
     {
         foreach (var supportCard in GetCardsTypesByIds(cards.Keys.ToList()))
         {

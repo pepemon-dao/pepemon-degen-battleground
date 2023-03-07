@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
@@ -29,7 +30,7 @@ public class PepemonCardDeck : ERC1155Common
         return (ulong)response.ReturnValue1;
     }
 
-    public static async Task<Dictionary<ulong, int>> GetAllSupportCards(ulong deckId)
+    public static async Task<IDictionary<ulong, int>> GetAllSupportCards(ulong deckId)
     {
         var request = new QueryUnityRequest<GetAllSupportCardsInDeckFunction, GetAllSupportCardsInDeckOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
@@ -39,7 +40,7 @@ public class PepemonCardDeck : ERC1155Common
             new GetAllSupportCardsInDeckFunction { DeckId = deckId },
             Address);
 
-        var result = new Dictionary<ulong, int>();
+        var result = new OrderedDictionary<ulong, int>();
         foreach (var card in response.SupportCards)
         {
             result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
