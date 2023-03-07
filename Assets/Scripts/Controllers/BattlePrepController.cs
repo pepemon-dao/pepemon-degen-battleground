@@ -176,7 +176,7 @@ public class BattlePrepController : MonoBehaviour
         public BigInteger battleRngSeed { get; set; }
         public ulong player1BattleCard { get; set; }
         public ulong player2BattleCard { get; set; }
-        public Dictionary<ulong, int> player1SupportCards { get; set; }
-        public Dictionary<ulong, int> player2SupportCards { get; set; }
+        public IDictionary<ulong, int> player1SupportCards { get; set; }
+        public IDictionary<ulong, int> player2SupportCards { get; set; }
     }
 }

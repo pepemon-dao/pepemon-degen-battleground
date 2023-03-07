@@ -42,7 +42,7 @@ public class ScreenEditDeck : MonoBehaviour
         var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);
 
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
-        supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
+        supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
 
         deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
