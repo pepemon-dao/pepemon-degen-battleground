@@ -51,15 +51,6 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
         public virtual BigInteger BattleId { get; set; }
     }
 
-    public partial class BattlesFunction : BattlesFunctionBase { }
-
-    [Function("battles", typeof(BattlesOutputDTO))]
-    public class BattlesFunctionBase : FunctionMessage
-    {
-        [Parameter("uint256", "", 1)]
-        public virtual BigInteger ReturnValue1 { get; set; }
-    }
-
     public partial class CalSupportCardsInHandFunction : CalSupportCardsInHandFunctionBase { }
 
     [Function("calSupportCardsInHand", typeof(CalSupportCardsInHandOutputDTO))]
@@ -82,7 +73,7 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
 
     public partial class CreateBattleFunction : CreateBattleFunctionBase { }
 
-    [Function("createBattle")]
+    [Function("createBattle", typeof(CreateBattleOutputDTO))]
     public class CreateBattleFunctionBase : FunctionMessage
     {
         [Parameter("address", "p1Addr", 1)]
@@ -157,8 +148,12 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
         public virtual string Player1Addr { get; set; }
         [Parameter("address", "player2Addr", 2, true )]
         public virtual string Player2Addr { get; set; }
-        [Parameter("uint256", "battleId", 3, false )]
+        [Parameter("uint256", "battleId", 3, false)]
         public virtual BigInteger BattleId { get; set; }
+        [Parameter("uint256", "p1DeckId", 4, false)]
+        public virtual BigInteger Player1Deck { get; set; }
+        [Parameter("uint256", "p2DeckId", 5, false)]
+        public virtual BigInteger Player2Deck { get; set; }
     }
 
 
@@ -170,25 +165,6 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger Seed { get; set; }
-    }
-
-    public partial class BattlesOutputDTO : BattlesOutputDTOBase { }
-
-    [FunctionOutput]
-    public class BattlesOutputDTOBase : IFunctionOutputDTO 
-    {
-        [Parameter("uint256", "battleId", 1)]
-        public virtual BigInteger BattleId { get; set; }
-        [Parameter("tuple", "player1", 2)]
-        public virtual Player Player1 { get; set; }
-        [Parameter("tuple", "player2", 3)]
-        public virtual Player Player2 { get; set; }
-        [Parameter("uint256", "currentTurn", 4)]
-        public virtual BigInteger CurrentTurn { get; set; }
-        [Parameter("uint8", "attacker", 5)]
-        public virtual byte Attacker { get; set; }
-        [Parameter("uint8", "turnHalves", 6)]
-        public virtual byte TurnHalves { get; set; }
     }
 
     public partial class CalSupportCardsInHandOutputDTO : CalSupportCardsInHandOutputDTOBase { }
@@ -213,7 +189,16 @@ namespace Contracts.PepemonBattle.abi.ContractDefinition
         public virtual string ReturnValue2 { get; set; }
     }
 
+    public partial class CreateBattleOutputDTO : CreateBattleOutputDTOBase { }
 
+    [FunctionOutput]
+    public class CreateBattleOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("tuple", "", 1)]
+        public virtual Battle ReturnValue1 { get; set; }
+        [Parameter("uint256", "battleId", 2)]
+        public virtual BigInteger BattleId { get; set; }
+    }
 
     public partial class FightOutputDTO : FightOutputDTOBase { }
 

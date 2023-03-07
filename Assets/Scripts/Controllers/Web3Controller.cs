@@ -12,6 +12,10 @@ using System.Collections.Generic;
 using Nethereum.RPC.Eth.DTOs;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
+using UnityEngine.UI;
+using Sirenix.OdinInspector;
+using System.Linq;
+using System;
 
 public class Web3Controller : MonoBehaviour
 {
@@ -21,6 +25,42 @@ public class Web3Controller : MonoBehaviour
     public UnityEvent onWalletConnected;
     public int CurrentChainId { get; private set; } = 0;
     public string SelectedAccountAddress { get; private set; }
+
+#if UNITY_EDITOR
+    #region Unity editor button for updating hardhat contracts addresses
+    [Serializable]
+    struct DeploymentJson
+    {
+        public string address;
+    }
+
+    [Button(), PropertyTooltip("Update hardhat's addresses (chainId 31337) from localhost deployment," +
+        "this way there is no need to copy the contracts' addresses from the terminal")]
+    private void UpdateHardhatAddresses()
+    {
+        // use hardhat local deployment assuming that the battle-contracts project is on ../
+        var deployments = @"..\battle-contracts\deployments\localhost";
+        
+        // get hardhat config
+        var chain = settings.chains.FirstOrDefault(x => x.chainId == 31337);
+        var index = Array.IndexOf(settings.chains, chain);
+
+        chain.pepemonBattleAddress = JsonUtility.FromJson<DeploymentJson>(
+            System.IO.File.ReadAllText($@"{deployments}\PepemonBattle.json")).address;
+        Debug.Log("Set pepemonBattleAddress = " + chain.pepemonBattleAddress);
+
+        chain.pepemonCardDeckAddress = JsonUtility.FromJson<DeploymentJson>(
+            System.IO.File.ReadAllText($@"{deployments}\PepemonCardDeck.json")).address;
+        Debug.Log("Set pepemonCardDeckAddress = " + chain.pepemonCardDeckAddress);
+
+        chain.pepemonMatchmakerAddresses[0] = JsonUtility.FromJson<DeploymentJson>(
+            System.IO.File.ReadAllText($@"{deployments}\PepemonMatchmaker.json")).address;
+        Debug.Log("Set pepemonMatchmakerAddresses[0] = " + chain.pepemonMatchmakerAddresses[0]);
+
+        settings.chains[index] = chain;
+    }
+    #endregion
+#endif
 
 #if !UNITY_EDITOR
     private bool _isMetamaskInitialised = false;

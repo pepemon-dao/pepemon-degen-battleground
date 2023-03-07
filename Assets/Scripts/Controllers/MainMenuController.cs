@@ -1,5 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Nethereum.Hex.HexTypes;
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Unity.Rpc;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,7 +27,6 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         ShowScreen(defaultScreenId);
-        _selectDeckListLoader.GetComponent<DeckListLoader>().onItemSelected.AddListener(SelectDeck);
     }
 
     public void ConnectWallet()
@@ -52,11 +55,6 @@ public class MainMenuController : MonoBehaviour
     public void SelectLeague(int leagueId)
     {
         selectedLeagueId = leagueId;
-    }
-
-    public void SelectDeck(ulong deckId)
-    {
-        selectedDeckId = deckId;
     }
 
     public void StartGame()

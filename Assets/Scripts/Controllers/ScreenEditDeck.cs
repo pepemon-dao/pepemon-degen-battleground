@@ -14,6 +14,8 @@ public class ScreenEditDeck : MonoBehaviour
 {
     [TitleGroup("Component References"), SerializeField] GameObject _deckDisplay;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _mintCardsButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _previousScreenButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
     private ulong currentDeckId;
     private ulong battleCard;
@@ -22,6 +24,7 @@ public class ScreenEditDeck : MonoBehaviour
     public void Start()
     {
         _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
+        _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
     public async void LoadAllCards(ulong deckId)
@@ -39,16 +42,38 @@ public class ScreenEditDeck : MonoBehaviour
         var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);
 
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
-        supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
+        supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
 
         deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
         _textLoading.SetActive(false);
     }
 
-    public async void HandleSaveButtonClick()
+    private void setButtonsInteractibleState(bool interactible)
     {
-        _saveDeckButton.GetComponent<Button>().interactable = false;
+        _saveDeckButton.GetComponent<Button>().interactable = interactible;
+        _previousScreenButton.GetComponent<Button>().interactable = interactible;
+        _mintCardsButton.GetComponent<Button>().interactable = interactible;
+    }
+
+    public async void HandleMintCardsButtonClick()
+    {
+        setButtonsInteractibleState(false);
+        try
+        {
+            await PepemonCardDeck.MintCards();
+            LoadAllCards(currentDeckId);
+        } 
+        finally
+        {
+            setButtonsInteractibleState(true);
+        }
+    }
+
+   public async void HandleSaveButtonClick()
+    {
+        setButtonsInteractibleState(false);
+
         var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
 
         // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
@@ -80,7 +105,7 @@ public class ScreenEditDeck : MonoBehaviour
             await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
         }
 
-        _saveDeckButton.GetComponent<Button>().interactable = true;
+        setButtonsInteractibleState(true);
     }
 
     private async Task UpdateBattlecard(ulong newBattleCard)

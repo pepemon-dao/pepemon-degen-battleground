@@ -6,20 +6,19 @@ public enum PlayCardType
     SpecialDefense
 }
 
-
 public enum PepemonType
 {
-    Plant,
     Fire,
+    Grass,
+    Water,
     Lightning,
     Wind,
     Poison,
-    Earth,
-    Grass,
-    Unknown,
     Ghost,
     Fairy,
-    Water
+    Earth,
+    Unknown,
+    None,
 }
 
 public enum CardRarity
@@ -27,4 +26,20 @@ public enum CardRarity
     Common,
     Rare,
     Epic
+}
+
+public enum EffectTo
+{
+    Attack,
+    SpecialAttack,
+    Defense,
+    SpecialDefense,
+    Speed,
+    Intelligence
+}
+
+public enum EffectFor
+{
+    Me,
+    Enemy
 }

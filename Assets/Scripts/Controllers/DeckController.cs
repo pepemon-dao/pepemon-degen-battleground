@@ -19,6 +19,7 @@ public class DeckController : MonoBehaviour
     [BoxGroup("Deck Components"), SerializeField] private TMP_Text _winCount;
     [BoxGroup("Deck Components"), SerializeField] private TMP_Text _lossCount;
 
+    public UnityEvent onSelectButtonClicked;
     public UnityEvent onEditButtonClicked;
 
     /// <summary>
@@ -52,6 +53,7 @@ public class DeckController : MonoBehaviour
     void OnSelectClicked()
     {
         GetComponent<SelectionItem>().ToggleSelected();
+        onSelectButtonClicked?.Invoke();
     }
 
     public async Task LoadDeckInfo(ulong deckId)

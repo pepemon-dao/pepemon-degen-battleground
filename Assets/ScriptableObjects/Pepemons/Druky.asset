@@ -19,9 +19,9 @@ MonoBehaviour:
   CardContentBackdrop: {fileID: 21300000, guid: 6c6139d92eb31b84e9633b365afe34a5, type: 3}
   CardContent: {fileID: 21300000, guid: f052fd0541801464ba8ee31176c61356, type: 3}
   Level: 1
-  Type: 2
+  Type: 4
   Weakness: 5
-  Resistence: 3
+  Resistence: 8
   Rarity: 0
   HealthPoints: 450
   Speed: 14

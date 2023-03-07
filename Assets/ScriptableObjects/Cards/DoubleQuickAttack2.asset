@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: DoubleQuickAttack2
+  m_EditorClassIdentifier: 
+  UID: b94ce64f-e67c-4395-97ae-67e2e73cb56c
+  Icon: {fileID: 0}
+  ID: 17
+  DisplayName: Double Quick Attack
+  CardDescription: Pepemon adds +4 to its Attack Power until end of turn.
+  Rarity: 0
+  Type: 0
+  CardEffectSprite: {fileID: 21300000, guid: 61e53dfc2f3ad6e46b302965f29cacf3, type: 3}
+  AttackPower: 4
+  DefensePower: 0
+  effectOne:
+    basePower: 4
+    triggeredPower: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  effectMany:
+    power: 0
+    numTurns: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0
