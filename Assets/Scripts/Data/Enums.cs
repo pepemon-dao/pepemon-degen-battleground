@@ -8,17 +8,17 @@ public enum PlayCardType
 
 public enum PepemonType
 {
-    Plant,
     Fire,
+    Grass,
+    Water,
     Lightning,
     Wind,
     Poison,
-    Earth,
-    Grass,
-    Unknown,
     Ghost,
     Fairy,
-    Water
+    Earth,
+    Unknown,
+    None,
 }
 
 public enum CardRarity

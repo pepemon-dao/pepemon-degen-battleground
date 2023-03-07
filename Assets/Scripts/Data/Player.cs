@@ -68,9 +68,10 @@ public class Player
 
         // Draw cards to hand
         // Note: Same logic of the contract PepemonBattle.sol
+        CurrentPepemonStats.inte = Math.Min(CurrentPepemonStats.inte, CurrentDeck.GetDeck().Count - PlayedCardCount);
         for (int i = 0; i < CurrentPepemonStats.inte; i++)
         {
-            CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[(i + PlayedCardCount) % CurrentDeck.GetDeck().Count]);
+            CurrentHand.AddCardToHand(CurrentDeck.GetDeck()[(i + PlayedCardCount)]);
         }
 
         PlayedCardCount += CurrentPepemonStats.inte;
