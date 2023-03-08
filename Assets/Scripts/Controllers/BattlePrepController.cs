@@ -86,7 +86,7 @@ public class BattlePrepController : MonoBehaviour
         else if (failedToEnter)
         {
             // go back to deck selection since the player could not enter nor is already waiting
-            FindObjectOfType<MainMenuController>().ShowScreen(4);
+            FindObjectOfType<MainMenuController>().ShowScreen(-1);
             return;
         }
 
@@ -147,7 +147,7 @@ public class BattlePrepController : MonoBehaviour
             Debug.LogWarning("Matchmaking Exit failed: " + ex.Message);
         }
 
-        FindObjectOfType<MainMenuController>().ShowScreen(4);
+        FindObjectOfType<MainMenuController>().ShowScreen(-1);
     }
 
     private async Task EnsureDeckTransferApproved()

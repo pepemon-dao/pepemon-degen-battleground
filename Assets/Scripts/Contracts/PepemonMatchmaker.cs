@@ -63,7 +63,7 @@ public class PepemonMatchmaker
     public static async Task Enter(PepemonLeagues league, ulong deckId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransactionAsync(
+        await request.SendTransactionAndWaitForReceiptAsync(
             new EnterFunction()
             {
                 DeckId = deckId,
@@ -74,7 +74,7 @@ public class PepemonMatchmaker
     public static async Task Exit(PepemonLeagues league, ulong deckId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SignAndSendTransactionAsync(
+        await request.SendTransactionAndWaitForReceiptAsync(
             new ExitFunction()
             {
                 DeckId = deckId,
