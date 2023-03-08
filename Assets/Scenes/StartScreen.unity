@@ -6874,6 +6874,8 @@ MonoBehaviour:
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
       pepemonMatchmakerAddresses:
       - 0x231d3f09394938B073ec650dAcF2EA850BF95196
+      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
+      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
     - chainId: 250
       chainName: Fantom Opera
       chainCurrencyName: FTM
@@ -6890,7 +6892,7 @@ MonoBehaviour:
     defaultChainId: 4002
     debugRpcUrl: https://rpc.ankr.com/fantom_testnet
     debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-    readOnlyRpcUrl: https://rpc.ankr.com/fantom
+    readOnlyRpcUrl: https://rpc.ankr.com/fantom_testnet
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
