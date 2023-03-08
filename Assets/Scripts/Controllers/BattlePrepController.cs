@@ -76,7 +76,7 @@ public class BattlePrepController : MonoBehaviour
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
         // However if the battle *has* started, the player's address will be in the first parameter of the BattleCreated event
-        if (deckOwner == Web3Controller.instance.SelectedAccountAddress)
+        if (deckOwner.Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase))
         {
             player2addr = player1addr;
             player1addr = null;
