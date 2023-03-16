@@ -56,6 +56,13 @@ sysinfo.txt
 *.unitypackage
 
 # Crashlytics generated file
-crashlytics-build.properties
+crashlytics-build.properties\
 
 .vscode/settings.json
+
+.vsconfig
+
+.DS_Store
+
+# Ignore artifacts folder
+artifacts/

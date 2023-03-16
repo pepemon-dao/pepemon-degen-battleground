@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: 14b52bdf-2a95-4c30-8347-b7305b49ea31
   Icon: {fileID: 0}
-  ID: 16
+  ID: 13
   DisplayName: Quick Attack
   CardDescription: Pepemon adds +3 to its Attack Power until end of turn.
   Rarity: 0
@@ -22,6 +22,18 @@ MonoBehaviour:
   CardEffectSprite: {fileID: 21300000, guid: 04831dff486ee6544ba0a7d83363e3a5, type: 3}
   AttackPower: 3
   DefensePower: 0
+  effectOne:
+    basePower: 3
+    triggeredPower: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  effectMany:
+    power: 0
+    numTurns: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
   Unstackable: 0
   Unresettable: 0
   UnstackableAmount: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System;
 
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/card", order = 1)]
 public class Card : ScriptableObject
@@ -40,11 +41,19 @@ public class Card : ScriptableObject
     [LabelWidth(80)]
     public Sprite CardEffectSprite;
 
+    [Obsolete("not used")]
     [TitleGroup("Properties")]
     [ShowIf("@this.Type == PlayCardType.Offense || this.Type == PlayCardType.SpecialOffense")] public int AttackPower;
 
+    [Obsolete("not used")]
     [TitleGroup("Properties")]
     [ShowIf("@this.Type == PlayCardType.Defense || this.Type == PlayCardType.SpecialDefense")] public int DefensePower;
+
+    [TitleGroup("Properties")]
+    public EffectOne effectOne;
+
+    [TitleGroup("Properties")]
+    public EffectMany effectMany;
 
     [TitleGroup("Properties")]
     public bool Unstackable;
@@ -52,7 +61,9 @@ public class Card : ScriptableObject
     [TitleGroup("Properties")]
     public bool Unresettable;
 
+    [Obsolete("not used")]
     [TitleGroup("Additionals"), ShowIf("Unstackable")] public int UnstackableAmount;
+    [Obsolete("not used")]
     [TitleGroup("Additionals"), ShowIf("Unresettable")] public int UnresettableAmount;
 
 

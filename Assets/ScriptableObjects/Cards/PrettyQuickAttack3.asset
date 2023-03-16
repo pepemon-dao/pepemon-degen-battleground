@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6e5e1c7c6330448a7000c2e43fca97, type: 3}
+  m_Name: PrettyQuickAttack3
+  m_EditorClassIdentifier: 
+  UID: bfb2add8-08d7-40b1-ab03-303c8bfb2e0f
+  Icon: {fileID: 0}
+  ID: 15
+  DisplayName: Pretty Quick Attack
+  CardDescription: Pepemon adds +2 to its Attack Power until end of turn.
+  Rarity: 0
+  Type: 0
+  CardEffectSprite: {fileID: 21300000, guid: d95fed4a4095d1f4b9306bb8735a0d1b, type: 3}
+  AttackPower: 2
+  DefensePower: 0
+  effectOne:
+    basePower: 2
+    triggeredPower: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  effectMany:
+    power: 0
+    numTurns: 0
+    effectTo: 0
+    effectFor: 0
+    reqCode: 0
+  Unstackable: 0
+  Unresettable: 0
+  UnstackableAmount: 0
+  UnresettableAmount: 0

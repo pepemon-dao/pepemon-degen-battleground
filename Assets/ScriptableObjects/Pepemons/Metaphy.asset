@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: 58715f61-1d13-456d-85e4-29667bec8256
   DisplayIcon: {fileID: 0}
-  ID: 20
+  ID: 
   DisplayName: Metaphy
   CardContentBackdrop: {fileID: 21300000, guid: 3e6344641535fdf4baee93b8722bbf68, type: 3}
   CardContent: {fileID: 21300000, guid: e996e435c12c8bf4cb69d1b30c2d1150, type: 3}
@@ -23,7 +23,7 @@ MonoBehaviour:
   Weakness: 9
   Resistence: 4
   Rarity: 0
-  HealthPoints: 400
+  HealthPoints: 8
   Speed: 10
   Intelligence: 10
   Attack: 10

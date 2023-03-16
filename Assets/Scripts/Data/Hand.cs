@@ -8,6 +8,7 @@ public class Hand
 {
     [ShowInInspector]
     private List<Card> _cardsInHand = new List<Card>();
+    private List<Card> _tableSupportCards = new List<Card>();
 
     public List<Card> AllOffenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.Offense).ToList();
     public List<Card> AllDefenseCards => _cardsInHand.Where(x => x.Type == PlayCardType.Defense).ToList();
@@ -16,8 +17,10 @@ public class Hand
 
     public void ClearHand() => _cardsInHand.Clear();
     public void AddCardToHand(Card card) => _cardsInHand.Add(card);
-    public void RemoveCardFromHand(Card card) => _cardsInHand.Remove(card);
     public List<Card> GetCardsInHand => _cardsInHand;
+    public List<Card> GetTableSupportCards => _tableSupportCards;
+    public void AddCardToTable(Card card) => _tableSupportCards.Add(card);
+    public void RemoveCardFromTable(Card card) => _tableSupportCards.Remove(card);
 
 
     public void RemoveAllOffenseCards()
