@@ -42,7 +42,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: _alpha
-    path: YouWin_Shadow
+    path: YouWinLose_Shadow
     classID: 114
     script: {fileID: 11500000, guid: f63bb86e318f6c447a18f1039119f478, type: 3}
   m_PPtrCurves: []
@@ -107,7 +107,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: _alpha
-    path: YouWin_Shadow
+    path: YouWinLose_Shadow
     classID: 114
     script: {fileID: 11500000, guid: f63bb86e318f6c447a18f1039119f478, type: 3}
   m_EulerEditorCurves: []

@@ -245,7 +245,7 @@ public class GameController : MonoBehaviour
                     player1Controller.UpdateCard(_player1);
                     player2Controller.UpdateCard(_player2);
 
-                    if (_player2.CurrentHP <= 0) Winner(_player1);
+                    if (_player2.CurrentHP <= 0) BattleResut(_player1);
                 }
                 else
                 {
@@ -261,7 +261,7 @@ public class GameController : MonoBehaviour
                     player1Controller.UpdateCard(_player1);
                     player2Controller.UpdateCard(_player2);
 
-                    if (_player1.CurrentHP <= 0) Winner(_player2);
+                    if (_player1.CurrentHP <= 0) BattleResut(_player2);
                 }
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
@@ -626,9 +626,10 @@ public class GameController : MonoBehaviour
     public int GetRoundNumber() => _roundNumber;
 
 
-    void Winner(Player player)
+    void BattleResut(Player winner)
     {
-        _uiController.DisplayWinner(player);
+        var isCurrentPlayerTheWinner = BattlePrepController.battleData.currentPlayerIsPlayer1;
+        _uiController.DisplayBattleResult(winner, isCurrentPlayerTheWinner);
         _gameHasFinished = true;
     }
 }

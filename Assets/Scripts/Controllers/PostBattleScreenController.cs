@@ -5,25 +5,38 @@ using UnityEngine;
 using UnityEngine.Events;
 using Sirenix.OdinInspector;
 using DG.Tweening;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
-public class ScreenController : MonoBehaviour
+public class PostBattleScreenController : MonoBehaviour
 {
     #region Enums
     protected enum ScreenState { SHOWN, HIDDEN }
+    #endregion
+
+    #region Constants
+    protected const string VICTORY_TEXT = "VICTORY!";
+    protected const string YOU_WIN_TEXT = "YOU WIN";
+
+    protected const string DEFEAT_TEXT = "DEFEAT";
+    protected const string YOU_LOSE_TEXT = "YOU LOSE";
     #endregion
 
     #region Editor Exposed Data
     [Title("Screen Settings")]
     [SerializeField] bool _startHidden = false;
 
+    [SerializeField] CardPreview _pepemon;
+    [SerializeField] TextReveal _victoryDefeat;
+    [SerializeField] TextReveal _youWinLose;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
     private UnityEvent OnHidden;
 
     [Title("Debugging")]
-    [Button(Name = "DEBUG Show")] private void Debug_Show() => Show();
+    [Button(Name = "DEBUG Show lose")] private void Debug_Show_Lose() { SetResult(false); Show(); }
+    [Button(Name = "DEBUG Show win")] private void Debug_Show_Win() { SetResult(true); Show(); }
     [Button(Name = "DEBUG Hide")] private void Debug_Hide() => Hide();
     #endregion
 
@@ -37,6 +50,17 @@ public class ScreenController : MonoBehaviour
     protected CanvasGroup _canvasGroup;
     protected Animator _animator;
     #endregion
+
+    public void SetResult(bool win)
+    {
+        _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
+        _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+    }
+
+    public void LoadPepemonDisplay(ulong cardId)
+    {
+        _pepemon.LoadCardData(cardId);
+    }
 
     #region INIT
     protected virtual void Awake()

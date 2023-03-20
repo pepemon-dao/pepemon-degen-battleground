@@ -18,7 +18,7 @@ public class TextReveal : MonoBehaviour
 
     [Space(10)]
 
-    [SerializeField] string _text;
+    [SerializeField] private string _text;
     #endregion
 
     #region Private Data
@@ -29,7 +29,7 @@ public class TextReveal : MonoBehaviour
     #region INIT
     private void Awake()
     {
-        _threshold = 1.0f / _text.Length;
+        _threshold = 0.8f / _text.Length;
 
         _curText = "";
         _tmpFore.SetText("");
@@ -39,10 +39,15 @@ public class TextReveal : MonoBehaviour
     }
     #endregion
 
+    public void SetText(string text)
+    {
+        _text = text;
+    }
+
     #region Text Reveal Logic
     private void Update()
     {
-        _curText = _text.Substring(0, Mathf.RoundToInt(_alpha / _threshold));
+        _curText = _text.Substring(0, Mathf.Min(Mathf.RoundToInt(_alpha / _threshold), _text.Length));
         _tmpFore.SetText(_curText);
         
         if (_tmpShadow != null)
