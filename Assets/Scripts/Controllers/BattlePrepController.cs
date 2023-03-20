@@ -114,7 +114,7 @@ public class BattlePrepController : MonoBehaviour
     {
         Debug.Log("Received battle event. BattleId: " + battleEventData.BattleId);
         Debug.Log("Loading battle data..");
-
+        
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
         var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
         var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
@@ -129,6 +129,7 @@ public class BattlePrepController : MonoBehaviour
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
+        battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr == Web3Controller.instance.SelectedAccountAddress;
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }
@@ -173,6 +174,7 @@ public class BattlePrepController : MonoBehaviour
     // container for the battle data which is used to display the battle in GameController
     public class BattleData
     {
+        public bool currentPlayerIsPlayer1 { get; set; }
         public BigInteger battleRngSeed { get; set; }
         public ulong player1BattleCard { get; set; }
         public ulong player2BattleCard { get; set; }
