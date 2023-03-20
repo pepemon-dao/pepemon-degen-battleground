@@ -72,7 +72,6 @@ public class BattlePrepController : MonoBehaviour
 
         string player1addr = Web3Controller.instance.SelectedAccountAddress, 
                player2addr = null;
-        battleData.currentPlayerIsPlayer1 = true;
 
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
@@ -81,7 +80,6 @@ public class BattlePrepController : MonoBehaviour
         {
             player2addr = player1addr;
             player1addr = null;
-            battleData.currentPlayerIsPlayer1 = false;
             // the Exit button must only be enabled once we are sure that the current player is in the wait list of the Matchmaker
             _exitButton.GetComponent<Button>().interactable = true;
         }
@@ -116,7 +114,7 @@ public class BattlePrepController : MonoBehaviour
     {
         Debug.Log("Received battle event. BattleId: " + battleEventData.BattleId);
         Debug.Log("Loading battle data..");
-
+        
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
         var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
         var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
@@ -131,6 +129,7 @@ public class BattlePrepController : MonoBehaviour
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
+        battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr == Web3Controller.instance.SelectedAccountAddress;
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }

@@ -628,8 +628,11 @@ public class GameController : MonoBehaviour
 
     void BattleResut(Player winner)
     {
-        var isCurrentPlayerTheWinner = BattlePrepController.battleData.currentPlayerIsPlayer1;
-        _uiController.DisplayBattleResult(winner, isCurrentPlayerTheWinner);
+        var player1won = ulong.Parse(winner.PlayerPepemon.ID) == BattlePrepController.battleData.player1BattleCard;
+        // when player1won=false and currentPlayerIsPlayer1=false, currentPlayerWon=true
+        // because player2 won and current player is Player2
+        var currentPlayerWon = player1won == BattlePrepController.battleData.currentPlayerIsPlayer1;
+        _uiController.DisplayBattleResult(winner, currentPlayerWon);
         _gameHasFinished = true;
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -20,6 +21,9 @@ public class PostBattleScreenController : MonoBehaviour
 
     protected const string DEFEAT_TEXT = "DEFEAT";
     protected const string YOU_LOSE_TEXT = "YOU LOSE";
+
+    protected const string RANKING_GAIN = "Gained +#pts";
+    protected const string RANKING_LOSS = "Lost -#pts";
     #endregion
 
     #region Editor Exposed Data
@@ -29,6 +33,8 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] CardPreview _pepemon;
     [SerializeField] TextReveal _victoryDefeat;
     [SerializeField] TextReveal _youWinLose;
+    [SerializeField] GameObject _rewardDisplay;
+    [SerializeField] Button _btnShowMenu;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
@@ -55,11 +61,23 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
         _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+
+        // TODO: replace this with the actual gain/loss
+        _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText( (win? RANKING_GAIN: RANKING_LOSS).Replace("#", "10") );
     }
 
     public void LoadPepemonDisplay(ulong cardId)
     {
         _pepemon.LoadCardData(cardId);
+    }
+
+    public void OnBtnShowMenuClick()
+    {
+        // go back to previous scene
+        // TODO: skip loading screen
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex - 1);
     }
 
     #region INIT
@@ -72,6 +90,7 @@ public class PostBattleScreenController : MonoBehaviour
     protected virtual void Start()
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
+        _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
     }
 
     private void OnValidate()
