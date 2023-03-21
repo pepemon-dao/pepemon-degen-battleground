@@ -17,6 +17,9 @@ public class MainMenuController : MonoBehaviour
 
     public GameObject _selectDeckListLoader;
 
+    public Button _startGameButton;
+    public Button _manageDecksButton;
+
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
     private int[] screenNavigationHistory = new int[10];
@@ -26,7 +29,24 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
-        ShowScreen(defaultScreenId);
+        // TODO: find a better way to handle re-loading the main scene
+        DeInitMainScene();
+    }
+
+    private void DeInitMainScene()
+    {
+        // assume that when no account was selected and his scene loads, its because the game just launched
+        if (Web3Controller.instance == null || Web3Controller.instance.SelectedAccountAddress == null)
+        {
+            ShowScreen(defaultScreenId);
+        }
+        // assume that when an account was already selected, this scene was loaded after a battle that just ended
+        else
+        {
+            ShowScreen(2);
+            _startGameButton.interactable = true;
+            _manageDecksButton.interactable = true;
+        }
     }
 
     public void ConnectWallet()

@@ -7649,6 +7649,8 @@ MonoBehaviour:
   - {fileID: 1157378616}
   - {fileID: 894610811}
   _selectDeckListLoader: {fileID: 453832911}
+  _startGameButton: {fileID: 1379687548}
+  _manageDecksButton: {fileID: 1515001109}
   defaultScreenId: 0
 --- !u!114 &1399361486
 MonoBehaviour:
