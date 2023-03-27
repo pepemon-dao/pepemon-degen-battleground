@@ -42,7 +42,7 @@ public class DeckListLoader : MonoBehaviour
         }
 
         // should not happen, but if it happens then it won't crash the game
-        var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
+        var account = Web3Controller.instance.SelectedAccountAddress;
         if (string.IsNullOrEmpty(account))
         {
             loadingMessageLabel.text = "Error: No account selected";
@@ -50,7 +50,7 @@ public class DeckListLoader : MonoBehaviour
         }
 
         // load all decks
-        var decks = await PepemonCardDeck.GetPlayerDecks(FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress);
+        var decks = await PepemonCardDeck.GetPlayerDecks(Web3Controller.instance.SelectedAccountAddress);
 
         var loadingTasks = new List<Task>();
 

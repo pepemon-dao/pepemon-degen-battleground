@@ -17,6 +17,12 @@ public class MainMenuController : MonoBehaviour
 
     public GameObject _selectDeckListLoader;
 
+    public ScreenManageDecks _screenManageDecks;
+
+    public Button _connectWalletButton;
+    public Button _startGameButton;
+    public Button _manageDecksButton;
+
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
     private int[] screenNavigationHistory = new int[10];
@@ -26,13 +32,31 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
-        ShowScreen(defaultScreenId);
+        // TODO: find a better way to handle re-loading the main scene
+        DeInitMainScene();
+        _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
+        _startGameButton.onClick.AddListener(OnStartGameButtonClick);
+        _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
     }
 
-    public void ConnectWallet()
+    private void DeInitMainScene()
     {
-        web3.ConnectWallet();
+        // assume that when no account was selected and his scene loads, its because the game just launched
+        if (Web3Controller.instance == null || Web3Controller.instance.SelectedAccountAddress == null)
+        {
+            ShowScreen(defaultScreenId);
+        }
+        // assume that when an account was already selected, this scene was loaded after a battle that just ended
+        else
+        {
+            ShowScreen(2);
+            _startGameButton.interactable = true;
+            _manageDecksButton.interactable = true;
+        }
     }
+
+    // TODO: use this method for all ShowScreen calls
+    public void ShowScreen(MainSceneScreensEnum screen) => ShowScreen((int) screen);
 
     public void ShowScreen(int screenId)
     {
@@ -79,5 +103,21 @@ public class MainMenuController : MonoBehaviour
     public void ToggleAudio(bool enable)
     {
 
+    }
+
+    public void OnConnectWalletButtonClick()
+    {
+        Web3Controller.instance.ConnectWallet();
+    }
+
+    public void OnStartGameButtonClick()
+    {
+        ShowScreen(MainSceneScreensEnum.LeagueSelection);
+    }
+
+    public void OnManageDecksButtonClick()
+    {
+        _screenManageDecks.ReloadAllDecks();
+        ShowScreen(MainSceneScreensEnum.ManageDecks);
     }
 }

@@ -129,7 +129,8 @@ public class BattlePrepController : MonoBehaviour
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
-        battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr == Web3Controller.instance.SelectedAccountAddress;
+        battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr
+            .Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase);
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }
