@@ -6873,9 +6873,9 @@ MonoBehaviour:
       pepemonFactoryAddress: 0x9460DfaAD34Bc55ee564A6851c58DFC390D7d4ac
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
       pepemonMatchmakerAddresses:
-      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
-      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
-      - 0x231d3f09394938B073ec650dAcF2EA850BF95196
+      - 0x6f2D7Ad24d1B17Cc56f8a43dBB9309ea227724A4
+      - 0x6f2D7Ad24d1B17Cc56f8a43dBB9309ea227724A4
+      - 0x6f2D7Ad24d1B17Cc56f8a43dBB9309ea227724A4
     - chainId: 250
       chainName: Fantom Opera
       chainCurrencyName: FTM
