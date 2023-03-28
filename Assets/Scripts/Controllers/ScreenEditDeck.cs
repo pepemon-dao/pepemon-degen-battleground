@@ -36,7 +36,7 @@ public class ScreenEditDeck : MonoBehaviour
         deckDisplayComponent.ClearSupportCardsList();
 
         currentDeckId = deckId;
-        var account = FindObjectOfType<MainMenuController>().web3.SelectedAccountAddress;
+        var account = Web3Controller.instance.SelectedAccountAddress;
 
         // This only returns unused cards
         var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);

@@ -36,6 +36,8 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Effects")] GameObject _attackTallyPS;         //the effect spawned by the card when tally the defense/attack amount
 
+    [TitleGroup("Post battle control"), SerializeField] PostBattleScreenController PostScreenController;
+
     Player _player1;
     Player _player2;
     Transform _sidebar;
@@ -278,8 +280,11 @@ public class UIController : MonoBehaviour
         _roundCount.text = "R: " + _gameController.GetRoundNumber();
     }
 
-    public void DisplayWinner(Player player)
+    public void DisplayBattleResult(Player winner, bool currentPlayerWon)
     {
-        Debug.Log("WINNER: " + player.PlayerPepemon.DisplayName);
+        Debug.Log("WINNER: " + winner.PlayerPepemon.DisplayName + " - " + (currentPlayerWon ? "Victory" : "Defeat"));
+        PostScreenController.LoadPepemonDisplay(ulong.Parse(winner.PlayerPepemon.ID));
+        PostScreenController.SetResult(currentPlayerWon);
+        PostScreenController.Show();
     }
 }

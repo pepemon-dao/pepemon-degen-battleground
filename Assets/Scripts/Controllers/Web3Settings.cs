@@ -18,6 +18,7 @@ public class Web3Settings
         public string chainCurrencySymbol;
         public uint chainCurrencyDecimals;
         public string rpcUrl;
+        public string blockExplorerUrl;
         public string pepemonBattleAddress;
         public string pepemonFactoryAddress;
         public string pepemonCardDeckAddress;

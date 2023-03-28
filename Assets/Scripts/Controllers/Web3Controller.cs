@@ -156,7 +156,7 @@ public class Web3Controller : MonoBehaviour
 #if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable())
         {
-            MetamaskInterop.EnableEthereum(gameObject.name, nameof(EthereumEnabled), nameof(DisplayError));
+            MetamaskInterop.EnableEthereum(Web3Controller.instance.name, nameof(EthereumEnabled), nameof(DisplayError));
         }
         else
         {

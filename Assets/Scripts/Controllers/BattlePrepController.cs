@@ -52,7 +52,7 @@ public class BattlePrepController : MonoBehaviour
         var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());
 
         // show the "Waiting for player" screen
-        FindObjectOfType<MainMenuController>().ShowScreen(7);
+        FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.WaitForOpponent);
 
         bool failedToEnter = false;
         try
@@ -86,7 +86,7 @@ public class BattlePrepController : MonoBehaviour
         else if (failedToEnter)
         {
             // go back to deck selection since the player could not enter nor is already waiting
-            FindObjectOfType<MainMenuController>().ShowScreen(-1);
+            FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.PreviousScreen);
             return;
         }
 
@@ -114,7 +114,7 @@ public class BattlePrepController : MonoBehaviour
     {
         Debug.Log("Received battle event. BattleId: " + battleEventData.BattleId);
         Debug.Log("Loading battle data..");
-
+        
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
         var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
         var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
@@ -129,6 +129,8 @@ public class BattlePrepController : MonoBehaviour
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
+        battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr
+            .Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase);
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }
@@ -147,7 +149,7 @@ public class BattlePrepController : MonoBehaviour
             Debug.LogWarning("Matchmaking Exit failed: " + ex.Message);
         }
 
-        FindObjectOfType<MainMenuController>().ShowScreen(-1);
+        FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.PreviousScreen);
     }
 
     private async Task EnsureDeckTransferApproved()
@@ -173,6 +175,7 @@ public class BattlePrepController : MonoBehaviour
     // container for the battle data which is used to display the battle in GameController
     public class BattleData
     {
+        public bool currentPlayerIsPlayer1 { get; set; }
         public BigInteger battleRngSeed { get; set; }
         public ulong player1BattleCard { get; set; }
         public ulong player2BattleCard { get; set; }
