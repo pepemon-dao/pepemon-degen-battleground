@@ -71,6 +71,15 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual BigInteger DeckId { get; set; }
     }
 
+    public partial class ForceExitFunction : ForceExitFunctionBase { }
+
+    [Function("forceExit")]
+    public class ForceExitFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "deckId", 1)]
+        public virtual BigInteger DeckId { get; set; }
+    }
+
     public partial class GetEloRatingChangeFunction : GetEloRatingChangeFunctionBase { }
 
     [Function("getEloRatingChange", "uint256")]
@@ -117,6 +126,14 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger ReturnValue1 { get; set; }
+    }
+
+    public partial class LeaderboardPlayersCountFunction : LeaderboardPlayersCountFunctionBase { }
+
+    [Function("leaderboardPlayersCount", "uint256")]
+    public class LeaderboardPlayersCountFunctionBase : FunctionMessage
+    {
+
     }
 
     public partial class OnERC1155BatchReceivedFunction : OnERC1155BatchReceivedFunctionBase { }
@@ -350,6 +367,15 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
     {
         [Parameter("address", "", 1)]
         public virtual string ReturnValue1 { get; set; }
+    }
+
+    public partial class LeaderboardPlayersCountOutputDTO : LeaderboardPlayersCountOutputDTOBase { }
+
+    [FunctionOutput]
+    public class LeaderboardPlayersCountOutputDTOBase : IFunctionOutputDTO
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual ulong Count { get; set; }
     }
 
 

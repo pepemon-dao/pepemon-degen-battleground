@@ -56,7 +56,19 @@ public class PepemonMatchmaker
         return (uint)eventLogs.Last().Event.BattleId;
     }
 
-    public static async Task<List<(string Address, ulong Ranking)>> GetPlayersRankings(PepemonLeagues league, int count = 10, int offset = 0)
+    public static async Task<ulong> GetLeaderboardPlayersCount(PepemonLeagues league)
+    {
+        var request = new QueryUnityRequest<LeaderboardPlayersCountFunction, LeaderboardPlayersCountOutputDTO>(
+            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        var response = await request.QueryAsync(new LeaderboardPlayersCountFunction(), Addresses[(int)league]);
+
+        return response.Count;
+    }
+
+    public static async Task<List<(string Address, ulong Ranking)>> GetPlayersRankings(
+        PepemonLeagues league, ulong count = 10, ulong offset = 0)
     {
         var request = new QueryUnityRequest<GetPlayersRankingsFunction, GetPlayersRankingsOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),

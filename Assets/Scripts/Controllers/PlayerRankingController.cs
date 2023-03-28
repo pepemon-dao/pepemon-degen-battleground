@@ -24,7 +24,8 @@ public class PlayerRankingController : MonoBehaviour, IPointerClickHandler
     // https://answers.unity.com/questions/902929/scroll-not-working-when-elements-inside-have-click.html
     public void OnPointerClick(PointerEventData eventData)
     {
-        // copy the address
-        GUIUtility.systemCopyBuffer = _playerAddress.text;
+        var url = Web3Controller.instance.GetChainConfig().blockExplorerUrl + _playerAddress.text;
+        Debug.Log($"Opening {url}");
+        Application.OpenURL(url);
     }
 }

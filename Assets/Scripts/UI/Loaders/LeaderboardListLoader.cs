@@ -14,6 +14,8 @@ public class LeaderboardListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _rankingList;
     [TitleGroup("Component References"), SerializeField] Text _loadingMessage;
 
+    private const int FETCH_SIZE = 50;
+    private const int TOP_PLAYERS_AMOUNT = 10;
     private bool loadingInProgress = false;
 
     /// <summary>
@@ -46,12 +48,16 @@ public class LeaderboardListLoader : MonoBehaviour
         }
 
         // load all rankings
-        List<(string Address, ulong Ranking)> rankings;
+        List<(string Address, ulong Ranking)> rankings = new();
         try
         {
-            // TODO: use dynamic count and offset
-            rankings = (await PepemonMatchmaker.GetPlayersRankings(league, count: 10, offset: 0))
-                .OrderByDescending((i) => i.Ranking).ToList();
+            var totalPlayers = await PepemonMatchmaker.GetLeaderboardPlayersCount(league);
+            for (ulong i = 0; i < totalPlayers; i+= FETCH_SIZE)
+            {
+                rankings.AddRange(await PepemonMatchmaker.GetPlayersRankings(league, count: FETCH_SIZE, offset: i));
+            }
+
+            rankings = rankings.OrderByDescending((i) => i.Ranking).Take(TOP_PLAYERS_AMOUNT).ToList();
         }
         catch(System.Exception)
         {
