@@ -18,10 +18,13 @@ public class MainMenuController : MonoBehaviour
     public GameObject _selectDeckListLoader;
 
     public ScreenManageDecks _screenManageDecks;
+    public ScreenLeaderboard _screenLeaderboard;
 
     public Button _connectWalletButton;
     public Button _startGameButton;
     public Button _manageDecksButton;
+    public Button _leaderboardButton;
+    public Button _creditsButton;
 
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
@@ -37,6 +40,8 @@ public class MainMenuController : MonoBehaviour
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
+        _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
+        _creditsButton.onClick.AddListener(OpenCredits);
     }
 
     private void DeInitMainScene()
@@ -49,9 +54,10 @@ public class MainMenuController : MonoBehaviour
         // assume that when an account was already selected, this scene was loaded after a battle that just ended
         else
         {
-            ShowScreen(2);
+            ShowScreen(MainSceneScreensEnum.Menu);
             _startGameButton.interactable = true;
             _manageDecksButton.interactable = true;
+            _leaderboardButton.interactable = true;
         }
     }
 
@@ -119,5 +125,11 @@ public class MainMenuController : MonoBehaviour
     {
         _screenManageDecks.ReloadAllDecks();
         ShowScreen(MainSceneScreensEnum.ManageDecks);
+    }
+
+    public void OnLeaderboardButtonClick()
+    {
+        _screenLeaderboard.ReloadDefaultLeaderboard();
+        ShowScreen(MainSceneScreensEnum.Leaderboard);
     }
 }

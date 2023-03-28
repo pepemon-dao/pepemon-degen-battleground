@@ -322,7 +322,7 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         [Parameter("address[]", "addresses", 1)]
         public virtual List<string> Addresses { get; set; }
         [Parameter("uint256[]", "rankings", 2)]
-        public virtual List<BigInteger> Rankings { get; set; }
+        public virtual List<ulong> Rankings { get; set; }
     }
 
     public partial class GetWaitingCountOutputDTO : GetWaitingCountOutputDTOBase { }

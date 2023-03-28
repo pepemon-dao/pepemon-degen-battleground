@@ -2,11 +2,8 @@ using Contracts.PepemonMatchmaker.abi.ContractDefinition;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Unity.Rpc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -57,6 +54,30 @@ public class PepemonMatchmaker
             .GetEventsAsync<BattleFinishedEventDTO>();
 
         return (uint)eventLogs.Last().Event.BattleId;
+    }
+
+    public static async Task<List<(string Address, ulong Ranking)>> GetPlayersRankings(PepemonLeagues league, int count = 10, int offset = 0)
+    {
+        var request = new QueryUnityRequest<GetPlayersRankingsFunction, GetPlayersRankingsOutputDTO>(
+            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        var response = await request.QueryAsync(
+            new GetPlayersRankingsFunction { Count = count, Offset = offset},
+            Addresses[(int)league]);
+
+        var playersRankings = new List<(string, ulong)>();
+        
+        if (response.Addresses.Count != response.Rankings.Count)
+        {
+            Debug.LogWarning("GetPlayersRankings: mismatching array sizes");
+        }
+
+        for (int i=0; i < response.Rankings.Count; i++)
+        {
+            playersRankings.Add((response.Addresses[i], response.Rankings[i]));
+        }
+        return playersRankings;
     }
 
 

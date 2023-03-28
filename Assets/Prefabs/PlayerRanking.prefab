@@ -146,7 +146,8 @@ GameObject:
   - component: {fileID: 6267468652572538642}
   - component: {fileID: 1076337308395408552}
   - component: {fileID: 6224649592548456320}
-  m_Layer: 0
+  - component: {fileID: -5327922202679273832}
+  m_Layer: 5
   m_Name: PlayerRanking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -209,6 +210,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &-5327922202679273832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4848466140965280454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c9cb1f533b7a243acf12b877469977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerAddress: {fileID: 2748043649669627228}
+  _playerRanking: {fileID: 9209233538303817030}
 --- !u!1 &7241259583809198809
 GameObject:
   m_ObjectHideFlags: 0
