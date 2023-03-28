@@ -1,46 +1,46 @@
-  name: Build & Deploy the Pepemon Unity Project
+name: Build & Deploy the Pepemon Unity Project
 
-  on:
-    push:
-      branches: [ main ]
-    pull_request:
-      branches: [ main ]
-    workflow_dispatch:
-      branches: [ '*' ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    branches: [ '*' ]
 
-  permissions:
-    contents: write
-    checks: write
+permissions:
+  contents: write
+  checks: write
 
-  jobs:
-    build:
-      name: Build the Pepemon Unity Project 
-      runs-on: ubuntu-latest
-      concurrency: ci-${{ github.ref }}
+jobs:
+  build:
+    name: Build the Pepemon Unity Project 
+    runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}
 
-      steps:
-        # Checkout
-        - name: Checkout repository
-          uses: actions/checkout@v3
-          with:
-            lfs: true
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true
 
-        # Cache
-        - uses: actions/cache@v2
-          with:
-            path: Library
-            key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-            restore-keys: |
-              Library-
+      # Cache
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
 
-        # Test
-        - name: Run tests
-          uses: game-ci/unity-test-runner@v2
-          env:
-            UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          with:
-            unityVersion: 2021.3.12f1
-            githubToken: ${{ secrets.GITHUB_TOKEN }}
+      # Test
+      - name: Run tests
+        uses: game-ci/unity-test-runner@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: 2021.3.12f1
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       # Build
       - name: Build project
