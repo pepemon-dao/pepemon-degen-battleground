@@ -52,7 +52,7 @@ public class BattlePrepController : MonoBehaviour
         var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());
 
         // show the "Waiting for player" screen
-        FindObjectOfType<MainMenuController>().ShowScreen(7);
+        FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.WaitForOpponent);
 
         bool failedToEnter = false;
         try
@@ -86,7 +86,7 @@ public class BattlePrepController : MonoBehaviour
         else if (failedToEnter)
         {
             // go back to deck selection since the player could not enter nor is already waiting
-            FindObjectOfType<MainMenuController>().ShowScreen(-1);
+            FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.PreviousScreen);
             return;
         }
 
@@ -149,7 +149,7 @@ public class BattlePrepController : MonoBehaviour
             Debug.LogWarning("Matchmaking Exit failed: " + ex.Message);
         }
 
-        FindObjectOfType<MainMenuController>().ShowScreen(-1);
+        FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.PreviousScreen);
     }
 
     private async Task EnsureDeckTransferApproved()

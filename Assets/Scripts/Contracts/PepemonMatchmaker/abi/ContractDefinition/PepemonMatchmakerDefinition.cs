@@ -35,6 +35,15 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual string RewardPoolAddress { get; set; }
     }
 
+    public partial class AddAdminFunction : AddAdminFunctionBase { }
+
+    [Function("addAdmin")]
+    public class AddAdminFunctionBase : FunctionMessage
+    {
+        [Parameter("address", "account", 1)]
+        public virtual string Account { get; set; }
+    }
+
     public partial class DeckOwnerFunction : DeckOwnerFunctionBase { }
 
     [Function("deckOwner", "address")]
@@ -62,6 +71,15 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual BigInteger DeckId { get; set; }
     }
 
+    public partial class ForceExitFunction : ForceExitFunctionBase { }
+
+    [Function("forceExit")]
+    public class ForceExitFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "deckId", 1)]
+        public virtual BigInteger DeckId { get; set; }
+    }
+
     public partial class GetEloRatingChangeFunction : GetEloRatingChangeFunctionBase { }
 
     [Function("getEloRatingChange", "uint256")]
@@ -73,10 +91,47 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual BigInteger LoserRating { get; set; }
     }
 
+    public partial class GetPlayersRankingsFunction : GetPlayersRankingsFunctionBase { }
+
+    [Function("getPlayersRankings", typeof(GetPlayersRankingsOutputDTO))]
+    public class GetPlayersRankingsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "count", 1)]
+        public virtual BigInteger Count { get; set; }
+        [Parameter("uint256", "offset", 2)]
+        public virtual BigInteger Offset { get; set; }
+    }
+
     public partial class GetWaitingCountFunction : GetWaitingCountFunctionBase { }
 
     [Function("getWaitingCount", "uint256")]
     public class GetWaitingCountFunctionBase : FunctionMessage
+    {
+
+    }
+
+    public partial class IsAdminFunction : IsAdminFunctionBase { }
+
+    [Function("isAdmin", "bool")]
+    public class IsAdminFunctionBase : FunctionMessage
+    {
+        [Parameter("address", "account", 1)]
+        public virtual string Account { get; set; }
+    }
+
+    public partial class LeaderboardPlayersFunction : LeaderboardPlayersFunctionBase { }
+
+    [Function("leaderboardPlayers", "address")]
+    public class LeaderboardPlayersFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual BigInteger ReturnValue1 { get; set; }
+    }
+
+    public partial class LeaderboardPlayersCountFunction : LeaderboardPlayersCountFunctionBase { }
+
+    [Function("leaderboardPlayersCount", "uint256")]
+    public class LeaderboardPlayersCountFunctionBase : FunctionMessage
     {
 
     }
@@ -115,12 +170,19 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual byte[] ReturnValue5 { get; set; }
     }
 
-    public partial class OwnerFunction : OwnerFunctionBase { }
+    public partial class OnERC721ReceivedFunction : OnERC721ReceivedFunctionBase { }
 
-    [Function("owner", "address")]
-    public class OwnerFunctionBase : FunctionMessage
+    [Function("onERC721Received", "bytes4")]
+    public class OnERC721ReceivedFunctionBase : FunctionMessage
     {
-
+        [Parameter("address", "", 1)]
+        public virtual string ReturnValue1 { get; set; }
+        [Parameter("address", "", 2)]
+        public virtual string ReturnValue2 { get; set; }
+        [Parameter("uint256", "", 3)]
+        public virtual BigInteger ReturnValue3 { get; set; }
+        [Parameter("bytes", "", 4)]
+        public virtual byte[] ReturnValue4 { get; set; }
     }
 
     public partial class PlayerRankingFunction : PlayerRankingFunctionBase { }
@@ -132,12 +194,21 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual string ReturnValue1 { get; set; }
     }
 
-    public partial class RenounceOwnershipFunction : RenounceOwnershipFunctionBase { }
+    public partial class RenounceAdminFunction : RenounceAdminFunctionBase { }
 
-    [Function("renounceOwnership")]
-    public class RenounceOwnershipFunctionBase : FunctionMessage
+    [Function("renounceAdmin")]
+    public class RenounceAdminFunctionBase : FunctionMessage
     {
 
+    }
+
+    public partial class SetAllowBattleAgainstOneselfFunction : SetAllowBattleAgainstOneselfFunctionBase { }
+
+    [Function("setAllowBattleAgainstOneself")]
+    public class SetAllowBattleAgainstOneselfFunctionBase : FunctionMessage
+    {
+        [Parameter("bool", "allow", 1)]
+        public virtual bool Allow { get; set; }
     }
 
     public partial class SetBattleContractAddressFunction : SetBattleContractAddressFunctionBase { }
@@ -196,15 +267,6 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual byte[] InterfaceId { get; set; }
     }
 
-    public partial class TransferOwnershipFunction : TransferOwnershipFunctionBase { }
-
-    [Function("transferOwnership")]
-    public class TransferOwnershipFunctionBase : FunctionMessage
-    {
-        [Parameter("address", "newOwner", 1)]
-        public virtual string NewOwner { get; set; }
-    }
-
     public partial class WaitingDecksFunction : WaitingDecksFunctionBase { }
 
     [Function("waitingDecks", typeof(WaitingDecksOutputDTO))]
@@ -214,34 +276,43 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
         public virtual BigInteger ReturnValue1 { get; set; }
     }
 
+    public partial class AdminAddedEventDTO : AdminAddedEventDTOBase { }
+
+    [Event("AdminAdded")]
+    public class AdminAddedEventDTOBase : IEventDTO
+    {
+        [Parameter("address", "account", 1, true)]
+        public virtual string Account { get; set; }
+    }
+
+    public partial class AdminRemovedEventDTO : AdminRemovedEventDTOBase { }
+
+    [Event("AdminRemoved")]
+    public class AdminRemovedEventDTOBase : IEventDTO
+    {
+        [Parameter("address", "account", 1, true)]
+        public virtual string Account { get; set; }
+    }
+
     public partial class BattleFinishedEventDTO : BattleFinishedEventDTOBase { }
 
     [Event("BattleFinished")]
     public class BattleFinishedEventDTOBase : IEventDTO
     {
-        [Parameter("address", "winner", 1, true )]
+        [Parameter("address", "winner", 1, true)]
         public virtual string Winner { get; set; }
-        [Parameter("address", "loser", 2, true )]
+        [Parameter("address", "loser", 2, true)]
         public virtual string Loser { get; set; }
-        [Parameter("uint256", "battleId", 3, false )]
+        [Parameter("uint256", "battleId", 3, false)]
         public virtual BigInteger BattleId { get; set; }
     }
 
-    public partial class OwnershipTransferredEventDTO : OwnershipTransferredEventDTOBase { }
 
-    [Event("OwnershipTransferred")]
-    public class OwnershipTransferredEventDTOBase : IEventDTO
-    {
-        [Parameter("address", "previousOwner", 1, true )]
-        public virtual string PreviousOwner { get; set; }
-        [Parameter("address", "newOwner", 2, true )]
-        public virtual string NewOwner { get; set; }
-    }
 
     public partial class DeckOwnerOutputDTO : DeckOwnerOutputDTOBase { }
 
     [FunctionOutput]
-    public class DeckOwnerOutputDTOBase : IFunctionOutputDTO 
+    public class DeckOwnerOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("address", "", 1)]
         public virtual string ReturnValue1 { get; set; }
@@ -254,42 +325,75 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
     public partial class GetEloRatingChangeOutputDTO : GetEloRatingChangeOutputDTOBase { }
 
     [FunctionOutput]
-    public class GetEloRatingChangeOutputDTOBase : IFunctionOutputDTO 
+    public class GetEloRatingChangeOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger ReturnValue1 { get; set; }
+    }
+
+    public partial class GetPlayersRankingsOutputDTO : GetPlayersRankingsOutputDTOBase { }
+
+    [FunctionOutput]
+    public class GetPlayersRankingsOutputDTOBase : IFunctionOutputDTO
+    {
+        [Parameter("address[]", "addresses", 1)]
+        public virtual List<string> Addresses { get; set; }
+        [Parameter("uint256[]", "rankings", 2)]
+        public virtual List<ulong> Rankings { get; set; }
     }
 
     public partial class GetWaitingCountOutputDTO : GetWaitingCountOutputDTOBase { }
 
     [FunctionOutput]
-    public class GetWaitingCountOutputDTOBase : IFunctionOutputDTO 
+    public class GetWaitingCountOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger ReturnValue1 { get; set; }
     }
 
-
-
-
-
-    public partial class OwnerOutputDTO : OwnerOutputDTOBase { }
+    public partial class IsAdminOutputDTO : IsAdminOutputDTOBase { }
 
     [FunctionOutput]
-    public class OwnerOutputDTOBase : IFunctionOutputDTO 
+    public class IsAdminOutputDTOBase : IFunctionOutputDTO
+    {
+        [Parameter("bool", "", 1)]
+        public virtual bool ReturnValue1 { get; set; }
+    }
+
+    public partial class LeaderboardPlayersOutputDTO : LeaderboardPlayersOutputDTOBase { }
+
+    [FunctionOutput]
+    public class LeaderboardPlayersOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("address", "", 1)]
         public virtual string ReturnValue1 { get; set; }
     }
 
+    public partial class LeaderboardPlayersCountOutputDTO : LeaderboardPlayersCountOutputDTOBase { }
+
+    [FunctionOutput]
+    public class LeaderboardPlayersCountOutputDTOBase : IFunctionOutputDTO
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual ulong Count { get; set; }
+    }
+
+
+
+
+
+
+
     public partial class PlayerRankingOutputDTO : PlayerRankingOutputDTOBase { }
 
     [FunctionOutput]
-    public class PlayerRankingOutputDTOBase : IFunctionOutputDTO 
+    public class PlayerRankingOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger ReturnValue1 { get; set; }
     }
+
+
 
 
 
@@ -306,18 +410,16 @@ namespace Contracts.PepemonMatchmaker.abi.ContractDefinition
     public partial class SupportsInterfaceOutputDTO : SupportsInterfaceOutputDTOBase { }
 
     [FunctionOutput]
-    public class SupportsInterfaceOutputDTOBase : IFunctionOutputDTO 
+    public class SupportsInterfaceOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("bool", "", 1)]
         public virtual bool ReturnValue1 { get; set; }
     }
 
-
-
     public partial class WaitingDecksOutputDTO : WaitingDecksOutputDTOBase { }
 
     [FunctionOutput]
-    public class WaitingDecksOutputDTOBase : IFunctionOutputDTO 
+    public class WaitingDecksOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "deckId", 1)]
         public virtual BigInteger DeckId { get; set; }
