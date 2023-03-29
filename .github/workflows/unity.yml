@@ -55,11 +55,13 @@ jobs:
 
       # Output
       - uses: actions/upload-artifact@v2
+        if: github.ref == 'refs/heads/main'
         with:
           name: Build
           path: build
 
       - name: Deploy to Github Pages🚀
         uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/main'
         with:
           folder: build/WebGL/WebGL
