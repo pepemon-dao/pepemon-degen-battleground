@@ -596,8 +596,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+<<<<<<< Updated upstream
   - {fileID: 620203414368433917}
   - {fileID: 620203414507713284}
+=======
+  - {fileID: 620203414507713284}
+  - {fileID: 620203414368433917}
+>>>>>>> Stashed changes
   m_Father: {fileID: 620203414604606720}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1545,7 +1550,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7580199773829662659, guid: a7b01f5cb60531b4ba863204681af0ab, type: 3}
       propertyPath: m_RootOrder
+<<<<<<< Updated upstream
       value: 1
+=======
+      value: 0
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 7580199773829662659, guid: a7b01f5cb60531b4ba863204681af0ab, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1939,7 +1948,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7929562962789807947, guid: 227f0ec92e9d11e4f9d8362c63337f80, type: 3}
       propertyPath: m_RootOrder
+<<<<<<< Updated upstream
       value: 0
+=======
+      value: 1
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 7929562962789807947, guid: 227f0ec92e9d11e4f9d8362c63337f80, type: 3}
       propertyPath: m_AnchorMax.x

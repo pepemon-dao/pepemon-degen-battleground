@@ -1306,7 +1306,11 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6233432362469420264}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+<<<<<<< Updated upstream
   m_LocalPosition: {x: 0, y: 0, z: 3}
+=======
+  m_LocalPosition: {x: 0, y: 0, z: 6}
+>>>>>>> Stashed changes
   m_LocalScale: {x: 0.025, y: 0.025, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1377,7 +1381,11 @@ MonoBehaviour:
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+<<<<<<< Updated upstream
   m_LayoutPriority: 1
+=======
+  m_LayoutPriority: 5
+>>>>>>> Stashed changes
 --- !u!1 &6233432362675064395
 GameObject:
   m_ObjectHideFlags: 0

@@ -272,6 +272,7 @@ PlayerSettings:
   m_BuildTargetIcons: []
   m_BuildTargetPlatformIcons:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   - m_BuildTarget: iPhone
     m_Icons:
     - m_Textures: []
@@ -369,6 +370,8 @@ PlayerSettings:
       m_Height: 1024
       m_Kind: 4
       m_SubKind: App Store
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   - m_BuildTarget: Android
