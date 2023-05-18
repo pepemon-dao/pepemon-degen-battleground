@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using System.Linq;
+using Pepemon.Battle;
 
 public class PepemonManagerWindow : OdinMenuEditorWindow
 {
@@ -19,7 +20,7 @@ public class PepemonManagerWindow : OdinMenuEditorWindow
     private bool treeRebuild = false;
 
     private DrawSelected<Card> drawCardData = new DrawSelected<Card>();
-    private DrawSelected<Pepemon> drawPepemonData = new DrawSelected<Pepemon>();
+    private DrawSelected<BattleCard> drawPepemonData = new DrawSelected<BattleCard>();
 
     private string cardDataPath = "Assets/ScriptableObjects/Cards";
     private string pepemonDataPath = "Assets/ScriptableObjects/Pepemons";
@@ -133,7 +134,7 @@ public class PepemonManagerWindow : OdinMenuEditorWindow
 
                 break;
             case ManagerState.PepemonData:
-                tree.AddAllAssetsAtPath("Pepemons", pepemonDataPath, typeof(Pepemon), true);
+                tree.AddAllAssetsAtPath("Pepemons", pepemonDataPath, typeof(BattleCard), true);
                 tree.EnumerateTree().ForEach(x => x.OnRightClick += AddContextMenu);
                 break;
             default:

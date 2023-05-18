@@ -3,43 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Containers/Cards data container")]
-public class DataContainer : ScriptableObject
+namespace Pepemon.Battle
 {
-    // should contain all pepemons/cards scriptable objects currently in the game
-    public List<Pepemon> Pepemons;
-    public List<Card> Cards;
-
-    // returns all cards (repeating them when necessary)
-    public IEnumerable<Card> GetAllCardsByIds(IDictionary<ulong, int> cards)
+    [CreateAssetMenu(menuName = "Containers/Cards data container")]
+    public class DataContainer : ScriptableObject
     {
-        foreach (var supportCard in GetCardsTypesByIds(cards.Keys.ToList()))
+        // should contain all pepemons/cards scriptable objects currently in the game
+        public List<BattleCard> Pepemons;
+        public List<Card> Cards;
+
+        // returns all cards (repeating them when necessary)
+        public IEnumerable<Card> GetAllCardsByIds(IDictionary<ulong, int> cards)
         {
-            if (supportCard != null)
+            foreach (var supportCard in GetCardsTypesByIds(cards.Keys.ToList()))
             {
-                if (!cards.TryGetValue((ulong)supportCard.ID, out var copies))
+                if (supportCard != null)
                 {
-                    Debug.LogWarning("Card ID not found: " + supportCard.ID);
-                    continue;
-                }
-                foreach (var card in Enumerable.Repeat(supportCard, copies))
-                {
-                    yield return card;
+                    if (!cards.TryGetValue((ulong)supportCard.ID, out var copies))
+                    {
+                        Debug.LogWarning("Card ID not found: " + supportCard.ID);
+                        continue;
+                    }
+                    foreach (var card in Enumerable.Repeat(supportCard, copies))
+                    {
+                        yield return card;
+                    }
                 }
             }
         }
-    }
 
-    public IEnumerable<Card> GetCardsTypesByIds(List<ulong> ids)
-    {
-        foreach (var id in ids)
+        public IEnumerable<Card> GetCardsTypesByIds(List<ulong> ids)
         {
-            yield return Cards.FirstOrDefault(card => (ulong)card.ID == id);
+            foreach (var id in ids)
+            {
+                yield return Cards.FirstOrDefault(card => (ulong)card.ID == id);
+            }
         }
-    }
 
-    public Pepemon GetPepemonById(string id)
-    {
-        return Pepemons.FirstOrDefault(pepemon => pepemon.ID == id);
+        public BattleCard GetPepemonById(string id)
+        {
+            return Pepemons.FirstOrDefault(pepemon => pepemon.ID == id);
+        }
     }
 }

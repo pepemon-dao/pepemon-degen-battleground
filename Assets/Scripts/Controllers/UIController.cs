@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
+using Pepemon.Battle;
 // Handles displaying game state
 public class UIController : MonoBehaviour
 {

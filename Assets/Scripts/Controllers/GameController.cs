@@ -7,6 +7,7 @@ using System;
 using System.Numerics;
 using Nethereum.ABI;
 using Nethereum.RLP;
+using Pepemon.Battle;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
