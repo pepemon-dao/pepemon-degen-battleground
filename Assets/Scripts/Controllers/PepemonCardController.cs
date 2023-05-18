@@ -4,6 +4,7 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using TMPro;
+using Pepemon.Battle;
 
 [System.Serializable]
 public class PepemonTypeData
@@ -34,7 +35,7 @@ public class PepemonCardController : MonoBehaviour
 
     [SerializeField] private List<PepemonTypeData> typeDatas = new List<PepemonTypeData>();
 
-    public void PopulateCard(Pepemon pepemonData)
+    public void PopulateCard(BattleCard pepemonData)
     {
         _nameText.text = pepemonData.name;
         _hpText.text = pepemonData.HealthPoints.ToString();

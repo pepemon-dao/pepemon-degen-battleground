@@ -3,6 +3,7 @@ using TMPro;
 using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using DG.Tweening;
+using Pepemon.Battle;
 
 // Handles the instance of a card within a session
 public class CardController : MonoBehaviour
