@@ -7770,24 +7770,10 @@ MonoBehaviour:
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
-    - chainId: 906090
-      chainName: Pepechain
-      chainCurrencyName: ETH
-      chainCurrencySymbol: ETH
-      chainCurrencyDecimals: 18
-      rpcUrl: https://l2-pepechain-testnet-8uk55qlld4.t.conduit.xyz
-      blockExplorerUrl: https://explorerl2-pepechain-testnet-8uk55qlld4.t.conduit.xyz
-      pepemonBattleAddress: 0xCade104678081383Fd7842D0eaAfb7e2122cC3Bf
-      pepemonFactoryAddress: 0x22895c1acdABC95191fe776E2953B984abCa1C40
-      pepemonCardDeckAddress: 0xE6DBa45B51fd511B9Da268a15A221258c8054b80
-      pepemonMatchmakerAddresses:
-      - 0x5db8ec7d98b1357Ade226E01aD5032fb44b5994D
-      - 0x5db8ec7d98b1357Ade226E01aD5032fb44b5994D
-      - 0x5db8ec7d98b1357Ade226E01aD5032fb44b5994D
-    defaultChainId: 906090
-    debugRpcUrl: https://l2-pepechain-testnet-8uk55qlld4.t.conduit.xyz
+    defaultChainId: 4002
+    debugRpcUrl: https://rpc.ankr.com/fantom_testnet
     debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-    readOnlyRpcUrl: https://l2-pepechain-testnet-8uk55qlld4.t.conduit.xyz
+    readOnlyRpcUrl: https://rpc.ankr.com/fantom_testnet
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
