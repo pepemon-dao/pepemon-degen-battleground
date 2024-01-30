@@ -261,6 +261,8 @@ public class GameController : MonoBehaviour
 
                     if (_player1.CurrentHP <= 0) BattleResut(_player2);
                 }
+                Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
+                Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
                 Debug.Log("waiting 2f");
                 yield return new WaitForSeconds(1f);
