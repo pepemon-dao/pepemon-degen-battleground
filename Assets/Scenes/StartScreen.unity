@@ -7728,6 +7728,7 @@ MonoBehaviour:
       pepemonBattleAddress: 0x16018De06b116b044f257Fe58d915e5da048CE14
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
       pepemonCardDeckAddress: 0xa784b4fcFe0cF627aD2Be650d5467597FCFBFf67
+      pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
       - 0x0941517e79a5898B46318B2C66634aa5928fC70f
     - chainId: 31337
@@ -7740,6 +7741,7 @@ MonoBehaviour:
       pepemonBattleAddress: 0x3DF3b26eE45f131960383323b2f9988E73967300
       pepemonFactoryAddress: 0x5aC1254f6c8cD976e796c951D7fE92eEF0eB70BE
       pepemonCardDeckAddress: 0xDA116D9Bc40195371B833fA8280dee2b190aCB49
+      pepemonGasLimit: 0
       pepemonMatchmakerAddresses:
       - 0x47E2B6189436D064a291d61a3f0822356823E26D
     - chainId: 4002
@@ -7749,9 +7751,10 @@ MonoBehaviour:
       chainCurrencyDecimals: 18
       rpcUrl: https://rpc.ankr.com/fantom_testnet
       blockExplorerUrl: https://testnet.ftmscan.com/address/
-      pepemonBattleAddress: 0xBe973123CF4ECC840fbA3aE14DACC6aD80Aaa2A9
+      pepemonBattleAddress: 0xA1E3aeE45Aa74349cD9A1eC290A41F218Ff34EaD
       pepemonFactoryAddress: 0x25e8db00C55b9da7C999Fdc0A9d098Cb0b3aAFfc
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
+      pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
       - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
       - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
@@ -7766,6 +7769,7 @@ MonoBehaviour:
       pepemonBattleAddress: 0x99dC834eB9cE894eE1142B5aCc6eEdD27cA14887
       pepemonFactoryAddress: 0x888c830242caaa352dc506a2c79d38b3e86102ad
       pepemonCardDeckAddress: 0x665688de6296956f3c7264961511412e02b24070
+      pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
