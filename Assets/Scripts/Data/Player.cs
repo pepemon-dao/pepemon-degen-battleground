@@ -18,15 +18,15 @@ namespace Pepemon.Battle
         [BoxGroup("Runtime")] public int CurrentHP;
         [BoxGroup("Runtime")] public Deck CurrentDeck;
         [BoxGroup("Runtime")] public Hand CurrentHand;
-        [BoxGroup("Runtime")] public int StartingIndex;
         [BoxGroup("Runtime")] public int PlayedCardCount;
         [BoxGroup("Runtime")] public CurrentBattleCardStats CurrentPepemonStats = new(); // all stats of the player's battle cards currently
 
 
-        public void Initialise(int index)
+        public void Initialize()
         {
             CurrentHP = PlayerPepemon.HealthPoints;
-            StartingIndex = index;
+            CurrentDeck.ClearDeck();
+            CurrentDeck.GetDeck().AddRange(PlayerDeck.GetDeck());
         }
 
         public void SetPlayerDeck(BattleCard pepemon, IEnumerable<Card> supportCards)
@@ -36,12 +36,8 @@ namespace Pepemon.Battle
             PlayerDeck.GetDeck().AddRange(supportCards);
         }
 
-        public void GetAndShuffelDeck(BigInteger seed, BigInteger currentTurn, BigInteger battleRng)
+        public void ShuffelCurrentDeck(BigInteger seed, BigInteger currentTurn, BigInteger battleRng)
         {
-            // Get local copy of deck and shuffle
-            CurrentDeck.ClearDeck();
-            CurrentDeck.GetDeck().AddRange(PlayerDeck.GetDeck());
-
             // calculate random seed like in solidity
             var abiEncode = new ABIEncode();
             CurrentDeck.ShuffelDeck(

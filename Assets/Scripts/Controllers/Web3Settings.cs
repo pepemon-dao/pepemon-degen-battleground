@@ -22,6 +22,7 @@ public class Web3Settings
         public string pepemonBattleAddress;
         public string pepemonFactoryAddress;
         public string pepemonCardDeckAddress;
+        public long pepemonGasLimit;
         public string[] pepemonMatchmakerAddresses;
     }
 
