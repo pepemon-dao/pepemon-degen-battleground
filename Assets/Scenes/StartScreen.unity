@@ -7751,14 +7751,14 @@ MonoBehaviour:
       chainCurrencyDecimals: 18
       rpcUrl: https://rpc.ankr.com/fantom_testnet
       blockExplorerUrl: https://testnet.ftmscan.com/address/
-      pepemonBattleAddress: 0xA1E3aeE45Aa74349cD9A1eC290A41F218Ff34EaD
+      pepemonBattleAddress: 0xBe973123CF4ECC840fbA3aE14DACC6aD80Aaa2A9
       pepemonFactoryAddress: 0x25e8db00C55b9da7C999Fdc0A9d098Cb0b3aAFfc
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
       pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
+      - 0xC8A27e449f2e87B770f442A423B7591006847b3F
+      - 0xC8A27e449f2e87B770f442A423B7591006847b3F
+      - 0xC8A27e449f2e87B770f442A423B7591006847b3F
     - chainId: 250
       chainName: Fantom Opera
       chainCurrencyName: FTM
