@@ -7,6 +7,7 @@ using System;
 using System.Numerics;
 using Nethereum.ABI;
 using Nethereum.RLP;
+using Pepemon.Battle;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -131,12 +132,9 @@ public class GameController : MonoBehaviour
     void InitFirstRound()
     {
         _roundNumber = 0;
-        _player1.Initialise(1);
-        _player2.Initialise(2);
+        _player1.Initialize();
+        _player2.Initialize();
         _uiController.InitialiseGame(_player1, _player2);
-
-        _player1.GetAndShuffelDeck(PLAYER1_SEED, _roundNumber, battleSeed);
-        _player2.GetAndShuffelDeck(PLAYER2_SEED, _roundNumber, battleSeed);
     }
 
     IEnumerator LoopGame()
@@ -176,13 +174,13 @@ public class GameController : MonoBehaviour
             //Need to refresh decks
 
             // Shuffle player1 support cards
-            _player1.GetAndShuffelDeck(PLAYER1_SEED, _roundNumber, battleSeed);
+            _player1.ShuffelCurrentDeck(PLAYER1_SEED, _roundNumber, battleSeed);
 
             //Reset played card count
             _player1.PlayedCardCount = 0;
 
             // Shuffle player2 support cards
-            _player2.GetAndShuffelDeck(PLAYER2_SEED, _roundNumber, battleSeed);
+            _player2.ShuffelCurrentDeck(PLAYER2_SEED, _roundNumber, battleSeed);
 
             //Reset played card count
             _player2.PlayedCardCount = 0;

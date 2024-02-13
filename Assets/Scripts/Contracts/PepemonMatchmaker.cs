@@ -20,7 +20,7 @@ public class PepemonMatchmaker
     /// PepemonMatchmaker address
     /// </summary>
     private static string[] Addresses => Web3Controller.instance.GetChainConfig().pepemonMatchmakerAddresses;
-
+    private static long BattleGasLimit => Web3Controller.instance.GetChainConfig().pepemonGasLimit;
 
     public static async Task<string> GetDeckOwner(PepemonLeagues league, ulong deckId)
     {
@@ -100,6 +100,7 @@ public class PepemonMatchmaker
             new EnterFunction()
             {
                 DeckId = deckId,
+                Gas = BattleGasLimit > 0 ? BattleGasLimit : null
             },
             Addresses[(int)league]);
     }
