@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
-using Cysharp.Threading.Tasks;
 
 public class EVM
 {
@@ -22,7 +21,11 @@ public class EVM
         string url = host + "/balanceOf";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -36,7 +39,11 @@ public class EVM
         string url = host + "/verify";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -55,7 +62,11 @@ public class EVM
         string url = host + "/call";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -75,7 +86,11 @@ public class EVM
         string url = host + "/multicall";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -91,7 +106,11 @@ public class EVM
         string url = host + "/txStatus";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -106,7 +125,11 @@ public class EVM
         string url = host + "/blockNumber";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<int> data = JsonUtility.FromJson<Response<int>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -122,7 +145,11 @@ public class EVM
         string url = host + "/nonce";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -137,7 +164,11 @@ public class EVM
         string url = host + "/createContractData";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -156,7 +187,11 @@ public class EVM
         string url = host + "/all721";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -174,7 +209,11 @@ public class EVM
         string url = host + "/all1155";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -189,7 +228,11 @@ public class EVM
         string url = host + "/gasPrice";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -207,7 +250,11 @@ public class EVM
         string url = host + "/gasLimit";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -222,7 +269,11 @@ public class EVM
         string url = host + "/chainId";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -243,7 +294,11 @@ public class EVM
         string url = host + "/createTransaction";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }
@@ -265,7 +320,11 @@ public class EVM
         string url = host + "/broadcastTransaction";
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            await webRequest.SendWebRequest();
+            var operation = webRequest.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
             Response<string> data = JsonUtility.FromJson<Response<string>>(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
             return data.response;
         }

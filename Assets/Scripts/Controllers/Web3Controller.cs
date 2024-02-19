@@ -10,12 +10,14 @@ using Nethereum.RPC.HostWallet;
 using System.Collections.Generic;
 #endif
 using Nethereum.RPC.Eth.DTOs;
-using Cysharp.Threading.Tasks;
+
 using System.Threading.Tasks;
 using UnityEngine.UI;
 using Sirenix.OdinInspector;
 using System.Linq;
 using System;
+using System.Collections;
+using UniRx;
 
 public class Web3Controller : MonoBehaviour
 {
@@ -236,14 +238,19 @@ public class Web3Controller : MonoBehaviour
         Debug.LogError(errorMessage);
     }
 
-    public static async Task<TransactionReceipt> GetTransactionReceipt(string transactionHash)
+    public static async Task<TransactionReceipt> GetTransactionReceipt(MonoBehaviour monoBehaviour, string transactionHash)
     {
         var request = new TransactionReceiptPollingRequest(instance.GetUnityRpcRequestClientFactory());
-        await request.PollForReceipt(transactionHash, 0.25f);
+
+        await monoBehaviour.StartCoroutine(request.PollForReceipt(transactionHash, 0.25f));
+
         if (request.Result != null)
         {
             return request.Result;
         }
-        throw request.Exception;
+        else
+        {
+            throw request.Exception;
+        }
     }
 }

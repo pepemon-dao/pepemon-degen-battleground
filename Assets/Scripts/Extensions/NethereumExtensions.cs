@@ -3,13 +3,13 @@ using Nethereum.Contracts;
 using Nethereum.Unity.Contracts;
 using Nethereum.Unity.Rpc;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
 using UnityEngine;
 using Nethereum.Contracts.QueryHandlers.MultiCall;
 using System.Collections.Generic;
 using System.Threading;
 using System;
+using Cysharp.Threading.Tasks;
 
 public static class NethereumExtensions
 {
