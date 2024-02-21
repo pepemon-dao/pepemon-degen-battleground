@@ -105,9 +105,9 @@ public class Web3Controller : MonoBehaviour
     public IUnityRpcRequestClientFactory GetUnityRpcRequestClientFactory()
     {
 #if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable()) 
+        if (MetamaskWebglInterop.IsMetamaskAvailable()) 
         {
-            return new MetamaskRequestRpcClientFactory(SelectedAccountAddress, null);
+            return new MetamaskWebglCoroutineRequestRpcClientFactory(SelectedAccountAddress, null);
         }
         else
         {
@@ -133,9 +133,9 @@ public class Web3Controller : MonoBehaviour
     public IContractTransactionUnityRequest GetContractTransactionUnityRequest()
     {
 #if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable())
+        if (MetamaskWebglInterop.IsMetamaskAvailable())
         {
-            return new MetamaskTransactionUnityRequest(SelectedAccountAddress, GetUnityRpcRequestClientFactory());
+            return new MetamaskTransactionCoroutineUnityRequest(SelectedAccountAddress, GetUnityRpcRequestClientFactory());
         }
         else
         {
@@ -154,9 +154,9 @@ public class Web3Controller : MonoBehaviour
     private void OpenMetamaskConnectDialog()
     {
 #if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable())
+        if (MetamaskWebglInterop.IsMetamaskAvailable())
         {
-            MetamaskInterop.EnableEthereum(Web3Controller.instance.name, nameof(EthereumEnabled), nameof(DisplayError));
+            MetamaskWebglInterop.EnableEthereum(Web3Controller.instance.name, nameof(EthereumEnabled), nameof(DisplayError));
         }
         else
         {
@@ -171,8 +171,8 @@ public class Web3Controller : MonoBehaviour
 #if !UNITY_EDITOR
         if (!_isMetamaskInitialised)
         {
-            MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
-            MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
+            MetamaskWebglInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
+            MetamaskWebglInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
             _isMetamaskInitialised = true;
         }
         onWalletConnected?.Invoke();
