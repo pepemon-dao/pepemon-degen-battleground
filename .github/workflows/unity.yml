@@ -1,3 +1,8 @@
+- name: Cleanup Docker
+  run: |
+    docker system prune -af
+    docker volume prune -f
+
 name: Build & Deploy the Pepemon Unity Project
 
 on:
