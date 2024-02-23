@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Nethereum.Web3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -52,11 +52,10 @@ public class DeckListLoader : MonoBehaviour
         // load all decks
         var decks = await PepemonCardDeck.GetPlayerDecks(Web3Controller.instance.SelectedAccountAddress);
 
-        var loadingTasks = new List<Task>();
+        var loadingTasks = new List<UniTask>();
 
         decks.ForEach((deckId) => {
             var deckInstance = Instantiate(_deckPrefab);
-            deckInstance.transform.SetParent(_deckList.transform, false);
 
             // show or hide the edit mode
             deckInstance.GetComponent<DeckController>().DisplayDeckEditMode = _deckEditMode;
@@ -70,11 +69,20 @@ public class DeckListLoader : MonoBehaviour
                 });
 
             // this should set each deck detail in parallel
-            loadingTasks.Add(deckInstance.GetComponent<DeckController>().LoadDeckInfo(deckId));
+            loadingTasks.Add(LoadAndAddDeck(deckInstance, deckId));
         });
 
-        await Task.WhenAll(loadingTasks);
+        await UniTask.WhenAll(loadingTasks);
         _loadingMessage.SetActive(false);
         loadingInProgress = false;
+    }
+
+    private async UniTask LoadAndAddDeck(GameObject deckInstance, ulong deckId)
+    {
+        var showDeck = await deckInstance.GetComponent<DeckController>().LoadDeckInfo(deckId, !_deckEditMode);
+        if (showDeck)
+        {
+            deckInstance.transform.SetParent(_deckList.transform, false);
+        }
     }
 }
