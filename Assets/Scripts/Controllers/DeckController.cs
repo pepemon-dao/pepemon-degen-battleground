@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -56,7 +57,7 @@ public class DeckController : MonoBehaviour
         onSelectButtonClicked?.Invoke();
     }
 
-    public async Task LoadDeckInfo(ulong deckId)
+    public async UniTask<bool> LoadDeckInfo(ulong deckId, bool selectionMode)
     {
         Debug.Log("LoadDeckInfo of deckId " + deckId);
         var battleCard = await PepemonCardDeck.GetBattleCard(deckId);
@@ -68,6 +69,14 @@ public class DeckController : MonoBehaviour
         // TODO: Use on-chain MAX_SUPPORT_CARDS value
         _deckName.text = (metadata?.name ?? "New") + " Deck";
         _battleCard.text = metadata?.name ?? "None";
-        _supportCardCount.text = (supportCards.Values?.Count ?? 0) + " / " + 60;
+        var supportCardCount = (supportCards.Values?.Count ?? 0);
+        _supportCardCount.text = supportCardCount + " / " + 60;
+
+        if (selectionMode && (metadata?.name == null || supportCardCount == 0))
+        {
+            gameObject.SetActive(false);
+            return false;
+        }
+        return true;
     }
 }
