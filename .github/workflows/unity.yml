@@ -2,11 +2,11 @@ name: Build & Deploy the Pepemon Unity Project
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-    branches: [ '*' ]
+    branches: ['*']
 
 permissions:
   contents: write
@@ -14,17 +14,21 @@ permissions:
 
 jobs:
   build:
-    name: Build the Pepemon Unity Project 
+    name: Build the Pepemon Unity Project
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
 
     steps:
-      # Checkout
+      - name: Cleanup Docker
+        run: |
+          docker system prune -af
+          docker volume prune -f
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           lfs: true
-
+    
       # Cache
       - uses: actions/cache@v2
         with:
