@@ -11,9 +11,8 @@ public class PepemonMatchmaker
 {
     public enum PepemonLeagues
     {
-        Rice = 0,
-        PepeKarp,
-        Chad
+        PvE = 0,
+        PvP,
     }
 
     /// <summary>
