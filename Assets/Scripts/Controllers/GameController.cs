@@ -159,8 +159,7 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
-        if (_roundNumber <= 1)
-            yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
         yield return new WaitForSeconds(1.6f);
         _uiController.HideNewRoundDisplay();
