@@ -159,7 +159,7 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
-        yield return new WaitForSeconds(1.25f);
+        yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
         yield return new WaitForSeconds(1.6f);
         _uiController.HideNewRoundDisplay();
