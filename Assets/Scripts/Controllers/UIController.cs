@@ -206,16 +206,18 @@ public class UIController : MonoBehaviour
             _player2TotalDisplay.sprite = _attackIcon;
         }
 
-        _player1TotalDisplay.gameObject.SetActive(true);
-        _player2TotalDisplay.gameObject.SetActive(true);
+        
         TallyUpCardValues(attackIndex);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
+
+        _player1TotalDisplay.gameObject.SetActive(true);
+        _player2TotalDisplay.gameObject.SetActive(true);
 
         _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
         _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2.5f);
 
         _player1TotalDisplay.gameObject.SetActive(false);
         _player2TotalDisplay.gameObject.SetActive(false);
