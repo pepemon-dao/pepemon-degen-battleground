@@ -11,9 +11,8 @@ public class PepemonMatchmaker
 {
     public enum PepemonLeagues
     {
-        Rice = 0,
-        PepeKarp,
-        Chad
+        PvE = 0,
+        PvP,
     }
 
     /// <summary>
@@ -93,16 +92,17 @@ public class PepemonMatchmaker
     }
 
 
-    public static async Task Enter(PepemonLeagues league, ulong deckId)
+    public static async Task<bool> Enter(PepemonLeagues league, ulong deckId)
     {
         var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SendTransactionAndWaitForReceiptAsync(
+        var result = await request.SendTransactionAndWaitForReceiptAsync(
             new EnterFunction()
             {
                 DeckId = deckId,
                 Gas = BattleGasLimit > 0 ? BattleGasLimit : null
             },
             Addresses[(int)league]);
+        return result.Succeeded();
     }
 
     public static async Task Exit(PepemonLeagues league, ulong deckId)

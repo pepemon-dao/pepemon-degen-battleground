@@ -58,7 +58,11 @@ public class BattlePrepController : MonoBehaviour
         try
         {
             Debug.Log("Entering the matchmaker");
-            await PepemonMatchmaker.Enter(selectedLeague, selectedDeck);
+            if (!await PepemonMatchmaker.Enter(selectedLeague, selectedDeck))
+            {
+                Debug.Log("Unable to enter the matchmaker: transaction failed");
+                failedToEnter = true;
+            }
         }
         catch (Exception e)
         {
