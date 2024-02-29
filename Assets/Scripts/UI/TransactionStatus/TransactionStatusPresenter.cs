@@ -1,6 +1,6 @@
 using UnityEngine;
-using TMPro;
 using UniRx;
+using TMPro;
 
 namespace Pepemon.UI.TransactionStatus
 {

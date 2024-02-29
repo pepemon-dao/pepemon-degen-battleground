@@ -139,7 +139,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator LoopGame()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         while (!_gameHasFinished)
         {
             yield return new WaitUntil(() => !_isPlayingRound);
@@ -159,8 +159,6 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
-        if (_roundNumber <= 1)
-            yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
         yield return new WaitForSeconds(1.6f);
         _uiController.HideNewRoundDisplay();
@@ -204,7 +202,7 @@ public class GameController : MonoBehaviour
         _uiController.DisplayHands();
 
         //delay to show drawing of cards
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
 
         //! need to think of a better way to display the cards being played
 
@@ -233,7 +231,7 @@ public class GameController : MonoBehaviour
                     _uiController.FlipCards(1);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(3f);
+                    yield return new WaitForSeconds(.5f);
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
@@ -251,10 +249,10 @@ public class GameController : MonoBehaviour
                 {
                     _uiController.FlipCards(2);
 
-                    yield return new WaitForSeconds(3f);
+                    yield return new WaitForSeconds(2f);
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(2f);
+                    yield return new WaitForSeconds(1f);
                     _player1.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
                     _uiController.UpdateUI();
@@ -267,7 +265,7 @@ public class GameController : MonoBehaviour
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
                 Debug.Log("waiting 2f");
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(1f);
 
                 // cleanup UI
                 _uiController.FlipCards(3);
