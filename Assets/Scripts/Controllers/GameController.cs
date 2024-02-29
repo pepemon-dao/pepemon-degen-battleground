@@ -44,6 +44,8 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+
+        //test
         PrepareDecksBeforeBattle();
 
         player1Controller.PopulateCard(_player1.PlayerPepemon);
