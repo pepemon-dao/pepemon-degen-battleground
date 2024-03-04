@@ -210,10 +210,12 @@ public class UIController : MonoBehaviour
         _player2TotalDisplay.gameObject.SetActive(true);
         TallyUpCardValues(attackIndex);
 
-        yield return new WaitForSeconds(2f);
 
         _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
         _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
+
+        yield return new WaitForSeconds(2.5f);
+
 
         yield return new WaitForSeconds(1f);
 
