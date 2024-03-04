@@ -7754,7 +7754,7 @@ MonoBehaviour:
       rpcUrl: https://rpc.ankr.com/fantom_testnet
       blockExplorerUrl: https://testnet.ftmscan.com/address/
       pepemonBattleAddress: 0xBe973123CF4ECC840fbA3aE14DACC6aD80Aaa2A9
-      pepemonFactoryAddress: 0x25e8db00C55b9da7C999Fdc0A9d098Cb0b3aAFfc
+      pepemonFactoryAddress: 0x8e4A75CCc2436d01fBc122cBaEc2CC44fdcd5898
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
       pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
