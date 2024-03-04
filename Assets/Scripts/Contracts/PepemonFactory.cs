@@ -1,4 +1,5 @@
 using Contracts.PepemonFactory.abi.ContractDefinition;
+using Cysharp.Threading.Tasks;
 using Nethereum.Unity.Rpc;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,67 @@ class PepemonFactory : ERC1155Common
         }
         Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);
         return null;
+    }
+
+    /// <summary>
+    /// Gets the stats of multiple battle cards
+    /// </summary>
+    /// <returns></returns>
+    public static async UniTask<List<BattleCardStats>> BatchGetBattleCardStats(ulong minId, ulong maxId)
+    {
+        var request = new QueryUnityRequest<BatchGetBattleCardStatsFunction, BatchGetBattleCardStatsOutputDTO>(
+            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        BatchGetBattleCardStatsOutputDTO response;
+        try
+        {
+            response = await request.QueryAsync(
+                        new BatchGetBattleCardStatsFunction { MinId = minId, MaxId = maxId },
+                        Address);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e);
+            return null;
+        }
+        return response.ReturnValue1;
+    }
+
+    /// <summary>
+    /// Gets the stats of multiple support cards
+    /// </summary>
+    /// <returns></returns>
+    public static async UniTask<List<SupportCardStats>> BatchGetSupportCardStats(ulong minId, ulong maxId)
+    {
+        var request = new QueryUnityRequest<BatchGetSupportCardStatsFunction, BatchGetSupportCardStatsOutputDTO>(
+            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        BatchGetSupportCardStatsOutputDTO response;
+        try
+        {
+            response = await request.QueryAsync(
+                        new BatchGetSupportCardStatsFunction { MinId = minId, MaxId = maxId },
+                        Address);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e);
+            return null;
+        }
+        return response.ReturnValue1;
+    }
+
+    public static async UniTask<ulong> GetLastCardId()
+    {
+        var request = new QueryUnityRequest<GetLastTokenIDFunction, GetLastTokenIDOutputDTO>(
+            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
+            Web3Controller.instance.SelectedAccountAddress);
+
+        var response = await request.QueryAsync(new GetLastTokenIDFunction(), Address);
+
+        return (ulong)response.ReturnValue1;
     }
 
     /// <summary>
@@ -145,13 +207,6 @@ class PepemonFactory : ERC1155Common
         public string image;
         public string name;
         public string description;
-        public CardAttribute[] attributes;
-    }
-
-    [Serializable]
-    public struct CardAttribute
-    {
-        public string trait_type;
-        public string value;
+        public bool isSupportCard;
     }
 }
