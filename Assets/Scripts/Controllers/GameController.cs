@@ -231,7 +231,7 @@ public class GameController : MonoBehaviour
                     _uiController.FlipCards(1);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(.5f);
+                    yield return new WaitForSeconds(.51f);
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
