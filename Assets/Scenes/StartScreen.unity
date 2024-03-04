@@ -7751,7 +7751,7 @@ MonoBehaviour:
       chainCurrencyName: FTM
       chainCurrencySymbol: FTM
       chainCurrencyDecimals: 18
-      rpcUrl: https://rpc.ankr.com/fantom_testnet
+      rpcUrl: https://rpc.testnet.fantom.network
       blockExplorerUrl: https://testnet.ftmscan.com/address/
       pepemonBattleAddress: 0xBe973123CF4ECC840fbA3aE14DACC6aD80Aaa2A9
       pepemonFactoryAddress: 0x25e8db00C55b9da7C999Fdc0A9d098Cb0b3aAFfc
@@ -7776,9 +7776,9 @@ MonoBehaviour:
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
     defaultChainId: 4002
-    debugRpcUrl: https://rpc.ankr.com/fantom_testnet
+    debugRpcUrl: https://rpc.testnet.fantom.network
     debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-    readOnlyRpcUrl: https://rpc.ankr.com/fantom_testnet
+    readOnlyRpcUrl: https://rpc.testnet.fantom.network
   onWalletConnected:
     m_PersistentCalls:
       m_Calls:
