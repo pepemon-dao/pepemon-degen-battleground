@@ -17,7 +17,7 @@ public class LoadingSplashScreen : MonoBehaviour
         });
 
         loadingMainText.text = "Loading card images...";
-        await PepemonFactoryCardCache.PreloadAllImages(10, (id) =>
+        await PepemonFactoryCardCache.PreloadAllImages(8, (id) =>
         {
             loadingSubText.text = $"Loaded image for card {id}";
         });
