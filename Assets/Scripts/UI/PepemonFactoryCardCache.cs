@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
+using Contracts.PepemonFactory.abi.ContractDefinition;
 
 /// <summary>
 /// Downloads and caches PepemonFactory card information, including metadata 
@@ -65,7 +66,6 @@ class PepemonFactoryCardCache
 
     private static async UniTask PreloadTokenMetadata(ulong minId, ulong maxId, Action<ulong> cardLoadedCallback = null)
     {
-        Debug.Log($"start {minId}-{maxId}");
         var supportCardsToFetch = new List<ulong>();
         var battleCardStats = await PepemonFactory.BatchGetBattleCardStats(minId, maxId);
         for (var i = 0; i < battleCardStats.Count; i++)
@@ -81,7 +81,6 @@ class PepemonFactoryCardCache
             {
                 cardMetadata[tokenId] = new PepemonFactory.CardMetadata
                 {
-                    external_url = battleCardStats[i].IpfsAddr,
                     description = battleCardStats[i].Description,
                     image = battleCardStats[i].IpfsAddr,
                     isSupportCard = false,
@@ -93,17 +92,18 @@ class PepemonFactoryCardCache
         }
         if (supportCardsToFetch.Count == 0)
         {
-            Debug.Log($"ret1 {minId}-{maxId}");
             return;
         }
 
-        var supportCardStats = await PepemonFactory.BatchGetSupportCardStats(
-            supportCardsToFetch[0], supportCardsToFetch[supportCardsToFetch.Count - 1]
-        );
-
-        if (supportCardStats == null)
+        List<SupportCardStats> supportCardStats;
+        try
         {
-            Debug.Log($"ret2 {minId}-{maxId}");
+            supportCardStats = await PepemonFactory.BatchGetSupportCardStats(
+                supportCardsToFetch[0], supportCardsToFetch[supportCardsToFetch.Count - 1]);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
             return;
         }
 
@@ -113,7 +113,6 @@ class PepemonFactoryCardCache
 
             cardMetadata[tokenId] = new PepemonFactory.CardMetadata
             {
-                external_url = supportCardStats[i].IpfsAddr,
                 description = supportCardStats[i].Description,
                 image = supportCardStats[i].IpfsAddr,
                 isSupportCard = true,
@@ -122,7 +121,6 @@ class PepemonFactoryCardCache
             cardLoadedCallback?.Invoke(tokenId);
             Debug.Log($"Loaded token metadata for id: {tokenId}");
         }
-        Debug.Log($"end {minId}-{maxId}");
     }
 
     private static async Task PreloadTokenImage(ulong tokenId, Action<ulong> cardLoadedCallback = null)
