@@ -20,7 +20,7 @@ public class ScreenLeaderboard : MonoBehaviour
     // TODO: Allow selecting different leaderboards
     public void ReloadDefaultLeaderboard()
     {
-        _rankingList.ReloadLeaderboard(PepemonMatchmaker.PepemonLeagues.Rice);
+        _rankingList.ReloadLeaderboard(PepemonMatchmaker.PepemonLeagues.PvP);
     }
 
     void OnPreviousScreenButtonClick()

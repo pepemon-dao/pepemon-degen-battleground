@@ -2,11 +2,11 @@ name: Build & Deploy the Pepemon Unity Project
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-    branches: [ '*' ]
+    branches: ['*']
 
 permissions:
   contents: write
@@ -14,19 +14,23 @@ permissions:
 
 jobs:
   build:
-    name: Build the Pepemon Unity Project 
+    name: Build the Pepemon Unity Project
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
 
     steps:
-      # Checkout
+      - name: Cleanup Docker
+        run: |
+          docker system prune -af
+          docker volume prune -f
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           lfs: true
-
+    
       # Cache
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
@@ -35,16 +39,18 @@ jobs:
 
       # Test
       - name: Run tests
-        uses: game-ci/unity-test-runner@v2
+        uses: game-ci/unity-test-runner@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: 2021.3.12f1
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       # Build
       - name: Build project
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -54,7 +60,7 @@ jobs:
           targetPlatform: WebGL
 
       # Output
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
           name: Build

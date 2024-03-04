@@ -1646,7 +1646,7 @@ GameObject:
   - component: {fileID: 466852536}
   - component: {fileID: 466852535}
   m_Layer: 5
-  m_Name: Text_PPDexCost
+  m_Name: Text_Bottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1692,7 +1692,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 500 PPDEX
+  m_text: 'Play against a bot
+
+    immediately'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
@@ -1719,15 +1721,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 71.9
-  m_fontSizeBase: 36
+  m_fontSize: 62
+  m_fontSizeBase: 62
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 2048
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -2094,7 +2096,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pepekarp League
+  m_text: PvE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
@@ -2121,7 +2123,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 71.2
+  m_fontSize: 71.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2454,7 +2456,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &630232704
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2476,7 +2478,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 320, y: -684.9794}
+  m_AnchoredPosition: {x: 320, y: -724.5783}
   m_SizeDelta: {x: 640, y: 640}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &630232705
@@ -5042,7 +5044,7 @@ GameObject:
   - component: {fileID: 982163083}
   - component: {fileID: 982163082}
   m_Layer: 5
-  m_Name: Text_PPDexCost
+  m_Name: Text_Bottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5088,7 +5090,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2500 PPDEX
+  m_text: "Play against other \nplayers"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
@@ -5115,15 +5117,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 71.9
-  m_fontSizeBase: 36
+  m_fontSize: 62
+  m_fontSizeBase: 62
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 2048
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -7356,11 +7358,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 75495cc934d4e90449c805f660317dc9, type: 3}
-    m_FontSize: 100
+    m_FontSize: 89
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 1
-    m_MaxSize: 120
+    m_MaxSize: 123
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -7540,7 +7542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1600, y: -684.9794}
+  m_AnchoredPosition: {x: 1440.0001, y: -643.61444}
   m_SizeDelta: {x: 640, y: 640}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1319189953
@@ -7620,7 +7622,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -7751,14 +7753,13 @@ MonoBehaviour:
       chainCurrencyDecimals: 18
       rpcUrl: https://rpc.ankr.com/fantom_testnet
       blockExplorerUrl: https://testnet.ftmscan.com/address/
-      pepemonBattleAddress: 0xA1E3aeE45Aa74349cD9A1eC290A41F218Ff34EaD
+      pepemonBattleAddress: 0xBe973123CF4ECC840fbA3aE14DACC6aD80Aaa2A9
       pepemonFactoryAddress: 0x25e8db00C55b9da7C999Fdc0A9d098Cb0b3aAFfc
       pepemonCardDeckAddress: 0x12EaA00470d8160DC43C11c32fD8c30E5fca0C05
       pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
-      - 0x3DD5213768d66B4f1f625784aC8588C472F44b88
+      - 0xEB6F3c59415efA4AA00e3D1be71827b52B0B4BB4
+      - 0xC8A27e449f2e87B770f442A423B7591006847b3F
     - chainId: 250
       chainName: Fantom Opera
       chainCurrencyName: FTM
@@ -8331,7 +8332,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960, y: -684.9794}
+  m_AnchoredPosition: {x: 480.00003, y: -643.61444}
   m_SizeDelta: {x: 640, y: 640}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1379819351
@@ -8411,7 +8412,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -9338,7 +9339,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Chad League
+  m_text: PvP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}

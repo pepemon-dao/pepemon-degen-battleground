@@ -25,7 +25,7 @@ MonoBehaviour:
   Rarity: 0
   HealthPoints: 30
   Speed: 21
-  Intelligence: 7
+  Intelligence: 4
   Attack: 4
   Defense: 13
   SAttack: 20
