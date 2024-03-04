@@ -68,4 +68,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         if: github.ref == 'refs/heads/main'
         with:
-          folder: build/WebGL/WebGL
+          folder: build/WebGL # Fix the folder path here
+          token: ${{ secrets.GITHUB_TOKEN }}
