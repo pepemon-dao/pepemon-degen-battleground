@@ -20,7 +20,7 @@ MonoBehaviour:
     3) Effects do not stack or reset with another card of the same name.
   Rarity: 1
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 7f00fd3803674764798b5e98f12e0e50, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 5bcbb639e67d2304ab1f536d402c6df9, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:

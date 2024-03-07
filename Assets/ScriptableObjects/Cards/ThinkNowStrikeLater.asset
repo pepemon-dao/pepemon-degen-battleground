@@ -21,7 +21,7 @@ MonoBehaviour:
     card of the same name.
   Rarity: 2
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 94ce8b49e4ae7a24caacd0f13ec23627, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: dbfdd9318a8e3f643b2426f05bae53c2, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:
