@@ -25,6 +25,7 @@ public class UIController : MonoBehaviour
     [SerializeField, BoxGroup("Board")] Transform _index2CardContainer;
     [SerializeField, BoxGroup("Board")] Transform _deck1Transform;
     [SerializeField, BoxGroup("Board")] Transform _deck2Transform;
+    [SerializeField, BoxGroup("Board")] GameObject _blurryScreen;
     [SerializeField, BoxGroup("Board")] Transform _board;
     [SerializeField, BoxGroup("Board")] Image _player1TotalDisplay;
     [SerializeField, BoxGroup("Board")] Image _player2TotalDisplay;
@@ -215,8 +216,11 @@ public class UIController : MonoBehaviour
         _player1TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
         _player2TotalDisplay.GetComponent<Animator>().SetTrigger("Clash");
 
+        _blurryScreen.SetActive(true);
+
         yield return new WaitForSeconds(2.5f);
 
+        _blurryScreen.SetActive(false);
 
         yield return new WaitForSeconds(1f);
 
