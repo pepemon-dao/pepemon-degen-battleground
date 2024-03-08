@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 using Pepemon.Battle;
+using static UnityEngine.ParticleSystem;
 // Handles displaying game state
 public class UIController : MonoBehaviour
 {
@@ -236,7 +237,11 @@ public class UIController : MonoBehaviour
                 if (_card.HostedCard.IsAttackingCard())
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player1TotalDisplay.transform.position;
+                    var mainModule = _ps.GetComponent<ParticleSystem>().main;
+                    Color startColor = Color.red;
+                    startColor.a = 0.5f;
+                    mainModule.startColor = new ParticleSystem.MinMaxGradient(startColor);
                 }
             }
             foreach (CardController _card in _player2Cards)
@@ -244,7 +249,11 @@ public class UIController : MonoBehaviour
                 if (_card.HostedCard.Type == PlayCardType.Defense)
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player2TotalDisplay.transform.position;
+                    var mainModule = _ps.GetComponent<ParticleSystem>().main;
+                    Color startColor = Color.blue;
+                    startColor.a = 0.5f;
+                    mainModule.startColor = new ParticleSystem.MinMaxGradient(startColor);
                 }
             }
         }
@@ -256,7 +265,11 @@ public class UIController : MonoBehaviour
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
                     //particle system moves toward the tally display for effect
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player1TotalDisplay.transform.position;
+                    var mainModule = _ps.GetComponent<ParticleSystem>().main;
+                    Color startColor = Color.blue;
+                    startColor.a = 0.5f;
+                    mainModule.startColor = new ParticleSystem.MinMaxGradient(startColor);
                 }
             }
             foreach (CardController _card in _player2Cards)
@@ -265,7 +278,11 @@ public class UIController : MonoBehaviour
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
                     //particle system moves toward the tally display for effect
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player2TotalDisplay.transform.position;
+                    var mainModule = _ps.GetComponent<ParticleSystem>().main;
+                    Color startColor = Color.red;
+                    startColor.a = 0.5f;
+                    mainModule.startColor = new ParticleSystem.MinMaxGradient(startColor);
                 }
             }
         }

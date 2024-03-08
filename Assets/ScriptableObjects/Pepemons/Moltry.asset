@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: 5ddf710b-c5c2-42fa-986b-8b83a21d120f
   DisplayIcon: {fileID: 0}
-  ID: 15
+  ID: 
   DisplayName: Moltry
   CardContentBackdrop: {fileID: 21300000, guid: 22bcdada3e855924bab4c21a2022a73c, type: 3}
   CardContent: {fileID: 21300000, guid: 7943a6531fbdcd245b71916878c56b28, type: 3}

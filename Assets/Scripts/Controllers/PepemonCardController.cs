@@ -47,32 +47,22 @@ public class PepemonCardController : MonoBehaviour
         _spdText.text = pepemonData.Speed.ToString();
         _intText.text = pepemonData.Intelligence.ToString();
 
-        bool isFiltered = pepemonData.ID != "11" && pepemonData.ID != "12" && pepemonData.ID != "13" 
-            && pepemonData.ID != "14" && pepemonData.ID != "15" && pepemonData.ID != "16";
-        if (isFiltered)
+        /*
+        typeDatas.ForEach((tD) =>
         {
-            typeDatas.ForEach((tD) =>
+            if (tD.type == pepemonData.Type)
             {
-                if (tD.type == pepemonData.Type)
-                {
-                    _backDropImage.sprite = tD.cardBackImage;
-                    _footerImage.sprite = tD.footerImage;
-                    _iconImage.sprite = tD.iconImage;
-                }
-            });
-        }
-        
+                _backDropImage.sprite = tD.cardBackImage;
+                _footerImage.sprite = tD.footerImage;
+                _iconImage.sprite = tD.iconImage;
+            }
+        });
+        */
 
         if (pepemonData.CardContentBackdrop != null)
         {
-            if (isFiltered)
-            {
-                _cardContentBackdrop.sprite = pepemonData.CardContentBackdrop;
-            }
-            else
-            {
-                _backDropImage.sprite = pepemonData.CardContentBackdrop;
-            }
+            //_cardContentBackdrop.sprite = pepemonData.CardContentBackdrop;
+            _backDropImage.sprite = pepemonData.CardContentBackdrop;
         }
         if (pepemonData.CardContent != null)
             _cardContent.sprite = pepemonData.CardContent;

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UID: 86cf5c96-eea7-4354-abd7-c76d7c6fbe4a
   DisplayIcon: {fileID: 0}
-  ID: 11
+  ID: 
   DisplayName: Dicey
   CardContentBackdrop: {fileID: 21300000, guid: 000b931ce18e0e74ea4d887d40a60d10, type: 3}
   CardContent: {fileID: 0}

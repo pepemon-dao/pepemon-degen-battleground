@@ -41,8 +41,8 @@ public class CardController : MonoBehaviour
     public void PopulateCard(Card card)
     {
         HostedCard = card;
-        _cardDisplayName.text = HostedCard.DisplayName;
-        _cardDescription.text = HostedCard.CardDescription;
+        //_cardDisplayName.text = HostedCard.DisplayName;
+        //_cardDescription.text = HostedCard.CardDescription;
 
         /*
         switch (card.Type)
