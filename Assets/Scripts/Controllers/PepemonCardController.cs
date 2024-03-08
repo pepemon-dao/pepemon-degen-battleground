@@ -47,6 +47,7 @@ public class PepemonCardController : MonoBehaviour
         _spdText.text = pepemonData.Speed.ToString();
         _intText.text = pepemonData.Intelligence.ToString();
 
+        /*
         typeDatas.ForEach((tD) =>
         {
             if (tD.type == pepemonData.Type)
@@ -56,9 +57,15 @@ public class PepemonCardController : MonoBehaviour
                 _iconImage.sprite = tD.iconImage;
             }
         });
+        */
 
-        _cardContentBackdrop.sprite = pepemonData.CardContentBackdrop;
-        _cardContent.sprite = pepemonData.CardContent;
+        if (pepemonData.CardContentBackdrop != null)
+        {
+            //_cardContentBackdrop.sprite = pepemonData.CardContentBackdrop;
+            _backDropImage.sprite = pepemonData.CardContentBackdrop;
+        }
+        if (pepemonData.CardContent != null)
+            _cardContent.sprite = pepemonData.CardContent;
     }
 
     public void UpdateCard(Player player)

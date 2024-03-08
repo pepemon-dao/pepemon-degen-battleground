@@ -21,7 +21,7 @@ MonoBehaviour:
     to the Pepemon until end of turn."
   Rarity: 1
   Type: 3
-  CardEffectSprite: {fileID: 21300000, guid: 84c0e4a135fb5754c8fcf7e4ac48eda5, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 9a72fb1d306a1ee4b9b115faf1ee5e3e, type: 3}
   AttackPower: 0
   DefensePower: 7
   effectOne:

@@ -39,6 +39,7 @@ public class GameController : MonoBehaviour
     [BoxGroup("Pepemon Controller")] public PepemonCardController player2Controller;
 
     [TitleGroup("Scriptable objects list"), SerializeField] DataContainer CardsScriptableObjsData;
+    [TitleGroup("AttackerUI"), SerializeField] List<GameObject> _attackerUIElements;
 
     [ReadOnly] private BigInteger battleSeed;
 
@@ -70,13 +71,15 @@ public class GameController : MonoBehaviour
         // add console.log calls in the PepemonBattle.sol contract to get this seed
         BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
             "68188038832262297884772284640717549873770515354422947402145954532168121309549");
-        BattlePrepController.battleData.player1BattleCard = 1;
+        //BattlePrepController.battleData.player1BattleCard = 1;
+        BattlePrepController.battleData.player1BattleCard = 4;
         BattlePrepController.battleData.player1SupportCards = new OrderedDictionary<ulong, int>()
         {
             [12] = 1,
             [28] = 2
         };
-        BattlePrepController.battleData.player2BattleCard = 2;
+        //BattlePrepController.battleData.player2BattleCard = 2;
+        BattlePrepController.battleData.player2BattleCard = 8;
         BattlePrepController.battleData.player2SupportCards = new OrderedDictionary<ulong, int>()
         {
             [12] = 1,
@@ -123,7 +126,7 @@ public class GameController : MonoBehaviour
     {
         _gameHasFinished = false;
         _currentAttacker = Attacker.PLAYER_ONE;
-        _roundNumber = 0;
+        _roundNumber = 1;
         _player1.Reset();
         _player2.Reset();
     }
@@ -131,7 +134,7 @@ public class GameController : MonoBehaviour
     // Each player shuffles their deck and draws cards equal to pepemon intelligence 
     void InitFirstRound()
     {
-        _roundNumber = 0;
+        _roundNumber = 1;
         _player1.Initialize();
         _player2.Initialize();
         _uiController.InitialiseGame(_player1, _player2);
@@ -219,6 +222,8 @@ public class GameController : MonoBehaviour
                 var atkPlayer = _currentAttacker == Attacker.PLAYER_ONE ? _player1 : _player2;
                 var defPlayer = _currentAttacker == Attacker.PLAYER_ONE ? _player2 : _player1;
 
+                AttackerUI(_currentAttacker);
+
                 CalcSupportCardsInHand(atkPlayer, defPlayer);
 
                 int totalAttackPower = atkPlayer.CurrentPepemonStats.atk + CalcResistanceWeakness(atkPlayer, defPlayer);
@@ -275,6 +280,7 @@ public class GameController : MonoBehaviour
             }
         }
         Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
+        AttackerUI(_currentAttacker, true);
         _roundNumber++;
         _isPlayingRound = false;
     }
@@ -634,5 +640,15 @@ public class GameController : MonoBehaviour
         var currentPlayerWon = player1won == BattlePrepController.battleData.currentPlayerIsPlayer1;
         _uiController.DisplayBattleResult(winner, currentPlayerWon);
         _gameHasFinished = true;
+    }
+
+    private void AttackerUI(Attacker attacker, bool disable = false)
+    {
+        bool isPlayer1Attacker = attacker == Attacker.PLAYER_ONE;
+
+        _attackerUIElements[0].SetActive(isPlayer1Attacker && !disable);
+        _attackerUIElements[1].SetActive(!isPlayer1Attacker && !disable);
+        _attackerUIElements[2].SetActive(!isPlayer1Attacker && !disable);
+        _attackerUIElements[3].SetActive(isPlayer1Attacker && !disable);
     }
 }

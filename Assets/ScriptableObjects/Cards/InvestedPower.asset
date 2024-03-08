@@ -21,7 +21,7 @@ MonoBehaviour:
     all the offense cards used by its player this turn (excluding offense card bonuses)."
   Rarity: 2
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 4b959a362f896784cbd7ca626958f560, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 97d057007208c2748bc9f98eeabfddd3, type: 3}
   AttackPower: 4
   DefensePower: 0
   effectOne:

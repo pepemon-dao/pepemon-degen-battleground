@@ -20,7 +20,7 @@ MonoBehaviour:
     this turn (no bonuses for using two copies of the same card in the same turn)
   Rarity: 1
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 618a0dc45e16a6a4b94a4ecc640978fb, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 51285444a0d2bbd468e99c221988afde, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:
