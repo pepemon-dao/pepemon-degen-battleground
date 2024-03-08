@@ -44,6 +44,7 @@ public class CardController : MonoBehaviour
         _cardDisplayName.text = HostedCard.DisplayName;
         _cardDescription.text = HostedCard.CardDescription;
 
+        /*
         switch (card.Type)
         {
             case PlayCardType.Defense:
@@ -71,7 +72,9 @@ public class CardController : MonoBehaviour
             case CardRarity.Epic:
                 _gemImage.sprite = _epicGem;
                 break;
-        }
+        }*/
+
+        _cardFrameImage.sprite = card.CardEffectSprite;
     }
 
     public void SetTargetTransform(Transform _target)

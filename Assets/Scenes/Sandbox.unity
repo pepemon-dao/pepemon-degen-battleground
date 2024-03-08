@@ -13530,7 +13530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _uiController: {fileID: 731252689}
   _player1:
-    PlayerPepemon: {fileID: 11400000, guid: ebf2eb4e75cd2fc41860cb891e6cbf2c, type: 2}
+    PlayerPepemon: {fileID: 11400000, guid: ccf111aa26c89b34e8664acaa9e9176d, type: 2}
     PlayerDeck:
       AllCards:
       - {fileID: 11400000, guid: a234538c2f067d74fbb9d4cb7b9db11d, type: 2}
@@ -13618,7 +13618,7 @@ MonoBehaviour:
       - {fileID: 11400000, guid: dd16e581279bd8b479fdab36fa0e21ba, type: 2}
     PlayedCardCount: 0
   _player2:
-    PlayerPepemon: {fileID: 11400000, guid: 7c7eb360152fbac4ba9415e12c03993d, type: 2}
+    PlayerPepemon: {fileID: 11400000, guid: 0770c7f64a4d5cc459980bd1c25f35bf, type: 2}
     PlayerDeck:
       AllCards:
       - {fileID: 11400000, guid: a234538c2f067d74fbb9d4cb7b9db11d, type: 2}
