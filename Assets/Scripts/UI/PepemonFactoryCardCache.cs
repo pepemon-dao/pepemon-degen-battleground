@@ -60,7 +60,6 @@ class PepemonFactoryCardCache
         } while (batchLoadedCardsCount >= batchRequestedCardsCount);
     }
 
-    /*
     public static async Task PreloadAllImages(ulong parallelBatchSize, Action<ulong> cardLoadedCallback = null)
     {
         var cardList = cardMetadata.ToList();
@@ -78,7 +77,6 @@ class PepemonFactoryCardCache
         }
     }
 
-    */
 
     private static async Task PreloadTokenMetadata(ulong tokenId, Action<ulong> cardLoadedCallback = null)
     {
@@ -91,7 +89,6 @@ class PepemonFactoryCardCache
         cardLoadedCallback?.Invoke(tokenId);
     }
 
-    /*
     private static async Task PreloadTokenImage(ulong tokenId, Action<ulong> cardLoadedCallback = null)
     {
         if (!cardMetadata.ContainsKey(tokenId))
@@ -129,67 +126,6 @@ class PepemonFactoryCardCache
             Debug.Log("Download of card image successful. Card id: " + tokenId);
             cardTextures[tokenId] = DownloadHandlerTexture.GetContent(webRequest);
             cardTextures[tokenId] = GenerateMipmaps(cardTextures[tokenId]);
-            cardLoadedCallback?.Invoke(tokenId);
-        }
-    }
-    */
-
-    public static async Task PreloadAllImages(ulong parallelBatchSize, Action<ulong> cardLoadedCallback = null)
-    {
-        var cardList = cardMetadata.ToList();
-
-        await Task.Run(async () =>
-        {
-            for (int batchStart = 0; batchStart < cardList.Count; batchStart += (int)parallelBatchSize)
-            {
-                int batchEnd = Math.Min(batchStart + (int)parallelBatchSize, cardList.Count);
-
-                var tasks = new List<Task>();
-
-                for (int i = batchStart; i < batchEnd; i++)
-                {
-                    tasks.Add(PreloadTokenImage(cardList[i].Key, cardLoadedCallback));
-                }
-
-                await Task.WhenAll(tasks);
-            }
-        });
-    }
-
-    private static async Task PreloadTokenImage(ulong tokenId, Action<ulong> cardLoadedCallback = null)
-    {
-        if (!cardMetadata.TryGetValue(tokenId, out PepemonFactory.CardMetadata metadata))
-        {
-            return;
-        }
-
-        string url = IpfsUrlService.ResolveIpfsUrlGateway(metadata.image);
-
-        try
-        {
-            using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
-            {
-                await webRequest.SendWebRequest();
-
-                if (webRequest.result == UnityWebRequest.Result.Success)
-                {
-                    Texture2D texture = DownloadHandlerTexture.GetContent(webRequest);
-                    Texture2D mipmappedTexture = GenerateMipmaps(texture);
-                    cardTextures[tokenId] = mipmappedTexture;
-                    cardLoadedCallback?.Invoke(tokenId);
-                }
-                else
-                {
-                    Debug.LogWarning($"Error while downloading card image {tokenId}: {webRequest.error}");
-                    cardTextures[tokenId] = new Texture2D(8, 8);
-                    cardLoadedCallback?.Invoke(tokenId);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"Error while downloading card image {tokenId}: {e.Message}");
-            cardTextures[tokenId] = new Texture2D(8, 8);
             cardLoadedCallback?.Invoke(tokenId);
         }
     }
