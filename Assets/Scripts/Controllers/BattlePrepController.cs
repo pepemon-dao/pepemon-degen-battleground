@@ -30,8 +30,8 @@ public class BattlePrepController : MonoBehaviour
 
     [Header("StarterDeck")]
     public static ulong starterDeckNumber;
-    [SerializeField] private List<Card> starterDeck1;
-    [SerializeField] private List<Card> starterDeck2;
+    public List<Card> starterDeck1;
+    public List<Card> starterDeck2;
 
     void Start()
     {
