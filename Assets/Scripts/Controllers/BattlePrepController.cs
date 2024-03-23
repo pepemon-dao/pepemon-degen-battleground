@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Unity.Rpc;
+using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +25,13 @@ public class BattlePrepController : MonoBehaviour
 
     // used on GameController on the battle scene
     public static BattleData battleData { get; private set; } = new BattleData();
+
+
+
+    [Header("StarterDeck")]
+    public static ulong starterDeckNumber;
+    [SerializeField] private List<Card> starterDeck1;
+    [SerializeField] private List<Card> starterDeck2;
 
     void Start()
     {
@@ -74,7 +84,7 @@ public class BattlePrepController : MonoBehaviour
         // is in the waitlist
         var deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
 
-        string player1addr = Web3Controller.instance.SelectedAccountAddress, 
+        string player1addr = Web3Controller.instance.SelectedAccountAddress,
                player2addr = null;
 
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
@@ -100,7 +110,7 @@ public class BattlePrepController : MonoBehaviour
         var battleEvent = await PepemonBattle.WaitForCreatedBattle(
                 player1addr,
                 player2addr,
-                nextBlock, 
+                nextBlock,
                 _cancellationTokenSource.Token);
 
         // initiate the battle immediatelly if the player initiated the battle
@@ -108,26 +118,70 @@ public class BattlePrepController : MonoBehaviour
         {
             // prevent player from clicking on the Exit button if BattleCreated event was captured
             _exitButton.GetComponent<Button>().interactable = false;
-            
+
             // proceed into the next scene
-            await InitBattleScene((PepemonBattle.BattleCreatedEventData) battleEvent);
+            await InitBattleScene((PepemonBattle.BattleCreatedEventData)battleEvent);
         }
+    }
+
+    public async Task<IDictionary<ulong, int>> GetAllSupportCards(ulong deckId)
+    {
+        var result = new OrderedDictionary<ulong, int>();
+
+        if (deckId == 10001) //using first starter deck
+        {
+            foreach (var card in starterDeck1)
+            {
+                ulong id = (ulong)card.ID;
+                result[id] = result.ContainsKey(id) ? result[id] + 1 : 1;
+            }
+        }
+        else // if not using the first then still assign a deck to it
+        {
+            foreach (var card in starterDeck2)
+            {
+                ulong id = (ulong)card.ID;
+                result[id] = result.ContainsKey(id) ? result[id] + 1 : 1;
+            }
+        }
+
+        return result;
     }
 
     private async Task InitBattleScene(PepemonBattle.BattleCreatedEventData battleEventData)
     {
         Debug.Log("Received battle event. BattleId: " + battleEventData.BattleId);
         Debug.Log("Loading battle data..");
-        
+
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
         var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
         var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
-        var reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player1Deck);
-        var reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player2Deck);
+
+        Task<IDictionary<ulong, int>> reqPlayer1SupportCards;
+        Task<IDictionary<ulong, int>> reqPlayer2SupportCards;
+
+        if (battleEventData.Player1Deck == 10001 || battleEventData.Player1Deck == 10002) //using starter deck
+        {
+            reqPlayer1SupportCards = GetAllSupportCards(battleEventData.Player1Deck);
+        }
+        else //using own deck
+        {
+            reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player1Deck);
+        }
+
+        if (battleEventData.Player2Deck == 10001 || battleEventData.Player2Deck == 10002) //using starter deck
+        {
+            reqPlayer2SupportCards = GetAllSupportCards(battleEventData.Player2Deck);
+        }
+        else //using own deck
+        {
+            reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player2Deck);
+        }
+
         await Task.WhenAll(reqBattleRngSeed, reqPlayer1BattleCard, reqPlayer2BattleCard, reqPlayer1SupportCards, reqPlayer2SupportCards);
 
         Debug.Log("Battle data loaded");
-        
+
         battleData.battleRngSeed = reqBattleRngSeed.Result;
         battleData.player1BattleCard = reqPlayer1BattleCard.Result;
         battleData.player2BattleCard = reqPlayer2BattleCard.Result;
