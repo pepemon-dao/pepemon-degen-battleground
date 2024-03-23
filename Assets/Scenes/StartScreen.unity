@@ -8123,7 +8123,7 @@ MonoBehaviour:
       pepemonGasLimit: 7500000
       pepemonMatchmakerAddresses:
       - 0xEB6F3c59415efA4AA00e3D1be71827b52B0B4BB4
-      - 0xC8A27e449f2e87B770f442A423B7591006847b3F
+      - 0xCa9210d0b04C75AAadd471FbDFBdcBf5A1876189
     - chainId: 250
       chainName: Fantom Opera
       chainCurrencyName: FTM
