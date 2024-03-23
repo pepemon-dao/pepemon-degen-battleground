@@ -1468,6 +1468,10 @@ PrefabInstance:
       propertyPath: _battlePrepController
       value: 
       objectReference: {fileID: 1016897154}
+    - target: {fileID: 425762299907590929, guid: bd0c3ea3727cf994788abfb333fde35a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 445921320446163100, guid: bd0c3ea3727cf994788abfb333fde35a, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -11207,6 +11211,10 @@ PrefabInstance:
       propertyPath: _battlePrepController
       value: 
       objectReference: {fileID: 1016897154}
+    - target: {fileID: 425762299907590929, guid: bd0c3ea3727cf994788abfb333fde35a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 445921320446163100, guid: bd0c3ea3727cf994788abfb333fde35a, type: 3}
       propertyPath: m_IsActive
       value: 0
