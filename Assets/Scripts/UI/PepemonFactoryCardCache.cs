@@ -9,6 +9,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
+using Cysharp.Threading.Tasks;
+using Contracts.PepemonFactory.abi.ContractDefinition;
 
 /// <summary>
 /// Downloads and caches PepemonFactory card information, including metadata 
@@ -18,46 +20,32 @@ class PepemonFactoryCardCache
 {
     private static ConcurrentDictionary<ulong, Texture2D> cardTextures = new ConcurrentDictionary<ulong, Texture2D>();
     private static ConcurrentDictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new ConcurrentDictionary<ulong, PepemonFactory.CardMetadata>();
-    public static List<ulong> CardsIds { get => cardMetadata.Keys.ToList(); }
+
+    public static ICollection<ulong> CardsIds => cardMetadata.Keys;
 
     public UnityEvent<ulong> cardMetadataLoaded;
     public UnityEvent<ulong> cardImageLoaded;
 
-    public static async Task PreloadAllMetadata(ulong parallelBatchSize, Action<ulong> cardLoadedCallback = null)
+    public static async Task PreloadAllMetadata(ulong parallelBatchSize, ulong batchCallSize, Action<ulong> cardLoadedCallback = null)
     {
-        ulong batchStart = 1;
-        ulong batchEnd;
-        ulong batchLoadedCardsCount;
-        ulong batchRequestedCardsCount;
+        ulong firstCardId = 1;
+        ulong lastCardId = await PepemonFactory.GetLastCardId();
 
-        do
+        ulong concurrentRequests = 0;
+
+        var batchLoadingTasks = new List<UniTask>();
+        for (ulong batchStart = firstCardId; batchStart < lastCardId; batchStart += batchCallSize)
         {
-            batchEnd = batchStart + parallelBatchSize;
-            batchLoadedCardsCount = 0;
-            batchRequestedCardsCount = 0;
-
-            List<Task> batchLoadingTasks = new List<Task>();
-            for (ulong i = batchStart; i < batchEnd; i++)
+            var batchEnd = Math.Min(batchStart + batchCallSize, lastCardId);
+            batchLoadingTasks.Add(PreloadTokenMetadata(batchStart, batchEnd, cardLoadedCallback));
+            concurrentRequests += 1;
+            if (concurrentRequests >= parallelBatchSize)
             {
-                ulong tokenId = i;
-                if (!cardMetadata.ContainsKey(tokenId))
-                {
-                    batchLoadingTasks.Add(PreloadTokenMetadata(tokenId, cardLoadedCallback));
-                    batchRequestedCardsCount++;
-                }
+                await UniTask.WhenAll(batchLoadingTasks);
+                concurrentRequests = 0;
             }
-            await Task.WhenAll(batchLoadingTasks);
-
-            for (ulong i = batchStart; i < batchEnd; i++)
-            {
-                if (cardMetadata.ContainsKey(i))
-                {
-                    batchLoadedCardsCount++;
-                }
-            }
-
-            batchStart += parallelBatchSize;
-        } while (batchLoadedCardsCount >= batchRequestedCardsCount);
+        }
+        await UniTask.WhenAll(batchLoadingTasks);
     }
 
     public static async Task PreloadAllImages(ulong parallelBatchSize, Action<ulong> cardLoadedCallback = null)
@@ -77,16 +65,63 @@ class PepemonFactoryCardCache
         }
     }
 
-
-    private static async Task PreloadTokenMetadata(ulong tokenId, Action<ulong> cardLoadedCallback = null)
+    private static async UniTask PreloadTokenMetadata(ulong minId, ulong maxId, Action<ulong> cardLoadedCallback = null)
     {
-        PepemonFactory.CardMetadata? metadata = await PepemonFactory.GetCardMetadata(tokenId);
-        if (metadata != null)
+        var supportCardsToFetch = new List<ulong>();
+        var battleCardStats = await PepemonFactory.BatchGetBattleCardStats(minId, maxId);
+        for (var i = 0; i < battleCardStats.Count; i++)
         {
-            cardMetadata[tokenId] = (PepemonFactory.CardMetadata)metadata;
+            var tokenId = (ulong)i + minId;
+
+            // when we accidentally tried to fetch a battlecard but it was a support card
+            if (battleCardStats[i].Hp == 0)
+            {
+                supportCardsToFetch.Add(tokenId);
+            }
+            else
+            {
+                cardMetadata[tokenId] = new PepemonFactory.CardMetadata
+                {
+                    description = battleCardStats[i].Description,
+                    image = battleCardStats[i].IpfsAddr,
+                    isSupportCard = false,
+                    name = battleCardStats[i].Name
+                };
+                cardLoadedCallback?.Invoke(tokenId);
+                Debug.Log($"Loaded token metadata for id: {tokenId}");
+            }
         }
-        Debug.Log($"Loaded token metadata for id: {tokenId}");
-        cardLoadedCallback?.Invoke(tokenId);
+        if (supportCardsToFetch.Count == 0)
+        {
+            return;
+        }
+
+        List<SupportCardStats> supportCardStats;
+        try
+        {
+            supportCardStats = await PepemonFactory.BatchGetSupportCardStats(
+                supportCardsToFetch[0], supportCardsToFetch[supportCardsToFetch.Count - 1]);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            return;
+        }
+
+        for (var i = 0; i < supportCardStats.Count; i++)
+        {
+            var tokenId = (ulong)i + minId;
+
+            cardMetadata[tokenId] = new PepemonFactory.CardMetadata
+            {
+                description = supportCardStats[i].Description,
+                image = supportCardStats[i].IpfsAddr,
+                isSupportCard = true,
+                name = supportCardStats[i].Name
+            };
+            cardLoadedCallback?.Invoke(tokenId);
+            Debug.Log($"Loaded token metadata for id: {tokenId}");
+        }
     }
 
     private static async Task PreloadTokenImage(ulong tokenId, Action<ulong> cardLoadedCallback = null)
@@ -124,8 +159,7 @@ class PepemonFactoryCardCache
                     return;
             }
             Debug.Log("Download of card image successful. Card id: " + tokenId);
-            cardTextures[tokenId] = DownloadHandlerTexture.GetContent(webRequest);
-            cardTextures[tokenId] = GenerateMipmaps(cardTextures[tokenId]);
+            cardTextures[tokenId] = GenerateMipmaps(DownloadHandlerTexture.GetContent(webRequest));
             cardLoadedCallback?.Invoke(tokenId);
         }
     }

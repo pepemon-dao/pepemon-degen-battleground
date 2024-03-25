@@ -25,8 +25,6 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public static string BYTECODE = "";
         public pepemonFactoryAbiDeploymentBase() : base(BYTECODE) { }
         public pepemonFactoryAbiDeploymentBase(string byteCode) : base(byteCode) { }
-        [Parameter("address", "_proxyRegistryAddress", 1)]
-        public virtual string ProxyRegistryAddress { get; set; }
     }
 
     public partial class AddMinterFunction : AddMinterFunctionBase { }
@@ -80,6 +78,58 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual List<ulong> Ids { get; set; }
     }
 
+    public partial class BaseMetadataURIFunction : BaseMetadataURIFunctionBase { }
+
+    [Function("baseMetadataURI", "string")]
+    public class BaseMetadataURIFunctionBase : FunctionMessage
+    {
+
+    }
+
+    public partial class BatchGetBattleCardStatsFunction : BatchGetBattleCardStatsFunctionBase { }
+
+    [Function("batchGetBattleCardStats", typeof(BatchGetBattleCardStatsOutputDTO))]
+    public class BatchGetBattleCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "minId", 1)]
+        public virtual BigInteger MinId { get; set; }
+        [Parameter("uint256", "maxId", 2)]
+        public virtual BigInteger MaxId { get; set; }
+    }
+
+    public partial class BatchGetSupportCardStatsFunction : BatchGetSupportCardStatsFunctionBase { }
+
+    [Function("batchGetSupportCardStats", typeof(BatchGetSupportCardStatsOutputDTO))]
+    public class BatchGetSupportCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "minId", 1)]
+        public virtual BigInteger MinId { get; set; }
+        [Parameter("uint256", "maxId", 2)]
+        public virtual BigInteger MaxId { get; set; }
+    }
+
+    public partial class BatchMintFunction : BatchMintFunctionBase { }
+
+    [Function("batchMint")]
+    public class BatchMintFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "start", 1)]
+        public virtual BigInteger Start { get; set; }
+        [Parameter("uint256", "end", 2)]
+        public virtual BigInteger End { get; set; }
+        [Parameter("address", "to", 3)]
+        public virtual string To { get; set; }
+    }
+
+    public partial class BattleCardStatsFunction : BattleCardStatsFunctionBase { }
+
+    [Function("battleCardStats", typeof(BattleCardStatsOutputDTO))]
+    public class BattleCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual BigInteger ReturnValue1 { get; set; }
+    }
+
     public partial class BurnFunction : BurnFunctionBase { }
 
     [Function("burn")]
@@ -101,18 +151,46 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
 
     }
 
-    public partial class CreateFunction : CreateFunctionBase { }
+    public partial class ConvertFunction : ConvertFunctionBase { }
 
-    [Function("create", "uint256")]
-    public class CreateFunctionBase : FunctionMessage
+    [Function("convert", "bytes32")]
+    public class ConvertFunctionBase : FunctionMessage
     {
-        [Parameter("uint256", "_maxSupply", 1)]
+        [Parameter("int16[14]", "arr", 1)]
+        public virtual List<short> Arr { get; set; }
+    }
+
+    public partial class CreateBattleCardFunction : CreateBattleCardFunctionBase { }
+
+    [Function("createBattleCard", "uint256")]
+    public class CreateBattleCardFunctionBase : FunctionMessage
+    {
+        [Parameter("tuple", "_stats", 1)]
+        public virtual BattleCardStats Stats { get; set; }
+        [Parameter("uint256", "_maxSupply", 2)]
         public virtual BigInteger MaxSupply { get; set; }
-        [Parameter("uint256", "_initialSupply", 2)]
+        [Parameter("uint256", "_initialSupply", 3)]
         public virtual BigInteger InitialSupply { get; set; }
-        [Parameter("string", "_uri", 3)]
+        [Parameter("string", "_uri", 4)]
         public virtual string Uri { get; set; }
-        [Parameter("bytes", "_data", 4)]
+        [Parameter("bytes", "_data", 5)]
+        public virtual byte[] Data { get; set; }
+    }
+
+    public partial class CreateSupportCardFunction : CreateSupportCardFunctionBase { }
+
+    [Function("createSupportCard", "uint256")]
+    public class CreateSupportCardFunctionBase : FunctionMessage
+    {
+        [Parameter("tuple", "_stats", 1)]
+        public virtual SupportCardStats Stats { get; set; }
+        [Parameter("uint256", "_maxSupply", 2)]
+        public virtual BigInteger MaxSupply { get; set; }
+        [Parameter("uint256", "_initialSupply", 3)]
+        public virtual BigInteger InitialSupply { get; set; }
+        [Parameter("string", "_uri", 4)]
+        public virtual string Uri { get; set; }
+        [Parameter("bytes", "_data", 5)]
         public virtual byte[] Data { get; set; }
     }
 
@@ -125,6 +203,24 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual BigInteger ReturnValue1 { get; set; }
     }
 
+    public partial class DeconvertFunction : DeconvertFunctionBase { }
+
+    [Function("deconvert", "int16[14]")]
+    public class DeconvertFunctionBase : FunctionMessage
+    {
+        [Parameter("bytes32", "num", 1)]
+        public virtual byte[] Num { get; set; }
+    }
+
+    public partial class ElementDecodeFunction : ElementDecodeFunctionBase { }
+
+    [Function("elementDecode", "string")]
+    public class ElementDecodeFunctionBase : FunctionMessage
+    {
+        [Parameter("uint16", "", 1)]
+        public virtual ushort ReturnValue1 { get; set; }
+    }
+
     public partial class EndMintingFunction : EndMintingFunctionBase { }
 
     [Function("endMinting")]
@@ -132,6 +228,14 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     {
         [Parameter("uint256", "_id", 1)]
         public virtual BigInteger Id { get; set; }
+    }
+
+    public partial class GetLastTokenIDFunction : GetLastTokenIDFunctionBase { }
+
+    [Function("getLastTokenID", "uint256")]
+    public class GetLastTokenIDFunctionBase : FunctionMessage
+    {
+
     }
 
     public partial class IsApprovedForAllFunction : IsApprovedForAllFunctionBase { }
@@ -152,14 +256,6 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     {
         [Parameter("address", "account", 1)]
         public virtual string Account { get; set; }
-    }
-
-    public partial class IsOwnerFunction : IsOwnerFunctionBase { }
-
-    [Function("isOwner", "bool")]
-    public class IsOwnerFunctionBase : FunctionMessage
-    {
-
     }
 
     public partial class IsWhitelistAdminFunction : IsWhitelistAdminFunctionBase { }
@@ -307,6 +403,17 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual string NewURI { get; set; }
     }
 
+    public partial class SetBattleCardStatsFunction : SetBattleCardStatsFunctionBase { }
+
+    [Function("setBattleCardStats")]
+    public class SetBattleCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "id", 1)]
+        public virtual BigInteger Id { get; set; }
+        [Parameter("tuple", "x", 2)]
+        public virtual BattleCardStats X { get; set; }
+    }
+
     public partial class SetContractURIFunction : SetContractURIFunctionBase { }
 
     [Function("setContractURI")]
@@ -314,6 +421,48 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     {
         [Parameter("string", "newURI", 1)]
         public virtual string NewURI { get; set; }
+    }
+
+    public partial class SetElementDecodeFunction : SetElementDecodeFunctionBase { }
+
+    [Function("setElementDecode")]
+    public class SetElementDecodeFunctionBase : FunctionMessage
+    {
+        [Parameter("uint16", "element", 1)]
+        public virtual ushort Element { get; set; }
+        [Parameter("string", "x", 2)]
+        public virtual string X { get; set; }
+    }
+
+    public partial class SetSupportCardStatsFunction : SetSupportCardStatsFunctionBase { }
+
+    [Function("setSupportCardStats")]
+    public class SetSupportCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "id", 1)]
+        public virtual BigInteger Id { get; set; }
+        [Parameter("tuple", "x", 2)]
+        public virtual SupportCardStats X { get; set; }
+    }
+
+    public partial class SetWeakResistFunction : SetWeakResistFunctionBase { }
+
+    [Function("setWeakResist")]
+    public class SetWeakResistFunctionBase : FunctionMessage
+    {
+        [Parameter("uint16", "element", 1)]
+        public virtual ushort Element { get; set; }
+        [Parameter("tuple", "x", 2)]
+        public virtual ElementWR X { get; set; }
+    }
+
+    public partial class SupportCardStatsFunction : SupportCardStatsFunctionBase { }
+
+    [Function("supportCardStats", typeof(SupportCardStatsOutputDTO))]
+    public class SupportCardStatsFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual BigInteger ReturnValue1 { get; set; }
     }
 
     public partial class SupportsInterfaceFunction : SupportsInterfaceFunctionBase { }
@@ -378,16 +527,25 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual BigInteger Id { get; set; }
     }
 
+    public partial class WeakResistFunction : WeakResistFunctionBase { }
+
+    [Function("weakResist", typeof(WeakResistOutputDTO))]
+    public class WeakResistFunctionBase : FunctionMessage
+    {
+        [Parameter("uint16", "", 1)]
+        public virtual ushort ReturnValue1 { get; set; }
+    }
+
     public partial class ApprovalForAllEventDTO : ApprovalForAllEventDTOBase { }
 
     [Event("ApprovalForAll")]
     public class ApprovalForAllEventDTOBase : IEventDTO
     {
-        [Parameter("address", "_owner", 1, true )]
-        public virtual string Owner { get; set; }
-        [Parameter("address", "_operator", 2, true )]
+        [Parameter("address", "account", 1, true )]
+        public virtual string Account { get; set; }
+        [Parameter("address", "operator", 2, true )]
         public virtual string Operator { get; set; }
-        [Parameter("bool", "_approved", 3, false )]
+        [Parameter("bool", "approved", 3, false )]
         public virtual bool Approved { get; set; }
     }
 
@@ -425,16 +583,16 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     [Event("TransferBatch")]
     public class TransferBatchEventDTOBase : IEventDTO
     {
-        [Parameter("address", "_operator", 1, true )]
+        [Parameter("address", "operator", 1, true )]
         public virtual string Operator { get; set; }
-        [Parameter("address", "_from", 2, true )]
+        [Parameter("address", "from", 2, true )]
         public virtual string From { get; set; }
-        [Parameter("address", "_to", 3, true )]
+        [Parameter("address", "to", 3, true )]
         public virtual string To { get; set; }
-        [Parameter("uint256[]", "_ids", 4, false )]
+        [Parameter("uint256[]", "ids", 4, false )]
         public virtual List<BigInteger> Ids { get; set; }
-        [Parameter("uint256[]", "_amounts", 5, false )]
-        public virtual List<BigInteger> Amounts { get; set; }
+        [Parameter("uint256[]", "values", 5, false )]
+        public virtual List<BigInteger> Values { get; set; }
     }
 
     public partial class TransferSingleEventDTO : TransferSingleEventDTOBase { }
@@ -442,16 +600,16 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     [Event("TransferSingle")]
     public class TransferSingleEventDTOBase : IEventDTO
     {
-        [Parameter("address", "_operator", 1, true )]
+        [Parameter("address", "operator", 1, true )]
         public virtual string Operator { get; set; }
-        [Parameter("address", "_from", 2, true )]
+        [Parameter("address", "from", 2, true )]
         public virtual string From { get; set; }
-        [Parameter("address", "_to", 3, true )]
+        [Parameter("address", "to", 3, true )]
         public virtual string To { get; set; }
-        [Parameter("uint256", "_id", 4, false )]
+        [Parameter("uint256", "id", 4, false )]
         public virtual BigInteger Id { get; set; }
-        [Parameter("uint256", "_amount", 5, false )]
-        public virtual BigInteger Amount { get; set; }
+        [Parameter("uint256", "value", 5, false )]
+        public virtual BigInteger Value { get; set; }
     }
 
     public partial class UriEventDTO : UriEventDTOBase { }
@@ -459,9 +617,9 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     [Event("URI")]
     public class UriEventDTOBase : IEventDTO
     {
-        [Parameter("string", "_uri", 1, false )]
-        public virtual string Uri { get; set; }
-        [Parameter("uint256", "_id", 2, true )]
+        [Parameter("string", "value", 1, false )]
+        public virtual string Value { get; set; }
+        [Parameter("uint256", "id", 2, true )]
         public virtual BigInteger Id { get; set; }
     }
 
@@ -504,7 +662,69 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     public class BalanceOfBatchOutputDTOBase : IFunctionOutputDTO 
     {
         [Parameter("uint256[]", "", 1)]
-        public virtual List<ulong> ReturnValue1 { get; set; }
+        public virtual List<BigInteger> ReturnValue1 { get; set; }
+    }
+
+    public partial class BaseMetadataURIOutputDTO : BaseMetadataURIOutputDTOBase { }
+
+    [FunctionOutput]
+    public class BaseMetadataURIOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("string", "", 1)]
+        public virtual string ReturnValue1 { get; set; }
+    }
+
+    public partial class BatchGetBattleCardStatsOutputDTO : BatchGetBattleCardStatsOutputDTOBase { }
+
+    [FunctionOutput]
+    public class BatchGetBattleCardStatsOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("tuple[]", "", 1)]
+        public virtual List<BattleCardStats> ReturnValue1 { get; set; }
+    }
+
+    public partial class BatchGetSupportCardStatsOutputDTO : BatchGetSupportCardStatsOutputDTOBase { }
+
+    [FunctionOutput]
+    public class BatchGetSupportCardStatsOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("tuple[]", "", 1)]
+        public virtual List<SupportCardStats> ReturnValue1 { get; set; }
+    }
+
+
+
+    public partial class BattleCardStatsOutputDTO : BattleCardStatsOutputDTOBase { }
+
+    [FunctionOutput]
+    public class BattleCardStatsOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("uint16", "element", 1)]
+        public virtual ushort Element { get; set; }
+        [Parameter("uint16", "hp", 2)]
+        public virtual ushort Hp { get; set; }
+        [Parameter("uint16", "speed", 3)]
+        public virtual ushort Speed { get; set; }
+        [Parameter("uint16", "intelligence", 4)]
+        public virtual ushort Intelligence { get; set; }
+        [Parameter("uint16", "defense", 5)]
+        public virtual ushort Defense { get; set; }
+        [Parameter("uint16", "attack", 6)]
+        public virtual ushort Attack { get; set; }
+        [Parameter("uint16", "specialAttack", 7)]
+        public virtual ushort SpecialAttack { get; set; }
+        [Parameter("uint16", "specialDefense", 8)]
+        public virtual ushort SpecialDefense { get; set; }
+        [Parameter("uint16", "level", 9)]
+        public virtual ushort Level { get; set; }
+        [Parameter("string", "name", 10)]
+        public virtual string Name { get; set; }
+        [Parameter("string", "description", 11)]
+        public virtual string Description { get; set; }
+        [Parameter("string", "ipfsAddr", 12)]
+        public virtual string IpfsAddr { get; set; }
+        [Parameter("string", "rarity", 13)]
+        public virtual string Rarity { get; set; }
     }
 
 
@@ -518,6 +738,17 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual string ReturnValue1 { get; set; }
     }
 
+    public partial class ConvertOutputDTO : ConvertOutputDTOBase { }
+
+    [FunctionOutput]
+    public class ConvertOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("bytes32", "", 1)]
+        public virtual byte[] ReturnValue1 { get; set; }
+    }
+
+
+
 
 
     public partial class CreatorsOutputDTO : CreatorsOutputDTOBase { }
@@ -529,7 +760,34 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
         public virtual string ReturnValue1 { get; set; }
     }
 
+    public partial class DeconvertOutputDTO : DeconvertOutputDTOBase { }
 
+    [FunctionOutput]
+    public class DeconvertOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("int16[14]", "", 1)]
+        public virtual List<short> ReturnValue1 { get; set; }
+    }
+
+    public partial class ElementDecodeOutputDTO : ElementDecodeOutputDTOBase { }
+
+    [FunctionOutput]
+    public class ElementDecodeOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("string", "", 1)]
+        public virtual string ReturnValue1 { get; set; }
+    }
+
+
+
+    public partial class GetLastTokenIDOutputDTO : GetLastTokenIDOutputDTOBase { }
+
+    [FunctionOutput]
+    public class GetLastTokenIDOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("uint256", "", 1)]
+        public virtual BigInteger ReturnValue1 { get; set; }
+    }
 
     public partial class IsApprovedForAllOutputDTO : IsApprovedForAllOutputDTOBase { }
 
@@ -544,15 +802,6 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
 
     [FunctionOutput]
     public class IsMinterOutputDTOBase : IFunctionOutputDTO 
-    {
-        [Parameter("bool", "", 1)]
-        public virtual bool ReturnValue1 { get; set; }
-    }
-
-    public partial class IsOwnerOutputDTO : IsOwnerOutputDTOBase { }
-
-    [FunctionOutput]
-    public class IsOwnerOutputDTOBase : IFunctionOutputDTO 
     {
         [Parameter("bool", "", 1)]
         public virtual bool ReturnValue1 { get; set; }
@@ -616,6 +865,43 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
 
 
 
+
+
+
+
+
+
+
+
+    public partial class SupportCardStatsOutputDTO : SupportCardStatsOutputDTOBase { }
+
+    [FunctionOutput]
+    public class SupportCardStatsOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("bytes32", "currentRoundChanges", 1)]
+        public virtual byte[] CurrentRoundChanges { get; set; }
+        [Parameter("bytes32", "nextRoundChanges", 2)]
+        public virtual byte[] NextRoundChanges { get; set; }
+        [Parameter("uint256", "specialCode", 3)]
+        public virtual BigInteger SpecialCode { get; set; }
+        [Parameter("uint16", "modifierNumberOfNextTurns", 4)]
+        public virtual ushort ModifierNumberOfNextTurns { get; set; }
+        [Parameter("bool", "isOffense", 5)]
+        public virtual bool IsOffense { get; set; }
+        [Parameter("bool", "isNormal", 6)]
+        public virtual bool IsNormal { get; set; }
+        [Parameter("bool", "isStackable", 7)]
+        public virtual bool IsStackable { get; set; }
+        [Parameter("string", "name", 8)]
+        public virtual string Name { get; set; }
+        [Parameter("string", "description", 9)]
+        public virtual string Description { get; set; }
+        [Parameter("string", "ipfsAddr", 10)]
+        public virtual string IpfsAddr { get; set; }
+        [Parameter("string", "rarity", 11)]
+        public virtual string Rarity { get; set; }
+    }
+
     public partial class SupportsInterfaceOutputDTO : SupportsInterfaceOutputDTOBase { }
 
     [FunctionOutput]
@@ -670,5 +956,16 @@ namespace Contracts.PepemonFactory.abi.ContractDefinition
     {
         [Parameter("string", "", 1)]
         public virtual string ReturnValue1 { get; set; }
+    }
+
+    public partial class WeakResistOutputDTO : WeakResistOutputDTOBase { }
+
+    [FunctionOutput]
+    public class WeakResistOutputDTOBase : IFunctionOutputDTO 
+    {
+        [Parameter("uint16", "weakness", 1)]
+        public virtual ushort Weakness { get; set; }
+        [Parameter("uint16", "resistance", 2)]
+        public virtual ushort Resistance { get; set; }
     }
 }
