@@ -15,6 +15,7 @@ public class CardController : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
     [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
     [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
+    [BoxGroup("Card Components"), SerializeField] private Image glow;
 
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialDefenceCardFrame;
@@ -73,6 +74,16 @@ public class CardController : MonoBehaviour
                 _gemImage.sprite = _epicGem;
                 break;
         }*/
+
+        switch (card.Type)
+        {
+            case PlayCardType.Defense:
+                glow.color = Color.cyan;
+                break;
+            case PlayCardType.SpecialDefense:
+                glow.color = Color.cyan;
+                break;
+        }
 
         _cardFrameImage.sprite = card.CardEffectSprite;
     }
