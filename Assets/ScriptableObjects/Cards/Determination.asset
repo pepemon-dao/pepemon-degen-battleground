@@ -21,7 +21,7 @@ MonoBehaviour:
     has an additional +6 Defense until end of turn.
   Rarity: 1
   Type: 3
-  CardEffectSprite: {fileID: 21300000, guid: 9846847805228494f8b29dea76d7d117, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 62e0babe86447f84183facc5aa289517, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:

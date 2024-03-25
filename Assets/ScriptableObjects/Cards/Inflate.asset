@@ -21,7 +21,7 @@ MonoBehaviour:
     do not stack with another card of the same name.
   Rarity: 1
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 7a39e7958d052564b813988b9d28f22d, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 8efed1c1e3ad723469f46908c1a2d4c7, type: 3}
   AttackPower: -7
   DefensePower: 0
   effectOne:

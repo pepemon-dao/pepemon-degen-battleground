@@ -21,7 +21,7 @@ MonoBehaviour:
     further -4 Attack Power until end of turn.
   Rarity: 1
   Type: 2
-  CardEffectSprite: {fileID: 21300000, guid: 44872bd33239a2d4d889b37f49258642, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 0eac8e8039910724d99ce65c5df0c34e, type: 3}
   AttackPower: 0
   DefensePower: 0
   effectOne:

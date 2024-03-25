@@ -20,7 +20,7 @@ MonoBehaviour:
     +3 offense card used during this turn
   Rarity: 1
   Type: 1
-  CardEffectSprite: {fileID: 21300000, guid: 4982f857cbf6e2b49be974ec03ab59d6, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 265604ac026d0f44aa796ef778e45229, type: 3}
   AttackPower: 6
   DefensePower: 0
   effectOne:

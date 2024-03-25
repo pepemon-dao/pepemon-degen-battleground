@@ -20,7 +20,7 @@ MonoBehaviour:
     used by the player during this turn
   Rarity: 1
   Type: 2
-  CardEffectSprite: {fileID: 21300000, guid: 43d8d0120a29e0546aa2d86d7a1a44ce, type: 3}
+  CardEffectSprite: {fileID: 21300000, guid: 25ea7a7f992c2a54db86d13808b2c869, type: 3}
   AttackPower: 0
   DefensePower: 5
   effectOne:
