@@ -99,12 +99,7 @@ public class CardController : MonoBehaviour
     /// </summary>
     public void SetAttackingTransform(int attackIndex)
     {
-        _startingTargetPosition = _targetPostion.position;
 
-        _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z - 15f);
-        _cardGlow.DOFade(1, .2f);
-        transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
-        /*
         if (attackIndex == 1)
         {
             _startingTargetPosition = _targetPostion.position;
@@ -121,7 +116,7 @@ public class CardController : MonoBehaviour
             _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
-        */
+
     }
 
     /// <summary>

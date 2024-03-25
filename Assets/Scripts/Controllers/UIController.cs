@@ -124,7 +124,7 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_player1Cards[i].HostedCard.IsAttackingCard() == true)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == false)
                 {
                     _player1Cards[i].SetAttackingTransform(1);
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
@@ -133,7 +133,7 @@ public class UIController : MonoBehaviour
 
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_player2Cards[i].HostedCard.IsAttackingCard() == false)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == true)
                 {
                     _player2Cards[i].SetAttackingTransform(2);
                     _player2Cards[i].GetComponent<Image>().color = Color.gray;
@@ -144,7 +144,7 @@ public class UIController : MonoBehaviour
         {
             for (int i = 0; i < _player2Cards.Count; i++)
             {
-                if (_player2Cards[i].HostedCard.IsAttackingCard() == true)
+                if (_player2Cards[i].HostedCard.IsAttackingCard() == false)
                 {
                     _player2Cards[i].SetAttackingTransform(2);
 
@@ -154,7 +154,7 @@ public class UIController : MonoBehaviour
 
             for (int i = 0; i < _player1Cards.Count; i++)
             {
-                if (_player1Cards[i].HostedCard.IsAttackingCard() == false)
+                if (_player1Cards[i].HostedCard.IsAttackingCard() == true)
                 {
                     _player1Cards[i].SetAttackingTransform(1);
 
