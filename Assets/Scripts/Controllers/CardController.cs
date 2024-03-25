@@ -14,6 +14,7 @@ public class CardController : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] private Image _cardBackgroundImage;
     [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
     [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _glowImage;
     [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
 
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
@@ -74,6 +75,16 @@ public class CardController : MonoBehaviour
                 break;
         }*/
 
+        switch (card.Type)
+        {
+            case PlayCardType.Defense:
+                _glowImage.color = Color.cyan;
+                break;
+            case PlayCardType.SpecialDefense:
+                _glowImage.color = Color.cyan;
+                break;
+        }
+
         _cardFrameImage.sprite = card.CardEffectSprite;
     }
 
@@ -87,8 +98,7 @@ public class CardController : MonoBehaviour
     /// The cards move foward when they are attacking
     /// </summary>
     public void SetAttackingTransform(int attackIndex)
-    {
-
+    { 
         if (attackIndex == 1)
         {
             _startingTargetPosition = _targetPostion.position;
@@ -105,7 +115,6 @@ public class CardController : MonoBehaviour
             _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
-
     }
 
     /// <summary>
