@@ -73,14 +73,14 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           folder: build/WebGL/WebGL
-          target-folder: _dev
+          target-folder: env/dev
 
       - name: Deploy to Staging 🧰
         uses: JamesIves/github-pages-deploy-action@v4
         if: github.ref == 'refs/heads/staging'
         with:
           folder: build/WebGL/WebGL
-          target-folder: _staging
+          target-folder: env/staging
 
       - name: Deploy to Production 🚀
         uses: JamesIves/github-pages-deploy-action@v4
