@@ -224,6 +224,10 @@ public class GameController : MonoBehaviour
 
                 AttackerUI(_currentAttacker);
 
+                Debug.Log("fight currentAttacker=" + _currentAttacker);
+                Debug.Log("fight totalAttackPower=" + atkPlayer.CurrentPepemonStats.atk);
+                Debug.Log("fight totalDefensePower=" + atkPlayer.CurrentPepemonStats.def);
+
                 CalcSupportCardsInHand(atkPlayer, defPlayer);
 
                 int totalAttackPower = atkPlayer.CurrentPepemonStats.atk + CalcResistanceWeakness(atkPlayer, defPlayer);
@@ -357,21 +361,23 @@ public class GameController : MonoBehaviour
                 // Card type is OFFENSE.
                 // Calc effects of EffectOne
                 
-                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
-                    if (isTriggered)
-                    {
-                        //use triggeredPower if triggered
-                        atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower * multiplier;
-                        totalNormalPower += effectOne.triggeredPower * multiplier;
-                    }
-                    else
-                    {
-                        //use basePower if not
-                        atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
-                        totalNormalPower += effectOne.basePower;
-                    }
-                
+                (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+
+                if (isTriggered)
+                {
+                    //use triggeredPower if triggered
+                    int power = effectOne.triggeredPower == 0 ? effectOne.basePower : effectOne.triggeredPower;
+                    atkPlayer.CurrentPepemonStats.atk += power * multiplier;
+                    totalNormalPower += effectOne.triggeredPower * multiplier;
                 }
+                else
+                {
+                    //use basePower if not
+                    atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
+                    totalNormalPower += effectOne.basePower;
+                }
+                
+            }
             else if (card.Type == PlayCardType.SpecialOffense)
             {
                 // Card type is STRONG OFFENSE.
@@ -391,37 +397,39 @@ public class GameController : MonoBehaviour
 
                 // Calc effects of EffectOne
 
-                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
-                    if (isTriggered)
+                (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                if (isTriggered)
+                {
+                    if (multiplier > 1)
                     {
-                        if (multiplier > 1)
-                        {
-                            atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower * multiplier;
-                        }
-                        else
-                        {
-                            if (effectOne.effectTo == EffectTo.SpecialAttack)
-                            {
-                                // If it's a use Special Attack instead of Attack card
-                                atkPlayer.CurrentPepemonStats.atk = atkPlayer.CurrentPepemonStats.sAtk;
-                                continue;
-                            }
-                            else if (effectOne.triggeredPower == 0)
-                            {
-                                // We have a card that says ATK is increased by amount
-                                // Equal to the total of all offense cards in the current turn
-                                isPower0CardIncluded = true;
-                                continue;
-                            }
-                            atkPlayer.CurrentPepemonStats.atk += effectOne.triggeredPower;
-                        }
+                        int power = effectOne.triggeredPower == 0 ? effectOne.basePower : effectOne.triggeredPower;
+                        atkPlayer.CurrentPepemonStats.atk += power * multiplier;
                     }
                     else
                     {
-                        //If not triggered: use base power instead
-                        atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
-                        totalNormalPower += effectOne.basePower;
+                        if (effectOne.effectTo == EffectTo.SpecialAttack)
+                        {
+                            // If it's a use Special Attack instead of Attack card
+                            atkPlayer.CurrentPepemonStats.atk = atkPlayer.CurrentPepemonStats.sAtk;
+                            continue;
+                        }
+                        else if (effectOne.triggeredPower == 0)
+                        {
+                            // We have a card that says ATK is increased by amount
+                            // Equal to the total of all offense cards in the current turn
+                            isPower0CardIncluded = true;
+                            continue;
+                        }
+                        int power = effectOne.triggeredPower == 0 ? effectOne.basePower : effectOne.triggeredPower;
+                        atkPlayer.CurrentPepemonStats.atk += power;
                     }
+                }
+                else
+                {
+                    //If not triggered: use base power instead
+                    atkPlayer.CurrentPepemonStats.atk += effectOne.basePower;
+                    totalNormalPower += effectOne.basePower;
+                }
 
 
                 // If card lasts for >1 turns, Add card to table if <5 on table currently
@@ -451,24 +459,24 @@ public class GameController : MonoBehaviour
 
             if (card.Type == PlayCardType.Defense)
             {
-                // Card type is OFFENSE.
-                // Calc effects of EffectOne
-                
-                    (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
-                    if (isTriggered)
-                    {
-                        //use triggeredPower if triggered
-                        defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * multiplier;
-                        totalNormalPower += effectOne.triggeredPower * multiplier;
-                    }
-                    else
-                    {
-                        //use basePower if not
-                        defPlayer.CurrentPepemonStats.def += effectOne.basePower;
-                        totalNormalPower += effectOne.basePower;
-                    }
-                
+                // Card type is DEFENSE.
+                // Calc effects of EffectOne       
+
+                (bool isTriggered, int multiplier) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
+                if (isTriggered)
+                {
+                    //use triggeredPower if triggered
+                    int power = effectOne.triggeredPower == 0 ? effectOne.basePower : effectOne.triggeredPower;
+                    defPlayer.CurrentPepemonStats.def += power * multiplier;
+                    totalNormalPower += effectOne.triggeredPower * multiplier;
                 }
+                else
+                {
+                    //use basePower if not
+                    defPlayer.CurrentPepemonStats.def += effectOne.basePower;
+                    totalNormalPower += effectOne.basePower;
+                }
+            }
             else if (card.Type == PlayCardType.SpecialDefense)
             {
                 // Card type is STRONG DEFENSE
@@ -489,35 +497,36 @@ public class GameController : MonoBehaviour
                 // Calc effects of EffectOne
                 
                 (bool isTriggered, int num) = CheckReqCode(atkPlayer, defPlayer, effectOne.reqCode, true);
-                    if (isTriggered)
-                    {
+                if (isTriggered)
+                {
                     if (num > 0)
-                        {
+                    {
                         defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower * num;
-                        }
-                        else
-                        {
-                            if (effectOne.effectTo == EffectTo.SpecialDefense)
-                            {
-                                // If it's a use Special Defense instead of Defense card
-                                defPlayer.CurrentPepemonStats.def = defPlayer.CurrentPepemonStats.sDef;
-                                continue;
-                            }
-                            else if (effectOne.triggeredPower == 0)
-                            {
-                                // Equal to the total of all defense cards in the current turn
-                                isPower0CardIncluded = true;
-                                continue;
-                            }
-                            defPlayer.CurrentPepemonStats.def += effectOne.triggeredPower;
-                        }
                     }
                     else
                     {
-                        //If not triggered: use base power instead
-                        defPlayer.CurrentPepemonStats.def += effectOne.basePower;
-                        totalNormalPower += effectOne.basePower;
+                        if (effectOne.effectTo == EffectTo.SpecialDefense)
+                        {
+                            // If it's a use Special Defense instead of Defense card
+                            defPlayer.CurrentPepemonStats.def = defPlayer.CurrentPepemonStats.sDef;
+                            continue;
+                        }
+                        else if (effectOne.triggeredPower == 0)
+                        {
+                            // Equal to the total of all defense cards in the current turn
+                            isPower0CardIncluded = true;
+                            continue;
+                        }
+                        int power = effectOne.triggeredPower == 0 ? effectOne.basePower : effectOne.triggeredPower;
+                        defPlayer.CurrentPepemonStats.def += power;
                     }
+                }
+                else
+                {
+                    //If not triggered: use base power instead
+                    defPlayer.CurrentPepemonStats.def += effectOne.basePower;
+                    totalNormalPower += effectOne.basePower;
+                }
 
 
                 // If card lasts for >1 turns, Add card to table if <5 on table currently

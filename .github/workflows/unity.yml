@@ -2,8 +2,10 @@ name: Build & Deploy the Pepemon Unity Project
 
 on:
   push:
-    branches: [main]
+    # Run Tests -> Build -> Deploy on main/release/staging
+    branches: [main, release, staging]
   pull_request:
+    # Run Tests -> Build on PRs targeting main
     branches: [main]
   workflow_dispatch:
     branches: ['*']
@@ -61,13 +63,27 @@ jobs:
 
       # Output
       - uses: actions/upload-artifact@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/release' || github.ref == 'refs/heads/staging'
         with:
           name: Build
           path: build
 
-      - name: Deploy to Github Pages🚀
+      - name: Deploy to Dev 📦
         uses: JamesIves/github-pages-deploy-action@v4
         if: github.ref == 'refs/heads/main'
+        with:
+          folder: build/WebGL/WebGL
+          target-folder: env/dev
+
+      - name: Deploy to Staging 🧰
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/staging'
+        with:
+          folder: build/WebGL/WebGL
+          target-folder: env/staging
+
+      - name: Deploy to Production 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/release'
         with:
           folder: build/WebGL/WebGL
