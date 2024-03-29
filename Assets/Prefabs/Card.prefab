@@ -421,6 +421,7 @@ MonoBehaviour:
   _gemImage: {fileID: 5715713872572670358}
   _glowImage: {fileID: 7146062227139627272}
   _cardGlow: {fileID: 1264209411062242368}
+  glow: {fileID: 7146062227139627272}
   _defenceCardFrame: {fileID: 21300000, guid: a9bd7b3850984e94eac473435215b510, type: 3}
   _specialDefenceCardFrame: {fileID: 21300000, guid: 392e2c19a7e406b43962202e252f5b79, type: 3}
   _attackCardFrame: {fileID: 21300000, guid: c5c737362a3b26d4f8528694f04dc3cc, type: 3}

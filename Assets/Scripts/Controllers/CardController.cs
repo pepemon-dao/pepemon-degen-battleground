@@ -16,6 +16,7 @@ public class CardController : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
     [BoxGroup("Card Components"), SerializeField] private Image _glowImage;
     [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
+    [BoxGroup("Card Components"), SerializeField] private Image glow;
 
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _defenceCardFrame;
     [BoxGroup("Card Backdrops"), SerializeField] private Sprite _specialDefenceCardFrame;
@@ -78,10 +79,10 @@ public class CardController : MonoBehaviour
         switch (card.Type)
         {
             case PlayCardType.Defense:
-                _glowImage.color = Color.cyan;
+                glow.color = Color.cyan;
                 break;
             case PlayCardType.SpecialDefense:
-                _glowImage.color = Color.cyan;
+                glow.color = Color.cyan;
                 break;
         }
 

@@ -38,7 +38,8 @@ public class DeckListLoader : MonoBehaviour
         // destroy before re-creating
         foreach (var deck in _deckList.GetComponentsInChildren<Button>())
         {
-            Destroy(deck.gameObject);
+            if (!deck.name.Contains("StarterDeck"))
+                Destroy(deck.gameObject);
         }
 
         // should not happen, but if it happens then it won't crash the game
