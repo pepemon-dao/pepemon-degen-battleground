@@ -14,6 +14,7 @@ public class CardController : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] private Image _cardBackgroundImage;
     [BoxGroup("Card Components"), SerializeField] private Image _cardStatImage;
     [BoxGroup("Card Components"), SerializeField] private Image _gemImage;
+    [BoxGroup("Card Components"), SerializeField] private Image _glowImage;
     [BoxGroup("Card Components"), SerializeField] private CanvasGroup _cardGlow;
     [BoxGroup("Card Components"), SerializeField] private Image glow;
 
@@ -98,8 +99,7 @@ public class CardController : MonoBehaviour
     /// The cards move foward when they are attacking
     /// </summary>
     public void SetAttackingTransform(int attackIndex)
-    {
-
+    { 
         if (attackIndex == 1)
         {
             _startingTargetPosition = _targetPostion.position;
@@ -116,7 +116,6 @@ public class CardController : MonoBehaviour
             _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
         }
-
     }
 
     /// <summary>
