@@ -36,7 +36,10 @@ public class DeckController : MonoBehaviour
         set
         {
             _editButton.gameObject.SetActive(value);
-            _selectButton.gameObject.SetActive(!value);
+            if (!isStarterDeck)
+            {
+                _selectButton.gameObject.SetActive(!value);
+            }
         }
 
         get => _editButton.gameObject.activeSelf;
@@ -61,7 +64,10 @@ public class DeckController : MonoBehaviour
             {
                 supportCardCount = _battlePrepController.starterDeck2.Count;
             }
-            
+
+            _selectButton.gameObject.SetActive(true);
+
+
             _supportCardCount.text = supportCardCount + " / " + 60;
         }
     }

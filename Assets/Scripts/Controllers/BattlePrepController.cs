@@ -82,7 +82,13 @@ public class BattlePrepController : MonoBehaviour
 
         // check if the current player's deck is in the matchmaker list of deck owners, if it is, then we can assume the player
         // is in the waitlist
-        var deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
+
+        string deckOwner = Web3Controller.instance.SelectedAccountAddress;
+
+        if (selectedDeck < 10000) //not starter deck
+        {
+            deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
+        }
 
         string player1addr = Web3Controller.instance.SelectedAccountAddress,
                player2addr = null;
