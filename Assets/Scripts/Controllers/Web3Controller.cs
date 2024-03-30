@@ -66,6 +66,9 @@ public class Web3Controller : MonoBehaviour
     private bool _isMetamaskInitialised = false;
 #endif
 
+    [HideInInspector] public bool IsConnected = false;
+    [HideInInspector] public ulong StarterDeckID = 0;
+
     private void Awake()
     {
         if (instance == null)
@@ -177,6 +180,7 @@ public class Web3Controller : MonoBehaviour
         }
         onWalletConnected?.Invoke();
         NewAccountSelected(addressSelected);
+        IsConnected = true;
 #else
         await Task.CompletedTask;
 #endif

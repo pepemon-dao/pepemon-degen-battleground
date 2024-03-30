@@ -8,6 +8,7 @@ using System.Numerics;
 using Nethereum.ABI;
 using Nethereum.RLP;
 using Pepemon.Battle;
+using System.Threading.Tasks;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -43,6 +44,10 @@ public class GameController : MonoBehaviour
 
     [ReadOnly] private BigInteger battleSeed;
 
+    [Header("StarterDeck")]
+    public List<Card> starterDeck1;
+    public List<Card> starterDeck2;
+
     private void Start()
     {
         PrepareDecksBeforeBattle();
@@ -57,62 +62,129 @@ public class GameController : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
     /// <summary>
     /// Used for debugging battles to ensure its synced with the blockchain results
     /// </summary>
-    private void PrepareSimulatedBattle()
+    private void PrepareSimulatedBattle(ulong starterDeckID)
     {
         // prevent overriding real battles
         if (BattlePrepController.battleData.battleRngSeed != 0)
         {
             return;
         }
-        // add console.log calls in the PepemonBattle.sol contract to get this seed
-        BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
-            "68188038832262297884772284640717549873770515354422947402145954532168121309549");
-        //BattlePrepController.battleData.player1BattleCard = 1;
-        BattlePrepController.battleData.player1BattleCard = 4;
-        BattlePrepController.battleData.player1SupportCards = new OrderedDictionary<ulong, int>()
+
+        if (starterDeckID == 0) // bot battle in editor
         {
-            [12] = 1,
-            [28] = 2
-        };
-        //BattlePrepController.battleData.player2BattleCard = 2;
-        BattlePrepController.battleData.player2BattleCard = 8;
-        BattlePrepController.battleData.player2SupportCards = new OrderedDictionary<ulong, int>()
+            // add console.log calls in the PepemonBattle.sol contract to get this seed
+            BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
+                "68188038832262297884772284640717549873770515354422947402145954532168121309549");
+            //BattlePrepController.battleData.player1BattleCard = 1;
+            BattlePrepController.battleData.player1BattleCard = 4;
+            BattlePrepController.battleData.player1SupportCards = new OrderedDictionary<ulong, int>()
+            {
+                [12] = 1,
+                [28] = 2
+            };
+            //BattlePrepController.battleData.player2BattleCard = 2;
+            BattlePrepController.battleData.player2BattleCard = 8;
+            BattlePrepController.battleData.player2SupportCards = new OrderedDictionary<ulong, int>()
+            {
+                [12] = 1,
+                [29] = 1,
+                [21] = 1
+            };
+        }
+        else // bot battle with starter deck
         {
-            [12] = 1,
-            [29] = 1,
-            [21] = 1
-        };
+            // add console.log calls in the PepemonBattle.sol contract to get this seed
+            BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
+                "68188038832262297884772284640717549873770515354422947402145954532168121309549");
+            BattlePrepController.battleData.player1BattleCard = 1;
+            BattlePrepController.battleData.player1SupportCards = GetAllSupportCards(starterDeckID);
+
+            ulong botStarterDeck = 10002;
+            if (starterDeckID == 10002)
+                botStarterDeck = 10001;
+
+            BattlePrepController.battleData.player2BattleCard = 2;
+            BattlePrepController.battleData.player2SupportCards = GetAllSupportCards(botStarterDeck);
+        }
+
+        _player1.SetPlayerDeck(
+        pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player1BattleCard.ToString()),
+        supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player1SupportCards));
+
+        _player2.SetPlayerDeck(
+            pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player2BattleCard.ToString()),
+            supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
+
+        BattlePrepController.battleData.currentPlayerIsPlayer1 = true;
     }
-#endif
+
+    public IDictionary<ulong, int> GetAllSupportCards(ulong deckId)
+    {
+        var result = new OrderedDictionary<ulong, int>();
+
+        if (deckId == 10001) //using first starter deck
+        {
+            foreach (var card in starterDeck1)
+            {
+                ulong id = (ulong)card.ID;
+                result[id] = result.ContainsKey(id) ? result[id] + 1 : 1;
+            }
+        }
+        else // if not using the first then still assign a deck to it
+        {
+            foreach (var card in starterDeck2)
+            {
+                ulong id = (ulong)card.ID;
+                result[id] = result.ContainsKey(id) ? result[id] + 1 : 1;
+            }
+        }
+
+        return result;
+    }
 
     private void PrepareDecksBeforeBattle()
     {
-#if UNITY_EDITOR
-        PrepareSimulatedBattle();
-#endif
-        // might be zero if ran from unity editor
-        if (BattlePrepController.battleData.battleRngSeed != 0)
-        {
-            _player1.SetPlayerDeck(
-                pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player1BattleCard.ToString()),
-                supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player1SupportCards));
+        ulong starterDeckID = 0;
+        if (Web3Controller.instance != null)
+            starterDeckID = Web3Controller.instance.StarterDeckID;
 
-            _player2.SetPlayerDeck(
-                pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player2BattleCard.ToString()),
-                supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
-
-            battleSeed = BattlePrepController.battleData.battleRngSeed;
-        }
-        else
+        if (starterDeckID != 0)
         {
+            PrepareSimulatedBattle(starterDeckID);
             // when ran from Unity Editor. Set battleSeed and GameController cards to simulate a specific battle
             Debug.LogWarning("Battle data not set from BattlePrepController");
             battleSeed = 1;
         }
+        else
+        {
+#if UNITY_EDITOR
+            PrepareSimulatedBattle(starterDeckID);
+#else
+            // might be zero if ran from unity editor
+            if (BattlePrepController.battleData.battleRngSeed != 0)
+            {
+                _player1.SetPlayerDeck(
+                    pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player1BattleCard.ToString()),
+                    supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player1SupportCards));
+
+                _player2.SetPlayerDeck(
+                    pepemon: CardsScriptableObjsData.GetPepemonById(BattlePrepController.battleData.player2BattleCard.ToString()),
+                    supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
+
+                battleSeed = BattlePrepController.battleData.battleRngSeed;
+            }
+            else
+            {
+                // when ran from Unity Editor. Set battleSeed and GameController cards to simulate a specific battle
+                Debug.LogWarning("Battle data not set from BattlePrepController");
+                battleSeed = 1;
+            }
+#endif
+        }
+        
     }
 
     [Button()]

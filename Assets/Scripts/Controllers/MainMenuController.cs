@@ -35,6 +35,8 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
+        Application.targetFrameRate = 60;
+
         // TODO: find a better way to handle re-loading the main scene
         DeInitMainScene();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
@@ -49,6 +51,7 @@ public class MainMenuController : MonoBehaviour
         // assume that when no account was selected and his scene loads, its because the game just launched
         if (Web3Controller.instance == null || Web3Controller.instance.SelectedAccountAddress == null)
         {
+            _startGameButton.interactable = true;
             ShowScreen(defaultScreenId);
         }
         // assume that when an account was already selected, this scene was loaded after a battle that just ended
@@ -73,7 +76,12 @@ public class MainMenuController : MonoBehaviour
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
 
-        for(int i = 0; i < menuScreens.Count; i++)
+        if (screenId == 3 && !Web3Controller.instance.IsConnected)  //league selection
+        {
+            screenId = 9; //starter decks
+        }
+
+        for (int i = 0; i < menuScreens.Count; i++)
         {
             menuScreens[i].SetActive(i == screenId);
         }
