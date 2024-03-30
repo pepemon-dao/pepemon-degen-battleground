@@ -77,12 +77,14 @@ public class DeckController : MonoBehaviour
         onEditButtonClicked?.Invoke();
     }
 
-    void OnSelectClicked()
+    public void OnSelectClicked()
     {
-        GetComponent<SelectionItem>().ToggleSelected();
-        onSelectButtonClicked?.Invoke();
-
-        if (isStarterDeck)
+        if (!isStarterDeck)
+        {
+            GetComponent<SelectionItem>().ToggleSelected();
+            onSelectButtonClicked?.Invoke();
+        }
+        else
         {
             _battlePrepController.OnDeckSelected(starterDeckId);
         }

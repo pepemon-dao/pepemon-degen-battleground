@@ -29,7 +29,6 @@ public class BattlePrepController : MonoBehaviour
 
 
     [Header("StarterDeck")]
-    public static ulong starterDeckNumber;
     public List<Card> starterDeck1;
     public List<Card> starterDeck2;
 
@@ -49,6 +48,7 @@ public class BattlePrepController : MonoBehaviour
     public void OnDeckSelected(ulong deckId)
     {
         selectedDeck = deckId;
+        Web3Controller.instance.StarterDeckID = deckId;
     }
 
     private async void OnSearchForOpponentButtonClick()
@@ -83,12 +83,7 @@ public class BattlePrepController : MonoBehaviour
         // check if the current player's deck is in the matchmaker list of deck owners, if it is, then we can assume the player
         // is in the waitlist
 
-        string deckOwner = Web3Controller.instance.SelectedAccountAddress;
-
-        if (selectedDeck < 10000) //not starter deck
-        {
-            deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
-        }
+        string deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
 
         string player1addr = Web3Controller.instance.SelectedAccountAddress,
                player2addr = null;
