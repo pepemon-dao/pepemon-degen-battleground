@@ -38,12 +38,33 @@ public class MainMenuController : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // TODO: find a better way to handle re-loading the main scene
-        DeInitMainScene();
+        HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
         _creditsButton.onClick.AddListener(OpenCredits);
+    }
+
+    private void HandleGoingBackToMenu()
+    {
+        if (PepemonFactoryCardCache.CardsIds.Count == 0)
+        {
+            DeInitMainScene();
+        }
+        else if (PostBattleScreenController.IsGoingFromBattle)
+        {
+            PostBattleScreenController.IsGoingFromBattle = false;
+            _startGameButton.interactable = true;
+            ShowScreen(2);
+        }
+
+
+        if (PostBattleScreenController.IsConnectingWallet)
+        {
+            PostBattleScreenController.IsConnectingWallet = false;
+            OnConnectWalletButtonClick();
+        }
     }
 
     private void DeInitMainScene()

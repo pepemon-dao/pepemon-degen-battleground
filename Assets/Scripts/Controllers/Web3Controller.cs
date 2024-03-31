@@ -68,6 +68,7 @@ public class Web3Controller : MonoBehaviour
 
     [HideInInspector] public bool IsConnected = false;
     [HideInInspector] public ulong StarterDeckID = 0;
+    [HideInInspector] public int StarterPepemonID = 0;
 
     private void Awake()
     {

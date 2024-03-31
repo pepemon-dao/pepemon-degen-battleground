@@ -50,6 +50,11 @@ public class BattlePrepController : MonoBehaviour
         selectedDeck = deckId;
         Web3Controller.instance.StarterDeckID = deckId;
     }
+    
+    public void OnPepemonSelected(int pepemonID)
+    {
+        Web3Controller.instance.StarterPepemonID = pepemonID;
+    }
 
     private async void OnSearchForOpponentButtonClick()
     {

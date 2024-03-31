@@ -35,6 +35,7 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] TextReveal _youWinLose;
     [SerializeField] GameObject _rewardDisplay;
     [SerializeField] Button _btnShowMenu;
+    [SerializeField] Button _btnConnectWallet;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
@@ -57,6 +58,11 @@ public class PostBattleScreenController : MonoBehaviour
     protected Animator _animator;
     #endregion
 
+    #region EndTransitionBackToMenu
+    public static bool IsGoingFromBattle = false;
+    public static bool IsConnectingWallet = false;
+    #endregion
+
     public void SetResult(bool win)
     {
         _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
@@ -76,6 +82,17 @@ public class PostBattleScreenController : MonoBehaviour
     {
         // go back to previous scene
         // TODO: skip loading screen
+        IsGoingFromBattle = true;
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex - 1);
+    }
+    
+    public void OnBtnConnectWalletClick()
+    {
+        // go back to previous scene
+        // TODO: skip loading screen
+        IsGoingFromBattle = true;
+        IsConnectingWallet = true;
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
@@ -91,6 +108,9 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
+
+        _btnConnectWallet.gameObject.SetActive(Web3Controller.instance.IsConnected);
+        _btnConnectWallet.onClick.AddListener(OnBtnConnectWalletClick);
     }
 
     private void OnValidate()
