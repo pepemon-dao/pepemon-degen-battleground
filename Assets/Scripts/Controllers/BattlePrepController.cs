@@ -45,10 +45,13 @@ public class BattlePrepController : MonoBehaviour
         selectedLeague = (PepemonMatchmaker.PepemonLeagues)league;
     }
 
-    public void OnDeckSelected(ulong deckId)
+    public void OnDeckSelected(ulong deckId, bool isStarterDeck)
     {
         selectedDeck = deckId;
-        Web3Controller.instance.StarterDeckID = deckId;
+        if (isStarterDeck)
+        {
+            Web3Controller.instance.StarterDeckID = deckId;
+        }
     }
     
     public void OnPepemonSelected(int pepemonID)

@@ -109,7 +109,7 @@ public class PostBattleScreenController : MonoBehaviour
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
 
-        _btnConnectWallet.gameObject.SetActive(Web3Controller.instance.IsConnected);
+        _btnConnectWallet.gameObject.SetActive(!Web3Controller.instance.IsConnected);
         _btnConnectWallet.onClick.AddListener(OnBtnConnectWalletClick);
     }
 
