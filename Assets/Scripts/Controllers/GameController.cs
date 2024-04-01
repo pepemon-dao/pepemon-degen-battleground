@@ -96,17 +96,22 @@ public class GameController : MonoBehaviour
         }
         else // bot battle with starter deck
         {
+            ulong pepemonStarterID = (ulong)Web3Controller.instance.StarterPepemonID;
+
             // add console.log calls in the PepemonBattle.sol contract to get this seed
             BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
                 "68188038832262297884772284640717549873770515354422947402145954532168121309549");
-            BattlePrepController.battleData.player1BattleCard = 1;
+            BattlePrepController.battleData.player1BattleCard = pepemonStarterID;
             BattlePrepController.battleData.player1SupportCards = GetAllSupportCards(starterDeckID);
 
             ulong botStarterDeck = 10002;
-            if (starterDeckID == 10002)
+            if (starterDeckID == botStarterDeck)
                 botStarterDeck = 10001;
+            ulong botStarterPepemon = 2;
+            if (pepemonStarterID == botStarterPepemon)
+                botStarterPepemon = 1;
 
-            BattlePrepController.battleData.player2BattleCard = 2;
+            BattlePrepController.battleData.player2BattleCard = botStarterPepemon;
             BattlePrepController.battleData.player2SupportCards = GetAllSupportCards(botStarterDeck);
         }
 
@@ -119,6 +124,10 @@ public class GameController : MonoBehaviour
             supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
 
         BattlePrepController.battleData.currentPlayerIsPlayer1 = true;
+        //resetting them
+        Web3Controller.instance.StarterDeckID = 0;
+        Web3Controller.instance.StarterPepemonID = 0;
+        BattlePrepController.battleData.battleRngSeed = 0;
     }
 
     public IDictionary<ulong, int> GetAllSupportCards(ulong deckId)
