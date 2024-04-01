@@ -86,7 +86,7 @@ public class DeckController : MonoBehaviour
         }
         else
         {
-            _battlePrepController.OnDeckSelected(starterDeckId);
+            _battlePrepController.OnDeckSelected(starterDeckId, true);
         }
     }
 

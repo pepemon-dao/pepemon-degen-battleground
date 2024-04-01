@@ -15,7 +15,7 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
-    [ReadOnly] public UnityEvent<ulong> onSelectDeck;
+    [ReadOnly] public UnityEvent<ulong, bool> onSelectDeck;
     private bool loadingInProgress = false;
 
     /// <summary>
@@ -66,7 +66,7 @@ public class DeckListLoader : MonoBehaviour
                 });
             deckInstance.GetComponent<DeckController>().onSelectButtonClicked.AddListener(
                 delegate {
-                    onSelectDeck?.Invoke(deckId);
+                    onSelectDeck?.Invoke(deckId, false);
                 });
 
             // this should set each deck detail in parallel
