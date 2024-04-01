@@ -92,7 +92,6 @@ public class MainMenuController : MonoBehaviour
             _startGameButton.interactable = true;
             ShowScreen(defaultScreenId);
         }
-        // assume that when an account was already selected, this scene was loaded after a battle that just ended
         else
         {
             ShowScreen(MainSceneScreensEnum.Menu);
