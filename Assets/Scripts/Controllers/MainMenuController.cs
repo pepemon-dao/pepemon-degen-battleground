@@ -50,13 +50,12 @@ public class MainMenuController : MonoBehaviour
     {
         if (PepemonFactoryCardCache.CardsIds.Count == 0)
         {
-            DeInitMainScene();
+            DeInitMainScene(true);
         }
         else if (PostBattleScreenController.IsGoingFromBattle)
         {
             PostBattleScreenController.IsGoingFromBattle = false;
-            _startGameButton.interactable = true;
-            ShowScreen(2);
+            DeInitMainScene(false);
         }
 
 
@@ -67,15 +66,32 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    private void DeInitMainScene()
+    private void DeInitMainScene(bool toLoad)
     {
         // assume that when no account was selected and his scene loads, its because the game just launched
+
+        /*
         if (Web3Controller.instance == null || Web3Controller.instance.SelectedAccountAddress == null)
         {
             _startGameButton.interactable = true;
             ShowScreen(defaultScreenId);
         }
         // assume that when an account was already selected, this scene was loaded after a battle that just ended
+        else
+        {
+            ShowScreen(MainSceneScreensEnum.Menu);
+            _startGameButton.interactable = true;
+            _manageDecksButton.interactable = true;
+            _leaderboardButton.interactable = true;
+        }
+
+        */
+
+        if (toLoad)
+        {
+            _startGameButton.interactable = true;
+            ShowScreen(defaultScreenId);
+        }
         else
         {
             ShowScreen(MainSceneScreensEnum.Menu);
