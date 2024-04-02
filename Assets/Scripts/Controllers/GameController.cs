@@ -107,9 +107,9 @@ public class GameController : MonoBehaviour
             ulong botStarterDeck = 10002;
             if (starterDeckID == botStarterDeck)
                 botStarterDeck = 10001;
-            ulong botStarterPepemon = 2;
-            if (pepemonStarterID == botStarterPepemon)
-                botStarterPepemon = 1;
+            ulong botStarterPepemon = 7;
+            //if (pepemonStarterID == botStarterPepemon)
+            //    botStarterPepemon = 1;
 
             BattlePrepController.battleData.player2BattleCard = botStarterPepemon;
             BattlePrepController.battleData.player2SupportCards = GetAllSupportCards(botStarterDeck);
