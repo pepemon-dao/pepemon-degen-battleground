@@ -8,14 +8,23 @@ using static PepemonFactory;
 
 public class DeckDisplay : MonoBehaviour
 {
-    [TitleGroup("Component References"), SerializeField] GameObject _supportCardPrefab;
-    [TitleGroup("Component References"), SerializeField] GameObject _supportCardList;
-    [TitleGroup("Component References"), SerializeField] GameObject _battleCardPrefab;
-    [TitleGroup("Component References"), SerializeField] GameObject _battleCardList;
+    [TitleGroup("Component References"), SerializeField]
+    GameObject _supportCardPrefab;
+
+    [TitleGroup("Component References"), SerializeField]
+    GameObject _supportCardList;
+
+    [TitleGroup("Component References"), SerializeField]
+    GameObject _battleCardPrefab;
+
+    [TitleGroup("Component References"), SerializeField]
+    GameObject _battleCardList;
+
 
     public ulong GetSelectedBattleCard()
     {
-        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
+        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()
+            ?.cardId ?? 0;
     }
 
     public void ClearBattleCardsList()
@@ -57,13 +66,16 @@ public class DeckDisplay : MonoBehaviour
         {
             if (supportCard.isSelected)
             {
-                result[supportCard.cardId] = result.ContainsKey(supportCard.cardId) ? result[supportCard.cardId] + 1 : 1;
+                result[supportCard.cardId] =
+                    result.ContainsKey(supportCard.cardId) ? result[supportCard.cardId] + 1 : 1;
             }
         }
+
         return result;
     }
 
-    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards)
+    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds,
+        Dictionary<ulong, int> selectedSupportCards)
     {
         // selected cards will appear first, makes it easier to de-select them
         foreach (var cardId in selectedSupportCards.Keys)
@@ -86,12 +98,13 @@ public class DeckDisplay : MonoBehaviour
             Debug.LogWarning("Invalid card");
             return;
         }
+
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
-        var cardAttribute = new CardAttribute 
-        { 
+        var cardAttribute = new CardAttribute
+        {
             value = isSupportCard ? "Pepemon Support" : "Pepemon Battle",
-            trait_type = "Set" 
+            trait_type = "Set"
         };
 
         // skip battlecards if isSupportCard=true and skip supportcards if isSupportCard=false
@@ -102,24 +115,34 @@ public class DeckDisplay : MonoBehaviour
 
         var prefab = _battleCardPrefab;
         var uiList = _battleCardList;
-        if(isSupportCard)
+        if (isSupportCard)
         {
             prefab = _supportCardPrefab;
-            uiList = _supportCardList;
+            uiList = _battleCardList;
         }
 
         for (int i = 0; i < count; i++)
         {
-            var cardInstance = Instantiate(prefab);
-            var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
-
-            cardInstance.transform.SetParent(uiList.transform, false);
-            cardPreviewComponent.LoadCardData(cardId);
-
-            // set checkmark
-            if (isSelected)
+            if (isSupportCard)
             {
-                cardPreviewComponent.ToggleSelected();
+                var cardInstance = Instantiate(prefab);
+                var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
+
+                cardInstance.transform.SetParent(uiList.transform, false);
+                cardPreviewComponent.LoadCardData(cardId);
+
+                cardInstance.GetComponent<CardPreview>().card = DeckManager.Instance.CardList.GetCardById(cardId);
+
+                CardData cardData = cardInstance.GetComponent<CardData>();
+
+                cardData.Card = DeckManager.Instance.CardList.GetCardById(cardId);
+
+
+                // set checkmark
+                if (isSelected)
+                {
+                    cardPreviewComponent.ToggleSelected();
+                }
             }
         }
     }

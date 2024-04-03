@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 4516655868441590206}
   - component: {fileID: 4516655868441590178}
   - component: {fileID: 4516655868441590176}
-  - component: {fileID: 4516655868441590207}
   - component: {fileID: -5894125579458932031}
+  - component: {fileID: 6802644863822063402}
+  - component: {fileID: 5923063646020584696}
   m_Layer: 5
   m_Name: BattleCardPreview
   m_TagString: Untagged
@@ -96,52 +97,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4516655868441590207}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SelectionItem, Assembly-CSharp
         m_MethodName: ToggleSelected
         m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!114 &4516655868441590207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4516655868441590205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 459e653f272d63543ad4abc352244567, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onSelected:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4516655869266700005}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  onDeselected:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4516655869266700005}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -165,6 +124,32 @@ MonoBehaviour:
   _cardImage: {fileID: 4516655869308334404}
   _text: {fileID: 5616305114283069979}
   _checkmark: {fileID: 0}
+  imagePreview: {fileID: 0}
+--- !u!114 &6802644863822063402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516655868441590205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2cc2d9aea4fdf944af8e66b0d46334d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5923063646020584696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516655868441590205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a707824db330eb04aa09ece29942c487, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  card: {fileID: 0}
 --- !u!1 &4516655869266700005
 GameObject:
   m_ObjectHideFlags: 0

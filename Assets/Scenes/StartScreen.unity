@@ -5734,7 +5734,7 @@ Animation:
   m_CullingType: 0
 --- !u!95 &1088413729
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5751,7 +5751,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1088413730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7777,7 +7778,7 @@ MonoBehaviour:
       - 0x0EA739B3c290E6194d37ba579948794cA0662705
     defaultChainId: 4002
     debugRpcUrl: https://rpc.testnet.fantom.network
-    debugPrivateKey: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+    debugPrivateKey: c873812afea72311b02c638e9ea88df59293991ce297435af5759bc5ad8bbd48
     readOnlyRpcUrl: https://rpc.testnet.fantom.network
   onWalletConnected:
     m_PersistentCalls:
@@ -8332,7 +8333,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 480.00003, y: -643.61444}
+  m_AnchoredPosition: {x: 480, y: -643.61444}
   m_SizeDelta: {x: 640, y: 640}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1379819351
@@ -12738,7 +12739,7 @@ RectTransform:
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &2133559652
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -12755,7 +12756,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!111 &2133559653
 Animation:
   m_ObjectHideFlags: 0

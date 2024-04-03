@@ -43,10 +43,22 @@ public class ScreenEditDeck : MonoBehaviour
 
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
         supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
-
+        
+        DeckManager.Instance.ClearCards();
+        
+        GameManager.Instance.SelectedDeck =  new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
+        
         deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
         _textLoading.SetActive(false);
+
+        
+
+        DeckManager.Instance.OldDeckCards = GameManager.Instance.SelectedDeck;
+        DeckManager.Instance.NewDeckCards = GameManager.Instance.SelectedDeck;
+        
+        
+        DeckManager.Instance.LoadDeckCards();
     }
 
     private void setButtonsInteractibleState(bool interactible)
@@ -91,15 +103,23 @@ public class ScreenEditDeck : MonoBehaviour
                 Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
             }
         }
-
         if (approvalOk)
         {
+            
+            /*
             GetSupportCardsDiff(
                 supportCards,
                 _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
                 out var supportCardsToBeAdded,
+                out var supportCardsToBeRemoved);*/
+            
+            GetSupportCardsDiff(
+                supportCards,
+                DeckManager.Instance.NewDeckCards,
+                out var supportCardsToBeAdded,
                 out var supportCardsToBeRemoved);
-
+            
+            
             // TODO: wait for transaction receipt
             await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
             await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());

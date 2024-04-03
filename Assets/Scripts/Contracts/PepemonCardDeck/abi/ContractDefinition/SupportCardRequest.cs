@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using System.Numerics;
 using Nethereum.Hex.HexTypes;
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using UnityEngine;
 
 namespace Contracts.PepemonCardDeck.abi.ContractDefinition
 {
+    [Serializable]
     public partial class SupportCardRequest : SupportCardRequestBase { }
-
+    [Serializable]
     public class SupportCardRequestBase 
     {
         [Parameter("uint256", "supportCardId", 1)]
-        public virtual BigInteger SupportCardId { get; set; }
+        [SerializeField] public virtual BigInteger SupportCardId { get; set; }
         [Parameter("uint256", "amount", 2)]
-        public virtual BigInteger Amount { get; set; }
+        [SerializeField]  public virtual BigInteger Amount { get; set; }
     }
 }

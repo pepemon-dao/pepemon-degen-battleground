@@ -44,5 +44,12 @@ namespace Pepemon.Battle
         {
             return Pepemons.FirstOrDefault(pepemon => pepemon.ID == id);
         }
+
+
+        public Card GetCardById(ulong id)
+        {
+            return Cards.FirstOrDefault(card => (ulong)card.ID == id); 
+        }
+        
     }
 }

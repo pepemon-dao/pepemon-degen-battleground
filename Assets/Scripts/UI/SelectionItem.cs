@@ -7,6 +7,8 @@ class SelectionItem : MonoBehaviour
     public UnityEvent onSelected;
     public UnityEvent onDeselected;
 
+    public bool isSelected;
+
     public void ToggleSelected()
     {
         GetComponentInParent<SelectionGroup>().ToggleSelected(this);
@@ -17,10 +19,12 @@ class SelectionItem : MonoBehaviour
         if (selected)
         {
             onSelected?.Invoke();
+            isSelected = true;
         }
         else
         {
             onDeselected?.Invoke();
+            isSelected = false;
         }
     }
 }
