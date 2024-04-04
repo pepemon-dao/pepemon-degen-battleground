@@ -47,6 +47,18 @@ public class ScreenEditDeck : MonoBehaviour
         deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
         _textLoading.SetActive(false);
+<<<<<<< Updated upstream
+=======
+
+        
+
+        DeckManager.Instance.OldDeckCards = GameManager.Instance.SelectedDeck;
+        DeckManager.Instance.NewDeckCards = GameManager.Instance.SelectedDeck;
+
+        DeckManager.Instance.SelectedDeckBattlecardID = battleCard;
+        
+        DeckManager.Instance.LoadDeckCards();
+>>>>>>> Stashed changes
     }
 
     private void setButtonsInteractibleState(bool interactible)
@@ -102,7 +114,8 @@ public class ScreenEditDeck : MonoBehaviour
 
             // TODO: wait for transaction receipt
             await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
-            await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
+           // await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
+           await UpdateBattlecard(GameManager.Instance.SelectedBattleCard);
         }
 
         setButtonsInteractibleState(true);
