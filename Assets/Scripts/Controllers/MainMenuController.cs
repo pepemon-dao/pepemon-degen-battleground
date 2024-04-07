@@ -66,7 +66,7 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    private void DeInitMainScene(bool toLoad)
+    private void DeInitMainScene(bool toLoadScreen)
     {
         // assume that when no account was selected and his scene loads, its because the game just launched
 
@@ -87,7 +87,9 @@ public class MainMenuController : MonoBehaviour
 
         */
 
-        if (toLoad)
+        // Show load screen in order to load cards into the PepemonFactoryCardCache.
+        // only necessary when launching the game from the battle scene
+        if (toLoadScreen)
         {
             _startGameButton.interactable = true;
             ShowScreen(defaultScreenId);

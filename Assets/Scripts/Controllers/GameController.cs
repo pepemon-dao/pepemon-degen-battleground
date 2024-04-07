@@ -78,14 +78,12 @@ public class GameController : MonoBehaviour
             // add console.log calls in the PepemonBattle.sol contract to get this seed
             BattlePrepController.battleData.battleRngSeed = BigInteger.Parse(
                 "68188038832262297884772284640717549873770515354422947402145954532168121309549");
-            //BattlePrepController.battleData.player1BattleCard = 1;
             BattlePrepController.battleData.player1BattleCard = 4;
             BattlePrepController.battleData.player1SupportCards = new OrderedDictionary<ulong, int>()
             {
                 [12] = 1,
                 [28] = 2
             };
-            //BattlePrepController.battleData.player2BattleCard = 2;
             BattlePrepController.battleData.player2BattleCard = 8;
             BattlePrepController.battleData.player2SupportCards = new OrderedDictionary<ulong, int>()
             {
@@ -108,8 +106,6 @@ public class GameController : MonoBehaviour
             if (starterDeckID == botStarterDeck)
                 botStarterDeck = 10001;
             ulong botStarterPepemon = 7;
-            //if (pepemonStarterID == botStarterPepemon)
-            //    botStarterPepemon = 1;
 
             BattlePrepController.battleData.player2BattleCard = botStarterPepemon;
             BattlePrepController.battleData.player2SupportCards = GetAllSupportCards(botStarterDeck);
@@ -124,6 +120,7 @@ public class GameController : MonoBehaviour
             supportCards: CardsScriptableObjsData.GetAllCardsByIds(BattlePrepController.battleData.player2SupportCards));
 
         BattlePrepController.battleData.currentPlayerIsPlayer1 = true;
+
         //resetting them
 
         if (Web3Controller.instance != null)
@@ -161,22 +158,16 @@ public class GameController : MonoBehaviour
 
     private void PrepareDecksBeforeBattle()
     {
-        ulong starterDeckID = 0;
-        if (Web3Controller.instance != null)
-            starterDeckID = Web3Controller.instance.StarterDeckID;
+        ulong starterDeckID = Web3Controller.instance?.StarterDeckID ?? 0;
 
+        // When player is going through the tutorial
         if (starterDeckID != 0)
         {
             PrepareSimulatedBattle(starterDeckID);
-            // when ran from Unity Editor. Set battleSeed and GameController cards to simulate a specific battle
-            Debug.LogWarning("Battle data not set from BattlePrepController");
-            battleSeed = 1;
+            battleSeed = new System.Random().NextBigInteger();
         }
         else
         {
-#if UNITY_EDITOR
-            PrepareSimulatedBattle(starterDeckID);
-#else
             // might be zero if ran from unity editor
             if (BattlePrepController.battleData.battleRngSeed != 0)
             {
@@ -196,7 +187,6 @@ public class GameController : MonoBehaviour
                 Debug.LogWarning("Battle data not set from BattlePrepController");
                 battleSeed = 1;
             }
-#endif
         }
         
     }
@@ -212,7 +202,7 @@ public class GameController : MonoBehaviour
     {
         _gameHasFinished = false;
         _currentAttacker = Attacker.PLAYER_ONE;
-        _roundNumber = 1;
+        _roundNumber = 0;
         _player1.Reset();
         _player2.Reset();
     }
@@ -220,7 +210,7 @@ public class GameController : MonoBehaviour
     // Each player shuffles their deck and draws cards equal to pepemon intelligence 
     void InitFirstRound()
     {
-        _roundNumber = 1;
+        _roundNumber = 0; // must start as 0
         _player1.Initialize();
         _player2.Initialize();
         _uiController.InitialiseGame(_player1, _player2);
@@ -732,7 +722,8 @@ public class GameController : MonoBehaviour
         return new(isTriggered, multiplier);
     }
 
-    public int GetRoundNumber() => _roundNumber;
+    // Used to display the current round. Note that current round must begin at 0 because its how it works in the blockchain
+    public int GetRoundNumber() => _roundNumber + 1;
 
 
     void BattleResut(Player winner)
