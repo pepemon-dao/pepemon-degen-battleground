@@ -5,7 +5,6 @@ using Sirenix.OdinInspector;
 using UnityEngine.UI;
 using TMPro;
 using Pepemon.Battle;
-using DG.Tweening;
 
 [System.Serializable]
 public class PepemonTypeData
@@ -23,7 +22,6 @@ public class PepemonCardController : MonoBehaviour
     [BoxGroup("Images"), SerializeField] private Image _footerImage;
     [BoxGroup("Images"), SerializeField] private Image _cardContentBackdrop;
     [BoxGroup("Images"), SerializeField] private Image _cardContent;
-    [BoxGroup("Images"), SerializeField] private Image _cardGlow;
 
     [BoxGroup("Text"), SerializeField] private TextMeshProUGUI _nameText;
     [BoxGroup("Text"), SerializeField] private TextMeshProUGUI _hpText;
@@ -37,12 +35,8 @@ public class PepemonCardController : MonoBehaviour
 
     [SerializeField] private List<PepemonTypeData> typeDatas = new List<PepemonTypeData>();
 
-    public BattleCard BattleCard { get; private set; }
-
     public void PopulateCard(BattleCard pepemonData)
     {
-        BattleCard = pepemonData;
-
         _nameText.text = pepemonData.name;
         _hpText.text = pepemonData.HealthPoints.ToString();
         _levelText.text = pepemonData.Level;
@@ -71,27 +65,11 @@ public class PepemonCardController : MonoBehaviour
             _backDropImage.sprite = pepemonData.CardContentBackdrop;
         }
         if (pepemonData.CardContent != null)
-        {
             _cardContent.sprite = pepemonData.CardContent;
-        }   
     }
 
     public void UpdateCard(Player player)
     {
         _hpText.text = player.CurrentHP.ToString();
-    }
-
-    public void ActivateCard(bool isAttacker)
-    {
-        Color color = isAttacker ? Color.red : Color.cyan;
-
-        _cardGlow.color = color;
-
-        _cardGlow.DOFade(0, 3f); 
-    }
-
-    public void DeActivateCard()
-    {
-        _cardGlow.DOFade(0, 2f);
     }
 }

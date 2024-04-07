@@ -248,7 +248,5 @@ public class BattlePrepController : MonoBehaviour
         public ulong player2BattleCard { get; set; }
         public IDictionary<ulong, int> player1SupportCards { get; set; }
         public IDictionary<ulong, int> player2SupportCards { get; set; }
-
-        public bool isBotMatch = false;
     }
 }
