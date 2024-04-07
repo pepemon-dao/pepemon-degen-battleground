@@ -121,17 +121,10 @@ public class GameController : MonoBehaviour
 
         BattlePrepController.battleData.currentPlayerIsPlayer1 = true;
 
-        BattlePrepController.battleData.isBotMatch = true;
-
         //resetting them
-
-        if (Web3Controller.instance != null)
-        {
-            Web3Controller.instance.StarterDeckID = 0;
-            Web3Controller.instance.StarterPepemonID = 0;
-            BattlePrepController.battleData.battleRngSeed = 0;
-        }
-        
+        Web3Controller.instance.StarterDeckID = 0;
+        Web3Controller.instance.StarterPepemonID = 0;
+        BattlePrepController.battleData.battleRngSeed = 0;
     }
 
     public IDictionary<ulong, int> GetAllSupportCards(ulong deckId)
@@ -189,8 +182,6 @@ public class GameController : MonoBehaviour
                 Debug.LogWarning("Battle data not set from BattlePrepController");
                 battleSeed = 1;
             }
-
-            BattlePrepController.battleData.isBotMatch = false;
         }
         
     }
@@ -242,8 +233,8 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
-        //if (_roundNumber <= 1)
-        //   yield return new WaitForSeconds(1.2f);
+        if (_roundNumber <= 1)
+            yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
         yield return new WaitForSeconds(1.6f);
         _uiController.HideNewRoundDisplay();
@@ -321,9 +312,6 @@ public class GameController : MonoBehaviour
                 {
                     _uiController.FlipCards(1);
 
-                    player1Controller.ActivateCard(true);
-                    player2Controller.ActivateCard(false);
-
                     //wait for animations showing the attacking/defending cards
                     yield return new WaitForSeconds(3f);
 
@@ -342,9 +330,6 @@ public class GameController : MonoBehaviour
                 else
                 {
                     _uiController.FlipCards(2);
-
-                    player1Controller.ActivateCard(false);
-                    player2Controller.ActivateCard(true);
 
                     yield return new WaitForSeconds(3f);
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
@@ -366,8 +351,6 @@ public class GameController : MonoBehaviour
 
                 // cleanup UI
                 _uiController.FlipCards(3);
-                player1Controller.DeActivateCard();
-                player2Controller.DeActivateCard();
                 Debug.Log(" after slow");
             }
         }
