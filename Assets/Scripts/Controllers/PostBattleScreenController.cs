@@ -69,11 +69,8 @@ public class PostBattleScreenController : MonoBehaviour
         _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
 
         // TODO: replace this with the actual gain/loss
-        ulong starterDeckID = 0;
-        if (Web3Controller.instance != null)
-            starterDeckID = Web3Controller.instance.StarterDeckID;
 
-        bool isBotMatch = starterDeckID != 0;
+        bool isBotMatch = BattlePrepController.battleData.isBotMatch;
         if (!isBotMatch)
         {
             _rewardDisplay.GetComponentInChildren<TextReveal>()
@@ -120,8 +117,6 @@ public class PostBattleScreenController : MonoBehaviour
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
 
-        if (Web3Controller.instance != null)
-            _btnClaimGift.gameObject.SetActive(!Web3Controller.instance.IsConnected);
         _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }
 

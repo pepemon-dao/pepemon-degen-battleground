@@ -121,6 +121,8 @@ public class GameController : MonoBehaviour
 
         BattlePrepController.battleData.currentPlayerIsPlayer1 = true;
 
+        BattlePrepController.battleData.isBotMatch = true;
+
         //resetting them
 
         if (Web3Controller.instance != null)
@@ -187,6 +189,8 @@ public class GameController : MonoBehaviour
                 Debug.LogWarning("Battle data not set from BattlePrepController");
                 battleSeed = 1;
             }
+
+            BattlePrepController.battleData.isBotMatch = false;
         }
         
     }
