@@ -35,7 +35,7 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] TextReveal _youWinLose;
     [SerializeField] GameObject _rewardDisplay;
     [SerializeField] Button _btnShowMenu;
-    [SerializeField] Button _btnConnectWallet;
+    [SerializeField] Button _btnClaimGift;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
@@ -60,7 +60,7 @@ public class PostBattleScreenController : MonoBehaviour
 
     #region EndTransitionBackToMenu
     public static bool IsGoingFromBattle = false;
-    public static bool IsConnectingWallet = false;
+    public static bool IsClaimingGift = false;
     #endregion
 
     public void SetResult(bool win)
@@ -69,8 +69,18 @@ public class PostBattleScreenController : MonoBehaviour
         _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
 
         // TODO: replace this with the actual gain/loss
-        _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText( (win? RANKING_GAIN: RANKING_LOSS).Replace("#", "10") );
+
+        bool isBotMatch = BattlePrepController.battleData.isBotMatch;
+        if (!isBotMatch)
+        {
+            _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
+        }
+        else
+        {
+            _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText(win ? "Gained Starter Pack" : "");
+        }
     }
 
     public void LoadPepemonDisplay(ulong cardId)
@@ -81,18 +91,16 @@ public class PostBattleScreenController : MonoBehaviour
     public void OnBtnShowMenuClick()
     {
         // go back to previous scene
-        // TODO: skip loading screen
         IsGoingFromBattle = true;
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
     
-    public void OnBtnConnectWalletClick()
+    public void OnBtnClaimGiftClick()
     {
         // go back to previous scene
-        // TODO: skip loading screen
         IsGoingFromBattle = true;
-        IsConnectingWallet = true;
+        IsClaimingGift = true;
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
@@ -109,8 +117,7 @@ public class PostBattleScreenController : MonoBehaviour
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
 
-        _btnConnectWallet.gameObject.SetActive(!Web3Controller.instance.IsConnected);
-        _btnConnectWallet.onClick.AddListener(OnBtnConnectWalletClick);
+        _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }
 
     private void OnValidate()
