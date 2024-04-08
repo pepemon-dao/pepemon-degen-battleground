@@ -38,6 +38,8 @@ public class CardController : MonoBehaviour
     [ReadOnly] public Card HostedCard;
 
     private Transform _targetPostion;        //the target transform in the layout group this card will lerp to
+    private Vector3 _targetScale;
+    private Vector3 _startingScale;
     private Vector3 _startingTargetPosition = Vector3.zero;  //the position to return to after being highlighted
 
     public void PopulateCard(Card card)
@@ -87,6 +89,9 @@ public class CardController : MonoBehaviour
         }
 
         _cardFrameImage.sprite = card.CardEffectSprite;
+
+        _startingScale = transform.localScale;
+        _targetScale = _startingScale;
     }
 
     public void SetTargetTransform(Transform _target)
@@ -107,6 +112,8 @@ public class CardController : MonoBehaviour
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z - 15f);
             _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
+
+            _targetScale = _startingScale * 1.2f;
         }
         else if (attackIndex == 2)
         {
@@ -115,6 +122,8 @@ public class CardController : MonoBehaviour
             _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 5f, _targetPostion.position.z - 15f);
             _cardGlow.DOFade(1, .2f);
             transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
+
+            _targetScale = _startingScale * 1.2f;
         }
     }
 
@@ -128,6 +137,7 @@ public class CardController : MonoBehaviour
         if (_startingTargetPosition != Vector3.zero)
             _targetPostion.position = _startingTargetPosition;
 
+        _targetScale = _startingScale;
     }
 
     void Update()
@@ -135,5 +145,6 @@ public class CardController : MonoBehaviour
         //lerp to target position on UI
 
         transform.position = Vector3.Lerp(transform.position, _targetPostion.position, 5 * Time.deltaTime);
+        transform.localScale = Vector3.Lerp(transform.localScale, _targetScale, 5 * Time.deltaTime);
     }
 }
