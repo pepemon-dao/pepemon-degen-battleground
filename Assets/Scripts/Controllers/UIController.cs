@@ -49,7 +49,7 @@ public class UIController : MonoBehaviour
     {
         _player1 = player1;
         _player2 = player2;
-        _sidebar = GameObject.Find("Sidebar").transform;
+        _sidebar = _board.Find("Sidebar");
 
         UpdateUI();
 
@@ -168,14 +168,14 @@ public class UIController : MonoBehaviour
             {
                 _player2Cards[i].ReturnToBaseTransform();
 
-                _player2Cards[i].GetComponent<Image>().color = Color.gray;
+                _player2Cards[i].GetComponent<Image>().color = Color.black;
             }
 
             for (int i = 0; i < _player1Cards.Count; i++)
             {
                 _player1Cards[i].ReturnToBaseTransform();
 
-                _player1Cards[i].GetComponent<Image>().color = Color.gray;
+                _player1Cards[i].GetComponent<Image>().color = Color.black;
             }
         }
 
