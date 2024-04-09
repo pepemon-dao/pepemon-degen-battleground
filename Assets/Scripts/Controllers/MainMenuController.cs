@@ -59,10 +59,10 @@ public class MainMenuController : MonoBehaviour
         }
 
 
-        if (PostBattleScreenController.IsConnectingWallet)
+        if (PostBattleScreenController.IsClaimingGift)
         {
-            PostBattleScreenController.IsConnectingWallet = false;
-            OnConnectWalletButtonClick();
+            PostBattleScreenController.IsClaimingGift = false;
+            //claim gift
         }
     }
 
