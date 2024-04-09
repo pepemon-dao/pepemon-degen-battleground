@@ -1,10 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+<<<<<<< Updated upstream
+=======
+using System.Diagnostics;
+using Pepemon.Battle;
+>>>>>>> Stashed changes
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static PepemonFactory;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// MonoBehavior for BattleCardTemplate and SupportCardTemplate
@@ -14,7 +20,25 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
     [BoxGroup("Card Components"), SerializeField] public TMP_Text _text;
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
+<<<<<<< Updated upstream
     public ulong cardId { get; private set; }
+=======
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text cardTypeText;
+    [BoxGroup("Card Components"), SerializeField] public Image cardTypeImage;
+    [Header("Icons")]
+    [BoxGroup("Card Components"), SerializeField] public Sprite offenseIcon;
+    [BoxGroup("Card Components"), SerializeField] public Sprite defenseIcon;
+    [BoxGroup("Card Components"), SerializeField] public Sprite monsterIcon;
+    
+    
+    public ulong cardId { get; private set; }
+    
+   [SerializeField] public ulong id { get;  set; }
+   
+   [SerializeField] public Card card { get;  set; }
+   
+   public BattleCard battleCard{ get;  set; }
+>>>>>>> Stashed changes
     public bool isSelected { get =>  GetComponentInParent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
 
     public void ToggleSelected()
@@ -26,6 +50,23 @@ public class CardPreview : MonoBehaviour
     public void LoadCardData(ulong cardId)
     {
         this.cardId = cardId;
+<<<<<<< Updated upstream
+=======
+        id = cardId;
+
+        bool isSupportCard = GetComponent<CardData>().IsSupportCard;
+
+        if (isSupportCard)
+        {
+            card = GetComponent<CardData>().Card;
+        }
+        else
+        {
+            battleCard = GetComponent<CardData>().BattleCard;
+        }
+      
+        
+>>>>>>> Stashed changes
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
         // set card image. blank if not found
@@ -47,5 +88,38 @@ public class CardPreview : MonoBehaviour
             new Vector2());
 
         _text.text = metadata?.name ?? "Unknown Card";
+
+        if (isSupportCard)
+        {
+            switch (card.Type)
+            {
+                case PlayCardType.Offense:
+                    cardTypeText.text = "Offense";
+                    cardTypeImage.sprite = offenseIcon;
+                    break;
+                case PlayCardType.SpecialOffense:
+                    cardTypeText.text = "S.Offense";
+                    cardTypeImage.sprite = offenseIcon;
+                    break;
+                case PlayCardType.Defense:
+                    cardTypeText.text = "Defense";
+                    cardTypeImage.sprite = defenseIcon;
+                    break;
+                case PlayCardType.SpecialDefense:
+                    cardTypeText.text = "S.Defense";
+                    cardTypeImage.sprite = defenseIcon;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        else
+        {
+            cardTypeText.text = "Monster";
+            cardTypeImage.sprite = monsterIcon;
+        }
+        
+      
+        
     }
 }

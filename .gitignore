@@ -66,3 +66,4 @@ crashlytics-build.properties\
 
 # Ignore artifacts folder
 artifacts/
+/.plastic
