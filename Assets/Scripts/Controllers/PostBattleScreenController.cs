@@ -81,6 +81,8 @@ public class PostBattleScreenController : MonoBehaviour
             _rewardDisplay.GetComponentInChildren<TextReveal>()
             .SetText(win ? "Gained Starter Pack" : "");
         }
+
+        _btnClaimGift.gameObject.SetActive(isBotMatch);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
