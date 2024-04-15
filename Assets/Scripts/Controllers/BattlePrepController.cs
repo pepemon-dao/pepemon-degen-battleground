@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -64,7 +64,7 @@ public class BattlePrepController : MonoBehaviour
         // SetApprovalForAll for CardDeck
         await EnsureDeckTransferApproved();
 
-        var blockNumber = await new BlockParameter().RequestLatestBlockNumber();
+        var blockNumber = new BlockParameter();
 
         // filter events starting from the next block, to avoid possibly getting the last battle of the player
         var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());

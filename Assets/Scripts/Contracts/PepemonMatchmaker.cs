@@ -1,7 +1,7 @@
 using Contracts.PepemonMatchmaker.abi.ContractDefinition;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ public class PepemonMatchmaker
 
     public static async Task<string> GetDeckOwner(PepemonLeagues league, ulong deckId)
     {
-        var request = new QueryUnityRequest<DeckOwnerFunction, DeckOwnerOutputDTO>(
+        /*var request = new QueryUnityRequest<DeckOwnerFunction, DeckOwnerOutputDTO>(
         Web3Controller.instance.GetUnityRpcRequestClientFactory(),
         Web3Controller.instance.SelectedAccountAddress);
 
@@ -31,7 +31,10 @@ public class PepemonMatchmaker
             new DeckOwnerFunction { DeckId = deckId },
             Addresses[(int)league]);
 
-        return response.ReturnValue1;
+        return response.ReturnValue1;*/
+
+        await Task.Delay(1);
+        return "";
     }
 
     public static async Task<uint> GetBattleFinishedEvents(
@@ -41,7 +44,7 @@ public class PepemonMatchmaker
         BlockParameter from,
         BlockParameter to)
     {
-        var eventLogs = await new BattleFinishedEventDTO()
+        /*var eventLogs = await new BattleFinishedEventDTO()
             .GetEventABI()
             .CreateFilterInput(
                 Addresses[(int)league],
@@ -52,11 +55,15 @@ public class PepemonMatchmaker
              )
             .GetEventsAsync<BattleFinishedEventDTO>();
 
-        return (uint)eventLogs.Last().Event.BattleId;
+        return (uint)eventLogs.Last().Event.BattleId;*/
+
+        await Task.Delay(1);
+        return 0;
     }
 
     public static async Task<ulong> GetLeaderboardPlayersCount(PepemonLeagues league)
     {
+        /*
         var request = new QueryUnityRequest<LeaderboardPlayersCountFunction, LeaderboardPlayersCountOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
@@ -64,11 +71,16 @@ public class PepemonMatchmaker
         var response = await request.QueryAsync(new LeaderboardPlayersCountFunction(), Addresses[(int)league]);
 
         return response.Count;
+        */
+
+        await Task.Delay(1);
+        return 0L;
     }
 
     public static async Task<List<(string Address, ulong Ranking)>> GetPlayersRankings(
         PepemonLeagues league, ulong count = 10, ulong offset = 0)
     {
+        /*
         var request = new QueryUnityRequest<GetPlayersRankingsFunction, GetPlayersRankingsOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
@@ -88,13 +100,15 @@ public class PepemonMatchmaker
         {
             playersRankings.Add((response.Addresses[i], response.Rankings[i]));
         }
-        return playersRankings;
+        return playersRankings;*/
+        await Task.Delay(1);
+        return new List<(string Address, ulong Ranking)>();
     }
 
 
     public static async Task<bool> Enter(PepemonLeagues league, ulong deckId)
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         var result = await request.SendTransactionAndWaitForReceiptAsync(
             new EnterFunction()
             {
@@ -102,17 +116,22 @@ public class PepemonMatchmaker
                 Gas = BattleGasLimit > 0 ? BattleGasLimit : null
             },
             Addresses[(int)league]);
-        return result.Succeeded();
+        return result.Succeeded();*/
+
+        await Task.Delay(1);
+        return true;
     }
 
     public static async Task Exit(PepemonLeagues league, ulong deckId)
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         await request.SendTransactionAndWaitForReceiptAsync(
             new ExitFunction()
             {
                 DeckId = deckId,
             },
-            Addresses[(int)league]);
+            Addresses[(int)league]);*/
+
+        await Task.Delay(1);
     }
 }

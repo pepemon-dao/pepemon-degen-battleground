@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nethereum.Contracts.Standards.ERC1155.ContractDefinition;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 
 public abstract class ERC1155Common
 {
@@ -15,7 +15,7 @@ public abstract class ERC1155Common
     /// <returns>result of IsApprovedForAll</returns>
     protected static async Task<bool> GetApproval(string contractAddress, string operatorAddress)
     {
-        var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
+        /*var request = new QueryUnityRequest<IsApprovedForAllFunction, IsApprovedForAllOutputDTO>(
            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
            Web3Controller.instance.SelectedAccountAddress);
 
@@ -25,9 +25,9 @@ public abstract class ERC1155Common
                 Account = Web3Controller.instance.SelectedAccountAddress,
                 Operator = operatorAddress
             },
-            contractAddress);
-
-        return response.ReturnValue1;
+            contractAddress);*/
+        await Task.Delay(1);
+        return true;//response.ReturnValue1;
     }
 
     /// <summary>
@@ -38,14 +38,16 @@ public abstract class ERC1155Common
     /// <returns>Transaction hash</returns>
     protected static async Task SetApproval(string contractAddress, bool approved, string operatorAddress)
     {
-        var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var approvalRequest = Web3Controller.instance.GetContractTransactionUnityRequest();
         await approvalRequest.SendTransactionAndWaitForReceiptAsync(
             new SetApprovalForAllFunction()
             {
                 Operator = operatorAddress,
                 Approved = approved
             },
-            contractAddress);
+            contractAddress);*/
+
+        await Task.Delay(1);
     }
 }
 

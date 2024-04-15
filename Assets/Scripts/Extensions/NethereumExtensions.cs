@@ -1,7 +1,7 @@
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
-using Nethereum.Unity.Contracts;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Contracts;
+//using Nethereum.Unity.Rpc;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Nethereum.RPC.Eth.DTOs;
@@ -16,6 +16,7 @@ public static class NethereumExtensions
     private const float TX_POLLING_INTERVAL_S = 0.25f;
     private const int EVENT_POLLING_INTERVAL_MS = 2000;
 
+    /*
     public static async Task<TResponse> QueryAsync<TFunctionMessage, TResponse>(this QueryUnityRequest<TFunctionMessage, TResponse> request,
                                                                                 TFunctionMessage functionMessage,
                                                                                 string contractAddress)
@@ -137,4 +138,5 @@ public static class NethereumExtensions
 
         return eventLogs;
     }
+    */
 }

@@ -1,13 +1,13 @@
 ﻿using Nethereum.Hex.HexTypes;
-using Nethereum.Unity.Contracts;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Contracts;
+//using Nethereum.Unity.Rpc;
 using Nethereum.Web3.Accounts;
 using UnityEngine;
 using UnityEngine.Events;
 #if !UNITY_EDITOR
-using Nethereum.Unity.Metamask;
-using Nethereum.RPC.HostWallet;
-using System.Collections.Generic;
+//using Nethereum.Unity.Metamask;
+//using Nethereum.RPC.HostWallet;
+//using System.Collections.Generic;
 #endif
 using Nethereum.RPC.Eth.DTOs;
 using Cysharp.Threading.Tasks;
@@ -89,7 +89,7 @@ public class Web3Controller : MonoBehaviour
     {
         Debug.Log("Trying to connect");
 #if !UNITY_EDITOR
-        OpenMetamaskConnectDialog();
+        //OpenMetamaskConnectDialog();
 #else
         Account debugAccount = new Account(settings.debugPrivateKey);
         NewAccountSelected(debugAccount.Address);
@@ -106,7 +106,7 @@ public class Web3Controller : MonoBehaviour
     /// <summary>
     /// Used with QueryUnityRequest to query contract functions (READ operations)
     /// </summary>
-    public IUnityRpcRequestClientFactory GetUnityRpcRequestClientFactory()
+    /*public IUnityRpcRequestClientFactory GetUnityRpcRequestClientFactory()
     {
 #if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable()) 
@@ -121,20 +121,20 @@ public class Web3Controller : MonoBehaviour
 #else
         return new UnityWebRequestRpcClientFactory(settings.debugRpcUrl);
 #endif
-    }
+    }*/
 
     /// <summary>
     /// Used with QueryUnityRequest to query contract functions (READ operations)
     /// </summary>
-    public IUnityRpcRequestClientFactory GetReadOnlyRpcRequestClientFactory()
+    /*public IUnityRpcRequestClientFactory GetReadOnlyRpcRequestClientFactory()
     {
         return new UnityWebRequestRpcClientFactory(settings.readOnlyRpcUrl);
-    }
+    }*/
 
     /// <summary>
     /// Used to invoke contract functions (WRITE operations)
     /// </summary>
-    public IContractTransactionUnityRequest GetContractTransactionUnityRequest()
+    /*public IContractTransactionUnityRequest GetContractTransactionUnityRequest()
     {
 #if !UNITY_EDITOR
         if (MetamaskInterop.IsMetamaskAvailable())
@@ -152,20 +152,20 @@ public class Web3Controller : MonoBehaviour
             privateKey: settings.debugPrivateKey,
             chainId: settings.defaultChainId);
 #endif
-    }
+    }*/
 
     // connect wallet in WebGL
     private void OpenMetamaskConnectDialog()
     {
 #if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable())
+        /*if (MetamaskInterop.IsMetamaskAvailable())
         {
             MetamaskInterop.EnableEthereum(Web3Controller.instance.name, nameof(EthereumEnabled), nameof(DisplayError));
         }
         else
         {
             DisplayError("Metamask is not available, please install it");
-        }
+        }*/
 #endif
     }
 
@@ -173,7 +173,7 @@ public class Web3Controller : MonoBehaviour
     public async void EthereumEnabled(string addressSelected)
     {
 #if !UNITY_EDITOR
-        if (!_isMetamaskInitialised)
+        /*if (!_isMetamaskInitialised)
         {
             MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
             MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
@@ -181,7 +181,8 @@ public class Web3Controller : MonoBehaviour
         }
         onWalletConnected?.Invoke();
         NewAccountSelected(addressSelected);
-        IsConnected = true;
+        IsConnected = true;*/
+        await Task.CompletedTask;
 #else
         await Task.CompletedTask;
 #endif
@@ -202,7 +203,7 @@ public class Web3Controller : MonoBehaviour
     private async Task SwitchChain(int chainId)
     {
 #if !UNITY_EDITOR
-        var addRequest = new WalletAddEthereumChainUnityRequest(GetUnityRpcRequestClientFactory());
+        /*var addRequest = new WalletAddEthereumChainUnityRequest(GetUnityRpcRequestClientFactory());
 
         var config = settings.GetChainConfig(chainId);
         var chainParams = new AddEthereumChainParameter
@@ -217,7 +218,9 @@ public class Web3Controller : MonoBehaviour
                 Decimals = config.chainCurrencyDecimals
             }
         };
-        await addRequest.SendRequest(chainParams);
+        await addRequest.SendRequest(chainParams);*/
+        
+        await Task.CompletedTask;
 #else
         await Task.CompletedTask;
 #endif
@@ -241,7 +244,7 @@ public class Web3Controller : MonoBehaviour
         Debug.LogError(errorMessage);
     }
 
-    public static async Task<TransactionReceipt> GetTransactionReceipt(string transactionHash)
+    /*public static async Task<TransactionReceipt> GetTransactionReceipt(string transactionHash)
     {
         var request = new TransactionReceiptPollingRequest(instance.GetUnityRpcRequestClientFactory());
         await request.PollForReceipt(transactionHash, 0.25f);
@@ -250,5 +253,5 @@ public class Web3Controller : MonoBehaviour
             return request.Result;
         }
         throw request.Exception;
-    }
+    }*/
 }

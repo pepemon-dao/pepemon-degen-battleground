@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 
 // The ABI definitions were generated using this command:
 // Nethereum.Generator.Console generate from-abi --abiPath C:\Projects\pepemon-battle-degen\Assets\Resources\abi\PepemonCardDeck.abi.json --outputPath C:\Projects\pepemon-battle-degen\Assets\Scripts\Contracts\ --namespace Contracts
@@ -20,19 +20,21 @@ public class PepemonCardDeck : ERC1155Common
     // reference implementation for Read operations: https://github.com/Nethereum/Nethereum/blob/master/src/Nethereum.Unity/Contracts/Standards/ERC721/NFTsOfUserUnityRequest.cs
     public static async Task<ulong> GetBattleCard(ulong deckId)
     {
-        var request = new QueryUnityRequest<GetBattleCardInDeckFunction, GetBattleCardInDeckOutputDTO>(
-            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
+        /* var request = new QueryUnityRequest<GetBattleCardInDeckFunction, GetBattleCardInDeckOutputDTO>(
+             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
+             Web3Controller.instance.SelectedAccountAddress);
 
-        var response = await request.QueryAsync(
-                    new GetBattleCardInDeckFunction { DeckId = deckId },
-                    Address);
-        return (ulong)response.ReturnValue1;
+         var response = await request.QueryAsync(
+                     new GetBattleCardInDeckFunction { DeckId = deckId },
+                     Address);*/
+
+        await Task.Delay(1);
+        return (ulong)0;//response.ReturnValue1;
     }
 
     public static async Task<IDictionary<ulong, int>> GetAllSupportCards(ulong deckId)
     {
-        var request = new QueryUnityRequest<GetAllSupportCardsInDeckFunction, GetAllSupportCardsInDeckOutputDTO>(
+        /*var request = new QueryUnityRequest<GetAllSupportCardsInDeckFunction, GetAllSupportCardsInDeckOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
@@ -44,13 +46,15 @@ public class PepemonCardDeck : ERC1155Common
         foreach (var card in response.SupportCards)
         {
             result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
-        }
-        return result;
+        }*/
+
+        await Task.Delay(1);
+        return new Dictionary<ulong, int>();//result;
     }
 
     public static async Task<List<ulong>> GetPlayerDecks(string address)
     {
-        var getDeckCountRequest = new QueryUnityRequest<GetDeckCountFunction, GetDeckCountOutputDTO>(
+        /*var getDeckCountRequest = new QueryUnityRequest<GetDeckCountFunction, GetDeckCountOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
@@ -76,19 +80,22 @@ public class PepemonCardDeck : ERC1155Common
                 Address);
 
             deckIds.Add((ulong)playerToDecksResponse.DeckId);
-        }
+        }*/
 
-        return deckIds;
+        await Task.Delay(1);
+        return new List<ulong>(); //deckIds;
     }
 
     public static async Task<ulong> GetMaxSupportCards()
     {
-        var request = new QueryUnityRequest<MaxSupportCardsFunction, MaxSupportCardsOutputDTO>(
+
+        await Task.Delay(1);
+        /*var request = new QueryUnityRequest<MaxSupportCardsFunction, MaxSupportCardsOutputDTO>(
            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
            Web3Controller.instance.SelectedAccountAddress);
 
-        var response = await request.QueryAsync(new MaxSupportCardsFunction(), Address);
-        return (ulong)response.ReturnValue1;
+        var response = await request.QueryAsync(new MaxSupportCardsFunction(), Address);*/
+        return (ulong)0;//response.ReturnValue1;
     }
 
     public static async Task<bool> GetApprovalState(string operatorAddress)
@@ -106,20 +113,24 @@ public class PepemonCardDeck : ERC1155Common
 
     public static async Task MintCards()
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SendTransactionAndWaitForReceiptAsync(new MintCardsFunction(), Address);
+        //var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        //await request.SendTransactionAndWaitForReceiptAsync(new MintCardsFunction(), Address);
+
+        await Task.Delay(1);
     }
 
     public static async Task CreateDeck()
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        //var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         // note: deck is created using the sender's address
-        await request.SendTransactionAndWaitForReceiptAsync(new CreateDeckFunction(), Address);
+        //await request.SendTransactionAndWaitForReceiptAsync(new CreateDeckFunction(), Address);
+
+        await Task.Delay(1);
     }
 
     public static async Task SetBattleCard(ulong deckId, ulong battleCardId)
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         await request.SendTransactionAndWaitForReceiptAsync(
             new AddBattleCardToDeckFunction()
             {
@@ -127,12 +138,17 @@ public class PepemonCardDeck : ERC1155Common
                 BattleCardId = battleCardId,
             },
             Address);
+        */
+
+        await Task.Delay(1);
     }
 
     public static async Task RemoveBattleCard(ulong deckId)
     {
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
-        await request.SendTransactionAndWaitForReceiptAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
+        //var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        //await request.SendTransactionAndWaitForReceiptAsync(new RemoveBattleCardFromDeckFunction() { DeckId = deckId }, Address);
+
+        await Task.Delay(1);
     }
 
     /// <summary>
@@ -142,14 +158,16 @@ public class PepemonCardDeck : ERC1155Common
     {
         // TODO: Check if max support cards will be reached
         // TODO: Check if the player has the cards
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         await request.SendTransactionAndWaitForReceiptAsync(
             new AddSupportCardsToDeckFunction()
             {
                 DeckId = deckId,
                 SupportCards = new List<SupportCardRequest>(requests),
             },
-            Address);
+            Address);*/
+
+        await Task.Delay(1);
     }
 
     /// <summary>
@@ -158,13 +176,15 @@ public class PepemonCardDeck : ERC1155Common
     public static async Task RemoveSupportCards(ulong deckId, params SupportCardRequest[] requests)
     {
         // TODO: Check if the deck has requested cards before removing
-        var request = Web3Controller.instance.GetContractTransactionUnityRequest();
+        /*var request = Web3Controller.instance.GetContractTransactionUnityRequest();
         await request.SendTransactionAndWaitForReceiptAsync(
             new RemoveSupportCardsFromDeckFunction()
             {
                 DeckId = deckId,
                 SupportCards = new List<SupportCardRequest>(requests),
             },
-            Address);
+            Address);*/
+
+        await Task.Delay(1);
     }
 }

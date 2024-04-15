@@ -1,5 +1,5 @@
 using Contracts.PepemonFactory.abi.ContractDefinition;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,8 @@ class PepemonFactory : ERC1155Common
     /// <returns></returns>
     public static async Task<CardMetadata?> GetCardMetadata(ulong tokenId)
     {
-        var request = new QueryUnityRequest<UriFunction, UriOutputDTO>(
+        await Task.Delay(1);
+        /*var request = new QueryUnityRequest<UriFunction, UriOutputDTO>(
             Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
@@ -48,7 +49,7 @@ class PepemonFactory : ERC1155Common
             var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(regexGroups[1].Value));
             return JsonUtility.FromJson<CardMetadata>(decoded);
         }
-        Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);
+        Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);*/
         return null;
     }
 
@@ -60,7 +61,7 @@ class PepemonFactory : ERC1155Common
     /// <returns>List of IDs of owned cards</returns>
     public static async Task<Dictionary<ulong, int>> GetOwnedCards(string address, List<ulong> tokenIds)
     {
-        var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
+        /*var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
@@ -78,25 +79,31 @@ class PepemonFactory : ERC1155Common
             if (response.ReturnValue1[i] > 0)
                 ownedCards[tokenIds[i]] = (int)response.ReturnValue1[i];
 
-        return ownedCards;
+        return ownedCards;*/
+
+        await Task.Delay(1);
+        return new Dictionary<ulong, int>();
     }
 
     public static async Task<BigInteger> GetTokenSupply(ulong tokenId)
     {
-        var request = new QueryUnityRequest<TotalSupplyFunction, TotalSupplyOutputDTO>(
+        /*var request = new QueryUnityRequest<TotalSupplyFunction, TotalSupplyOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
         var response = await request.QueryAsync(new TotalSupplyFunction { Id = tokenId }, Address);
-        return response.ReturnValue1;
+        return response.ReturnValue1;*/
+
+        await Task.Delay(1);
+        return BigInteger.One;
     }
 
     public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 5)
     {
-        ulong batch = 0;
+        //ulong batch = 0;
         ulong maxTokenId = 0;
-        ulong batchTokenMaxId = 0;
-
+        //ulong batchTokenMaxId = 0;
+        /*
         do
         {
             batchTokenMaxId = 0;
@@ -113,7 +120,9 @@ class PepemonFactory : ERC1155Common
             maxTokenId = Math.Max(maxTokenId, batchTokenMaxId);
             batch++;
         } while (batchTokenMaxId > 0);
+        */
 
+        await Task.Delay(1);
         return maxTokenId;
     }
 

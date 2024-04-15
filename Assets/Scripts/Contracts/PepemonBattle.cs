@@ -1,6 +1,6 @@
 ﻿using Contracts.PepemonBattle.abi.ContractDefinition;
 using Nethereum.Contracts;
-using Nethereum.Unity.Rpc;
+//using Nethereum.Unity.Rpc;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,15 +22,16 @@ class PepemonBattle
     /// <returns>The uint256 seed if the battle exists, 0 if the battle does not exists</returns>
     public static async Task<BigInteger> GetBattleRNGSeed(ulong battleId)
     {
-        var request = new QueryUnityRequest<BattleIdRNGSeedFunction, BattleIdRNGSeedOutputDTO>(
+        /*var request = new QueryUnityRequest<BattleIdRNGSeedFunction, BattleIdRNGSeedOutputDTO>(
             Web3Controller.instance.GetUnityRpcRequestClientFactory(),
             Web3Controller.instance.SelectedAccountAddress);
 
         var response = await request.QueryAsync(
             new BattleIdRNGSeedFunction { BattleId = battleId },
-            Address);
-
-        return response.Seed;
+            Address);*/
+        
+        await Task.Delay(1);
+        return BigInteger.Zero;//response.Seed;
     }
 
     /// <summary>
@@ -48,7 +49,7 @@ class PepemonBattle
         BlockParameter from,
         CancellationToken cancellationToken)
     {
-        var eventLogs = await new BattleCreatedEventDTO()
+        /*var eventLogs = await new BattleCreatedEventDTO()
             .GetEventABI()
             .CreateFilterInput(Address, playerAddr1, playerAddr2, from, null)
             .WaitForEventAsync<BattleCreatedEventDTO>(token: cancellationToken);
@@ -66,6 +67,15 @@ class PepemonBattle
             Player2Addr = lastEvent.Player2Addr,
             Player1Deck = (ulong)lastEvent.Player1Deck,
             Player2Deck = (ulong)lastEvent.Player2Deck,
+        };*/
+        await Task.CompletedTask;
+        return new BattleCreatedEventData()
+        {
+            BattleId = default,
+            Player1Addr = default,
+            Player2Addr = default,
+            Player1Deck = default,
+            Player2Deck = default,
         };
     }
 
