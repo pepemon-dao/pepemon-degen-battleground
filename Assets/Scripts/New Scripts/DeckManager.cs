@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Contracts.PepemonCardDeck.abi.ContractDefinition;
+using Nethereum.RPC.DebugNode;
 using Org.BouncyCastle.Crypto.Engines;
 using Pepemon.Battle;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DeckManager : MonoBehaviour
@@ -18,12 +22,32 @@ public class DeckManager : MonoBehaviour
     [SerializeField] private GameObject battleCardPreview;
     [SerializeField] private GameObject supportCardPreview;
 
+    [SerializeField] private GameObject slotPrefab;
+
     [SerializeField] private DataContainer cardList;
+
+    [SerializeField] private Image deckCardImage;
+
+    [SerializeField] private TextMeshProUGUI cardsInDeckText;
+
+    [Header("No Cards Variables")] [SerializeField]
+    private GameObject ownedCardsButtons;
+
+    [SerializeField] private GameObject offenseCardsButtons;
+    [SerializeField] private GameObject defenseCardsButtons;
+    [SerializeField] private GameObject noOwnedCardsGameObject;
+    [SerializeField] private GameObject noOffenseCardsGameObject;
+    [SerializeField] private GameObject noDefenseCardsGameObject;
 
     private Dictionary<ulong, int> oldDeckCards = new Dictionary<ulong, int>();
     private Dictionary<ulong, int> newDeckCards = new Dictionary<ulong, int>();
+
+    private ulong selectedDeckBattlecardID;
     
     private GridLayoutGroup ownedCardsGridLayout;
+
+
+    private int numberOfCardsInDeck = 0;
     
     private void Awake()
     {
@@ -34,6 +58,43 @@ public class DeckManager : MonoBehaviour
     }
 
 
+    private void Start()
+    {
+        numberOfCardsInDeck = 0;
+    }
+
+
+    private void Update()
+    {
+        if (ownedCardList.childCount == 0)
+        {
+            ShowNoOwnedCardsText();
+        }
+        else
+        {
+            HideNoOwnedCardsText();
+        }
+
+
+        if (GetNumberOfOffensiveCardsInDeck() == 0)
+        {
+            ShowNoOffenseCardsText();
+        }
+        else
+        {
+            HideNoOffensiveCardsText();
+        }
+
+
+        if (GetNumberOfSupportCardsInDeck() == 0)
+        {
+            ShowNoDefensiveCardsText();
+        }
+        else
+        {
+            HideNoDefensiveCardsText();
+        }
+    }
 
 
     public void AddCard(Card card, CardPreview cardPreview)
@@ -66,9 +127,13 @@ public class DeckManager : MonoBehaviour
 
             newCardPreview.id = cardPreview.id;
             newCardPreview.card = cardPreview.card;
-            newCardPreview.LoadCardData(cardPreview.id);
 
             cardData.Card = card;
+            cardData.IsSupportCard = true;
+
+            newCardPreview.LoadCardData(cardPreview.id);
+
+            UpdateOffenseSlots();
         }
         else
         {
@@ -84,9 +149,33 @@ public class DeckManager : MonoBehaviour
 
             newCardPreview.id = cardPreview.id;
             newCardPreview.card = cardPreview.card;
+            cardData.Card = card;
+            cardData.IsSupportCard = true;
+
             newCardPreview.LoadCardData(cardPreview.id);
 
-            cardData.Card = card;
+            UpdateSupportSlots();
+        }
+
+        numberOfCardsInDeck++;
+        cardsInDeckText.text = "Cards in deck : " + numberOfCardsInDeck;
+    }
+
+    public void AddCard(BattleCard battleCard, CardPreview cardPreview)
+    {
+        if (battleCard == null)
+            return;
+
+        if (!battleCard.ID.Equals(selectedDeckBattlecardID.ToString()))
+        {
+            if (deckCardImage.sprite != null)
+                RemoveBattleCard();
+
+            selectedDeckBattlecardID = Convert.ToUInt64(battleCard.ID);
+
+            GameManager.Instance.SelectedBattleCard = Convert.ToUInt64(battleCard.ID);
+
+            deckCardImage.sprite = cardPreview._cardImage.sprite;
         }
     }
 
@@ -109,16 +198,14 @@ public class DeckManager : MonoBehaviour
 
                     SelectionItem selectionItem = offenseCardGameObject.GetComponent<SelectionItem>();
 
+                    if (selectionItem == null)
+                        continue;
+
                     if (selectionItem.isSelected)
                     {
                         cardsToRemove.Add(offenseCardTransform);
-                        GameObject newCard = Instantiate(battleCardPreview, ownedCardList);
-                        CardPreview cardPreview = newCard.GetComponent<CardPreview>();
-                        CardPreview currentCardPreview = offenseCardGameObject.GetComponent<CardPreview>();
 
-                        cardPreview.id = currentCardPreview.id;
-                        cardPreview.card = currentCardPreview.card;
-                        cardPreview.LoadCardData(currentCardPreview.id);
+                        RestoreSupportCard(offenseCardTransform.gameObject.GetComponent<CardData>().Card.ID);
                     }
                 }
             }
@@ -131,16 +218,15 @@ public class DeckManager : MonoBehaviour
 
                     SelectionItem selectionItem = supporteCardGameObject.GetComponent<SelectionItem>();
 
+                    if (selectionItem == null)
+                        continue;
+
                     if (selectionItem.isSelected)
                     {
                         cardsToRemove.Add(supportCardTransform);
-                        GameObject newCard = Instantiate(battleCardPreview, ownedCardList);
-                        CardPreview cardPreview = newCard.GetComponent<CardPreview>();
-                        CardPreview currentCardPreview = supporteCardGameObject.GetComponent<CardPreview>();
 
-                        cardPreview.id = currentCardPreview.id;
-                        cardPreview.card = currentCardPreview.card;
-                        cardPreview.LoadCardData(currentCardPreview.id);
+                        RestoreSupportCard(supportCardTransform.gameObject.GetComponent<CardData>().Card.ID);
+                        
                     }
                 }
             }
@@ -149,8 +235,6 @@ public class DeckManager : MonoBehaviour
             foreach (var cardToRemove in cardsToRemove)
             {
                 CardData cardData = cardToRemove.gameObject.GetComponent<CardData>();
-
-                Debug.Log(cardData.Card);
 
                 if (newDeckCards.ContainsKey((ulong)cardData.Card.ID))
                 {
@@ -165,13 +249,52 @@ public class DeckManager : MonoBehaviour
                         newDeckCards.Remove((ulong)cardData.Card.ID);
                     }
 
-
+                    numberOfCardsInDeck--;
                     Destroy(cardToRemove.gameObject);
                 }
             }
+
+            UpdateOffenseSlots();
+            UpdateSupportSlots();
         }
+
+
+        cardsInDeckText.text = "Cards in deck : " + numberOfCardsInDeck;
     }
 
+
+    public void RemoveBattleCard()
+    {
+        deckCardImage.sprite = null;
+
+        foreach (Transform ownedCard in ownedCardList.transform)
+        {
+            CardData ownedCardData = ownedCard.gameObject.GetComponent<CardData>();
+
+            if ((ownedCardData.BattleCard.ID == selectedDeckBattlecardID.ToString()))
+            {
+                ownedCard.gameObject.SetActive(true);
+
+                break;
+            }
+        }
+
+        selectedDeckBattlecardID = 999999;
+    }
+
+    public void RestoreSupportCard(int cardId)
+    {
+        foreach (Transform ownedCard in ownedCardList.transform)
+        {
+            CardData offenseCardData = ownedCard.gameObject.GetComponent<CardData>();
+
+            if (offenseCardData.IsSupportCard && (offenseCardData.Card.ID == cardId))
+            {
+                ownedCard.gameObject.SetActive(true);
+                return;
+            }
+        }
+    }
 
     public void LoadDeckCards()
     {
@@ -183,6 +306,8 @@ public class DeckManager : MonoBehaviour
 
             for (int i = 0; i < oldCard.Value; i++)
             {
+                numberOfCardsInDeck++;
+
                 if (card.Type == PlayCardType.Offense || card.Type == PlayCardType.SpecialOffense)
                 {
                     GameObject newCard = Instantiate(supportCardPreview, offenseCardList);
@@ -193,11 +318,14 @@ public class DeckManager : MonoBehaviour
 
                     CardData cardData = newCard.GetComponent<CardData>();
 
+                    cardData.Card = card;
+                    cardData.IsSupportCard = true;
+
                     cardPreview.LoadCardData((ulong)card.ID);
 
                     clickableCard.enabled = false;
 
-                    cardData.Card = card;
+                    UpdateOffenseSlots();
                 }
                 else
                 {
@@ -209,15 +337,40 @@ public class DeckManager : MonoBehaviour
 
                     CardPreview cardPreview = newCard.GetComponent<CardPreview>();
 
+                    cardData.Card = card;
+                    cardData.IsSupportCard = true;
+
                     cardPreview.LoadCardData((ulong)card.ID);
 
                     clickableCard.enabled = false;
 
-                    cardData.Card = card;
+                    UpdateSupportSlots();
+                }
+
+
+                cardsInDeckText.text = "Cards in deck : " + numberOfCardsInDeck;
+            }
+
+            GameManager.Instance.SelectedBattleCard = selectedDeckBattlecardID;
+
+            foreach (Transform ownedCard in ownedCardList.transform)
+            {
+                CardData ownedCardData = ownedCard.gameObject.GetComponent<CardData>();
+
+                if ((!ownedCardData.IsSupportCard) &&
+                    (ownedCardData.BattleCard.ID == selectedDeckBattlecardID.ToString()))
+                {
+                    CardPreview battleCardPreviewComponent = ownedCard.GetComponent<CardPreview>();
+
+                    deckCardImage.sprite = battleCardPreviewComponent._cardImage.sprite;
+
+                    ownedCard.gameObject.SetActive(false);
+
+                    break;
                 }
             }
         }
-        
+
         UncheckSelectedCards();
     }
 
@@ -233,9 +386,12 @@ public class DeckManager : MonoBehaviour
 
             foreach (var card in newDeckCards)
             {
-                if (card.Key == (ulong)ownedCardData.Card.ID)
+                if (ownedCardData.IsSupportCard)
                 {
-                    ownedCard.gameObject.SetActive(false);
+                    if (card.Key == (ulong)ownedCardData.Card.ID)
+                    {
+                        ownedCard.gameObject.SetActive(false);
+                    }
                 }
             }
         }
@@ -246,6 +402,14 @@ public class DeckManager : MonoBehaviour
     {
         ClearOffensiveCards();
         ClearSupportCards();
+
+        ClearSupportSlots();
+        ClearOffenseSlots();
+
+        numberOfCardsInDeck = 0;
+        cardsInDeckText.text = "Cards in deck : " + numberOfCardsInDeck;
+
+        deckCardImage.sprite = null;
     }
 
     private void ClearOffensiveCards()
@@ -271,6 +435,153 @@ public class DeckManager : MonoBehaviour
         }
     }
 
+
+    private void UpdateOffenseSlots()
+    {
+        ClearOffenseSlots();
+
+        if (GetNumberOfOffensiveCardsInDeck() < 10)
+        {
+            SetSlots(offenseCardList, 10 - GetNumberOfOffensiveCardsInDeck());
+        }
+    }
+
+    private void UpdateSupportSlots()
+    {
+        ClearSupportSlots();
+
+        if (GetNumberOfSupportCardsInDeck() < 10)
+        {
+            SetSlots(supportCardList, 10 - GetNumberOfSupportCardsInDeck());
+        }
+    }
+
+
+    private void ClearOffenseSlots()
+    {
+        if (offenseCardList.childCount > 0)
+        {
+            foreach (Transform child in offenseCardList.transform)
+            {
+                GameObject childGameobject = child.gameObject;
+                CardData cardData = childGameobject.GetComponent<CardData>();
+                if (cardData != null)
+                {
+                    if (cardData.IsSlot)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void ClearSupportSlots()
+    {
+        if (supportCardList.childCount > 0)
+        {
+            foreach (Transform child in supportCardList.transform)
+            {
+                GameObject childGameobject = child.gameObject;
+                CardData cardData = childGameobject.GetComponent<CardData>();
+                if (cardData != null)
+                {
+                    if (cardData.IsSlot)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void SetSlots(Transform list, int numberOfSlots)
+    {
+        for (int i = 0; i < numberOfSlots; i++)
+        {
+            Instantiate(slotPrefab, list);
+        }
+    }
+
+
+    private void ShowNoOwnedCardsText()
+    {
+        ownedCardsButtons.SetActive(false);
+        noOwnedCardsGameObject.SetActive(true);
+    }
+
+
+    private void ShowNoOffenseCardsText()
+    {
+        offenseCardsButtons.SetActive(false);
+        noOffenseCardsGameObject.SetActive(true);
+        offenseCardList.gameObject.SetActive(false);
+    }
+
+
+    private void ShowNoDefensiveCardsText()
+    {
+        defenseCardsButtons.SetActive(false);
+        noDefenseCardsGameObject.SetActive(true);
+        supportCardList.gameObject.SetActive(false);
+    }
+
+
+    private void HideNoOwnedCardsText()
+    {
+        ownedCardsButtons.SetActive(true);
+        noOwnedCardsGameObject.SetActive(false);
+    }
+
+    private void HideNoOffensiveCardsText()
+    {
+        offenseCardsButtons.SetActive(true);
+        noOffenseCardsGameObject.SetActive(false);
+        offenseCardList.gameObject.SetActive(true);
+    }
+
+    private void HideNoDefensiveCardsText()
+    {
+        defenseCardsButtons.SetActive(true);
+        noDefenseCardsGameObject.SetActive(false);
+        supportCardList.gameObject.SetActive(true);
+    }
+
+    private int GetNumberOfSupportCardsInDeck()
+    {
+        int nbCards = 0;
+
+        foreach (var card in newDeckCards)
+        {
+            Card supportCard = cardList.GetCardById(card.Key);
+            if (supportCard.Type == PlayCardType.Defense || supportCard.Type == PlayCardType.SpecialDefense)
+            {
+                nbCards += card.Value;
+            }
+        }
+
+        return nbCards;
+    }
+
+
+    private int GetNumberOfOffensiveCardsInDeck()
+    {
+        int nbCards = 0;
+
+        foreach (var card in newDeckCards)
+        {
+            Card offenseCard = cardList.GetCardById(card.Key);
+            if (offenseCard.Type == PlayCardType.Offense || offenseCard.Type == PlayCardType.SpecialOffense)
+            {
+                nbCards += card.Value;
+            }
+        }
+
+        return nbCards;
+    }
+
     public DataContainer CardList => cardList;
 
 
@@ -285,5 +596,11 @@ public class DeckManager : MonoBehaviour
     {
         get => newDeckCards;
         set => newDeckCards = value;
+    }
+
+    public ulong SelectedDeckBattlecardID
+    {
+        get => selectedDeckBattlecardID;
+        set => selectedDeckBattlecardID = value;
     }
 }

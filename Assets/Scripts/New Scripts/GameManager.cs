@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; set; }
     
     private Dictionary<ulong, int> selectedDeck = new Dictionary<ulong, int>();
+
+    private ulong selectedBattleCard;
     
     private void Awake()
     {
@@ -23,5 +25,17 @@ public class GameManager : MonoBehaviour
     {
         get => selectedDeck;
         set => selectedDeck = value;
+    }
+
+    public Dictionary<ulong, int> SelectedDeck1
+    {
+        get => selectedDeck;
+        set => selectedDeck = value;
+    }
+
+    public ulong SelectedBattleCard
+    {
+        get => selectedBattleCard;
+        set => selectedBattleCard = value;
     }
 }

@@ -20,9 +20,19 @@ public class ClickableCard : MonoBehaviour, IPointerClickHandler
         CardData cardData = GetComponent<CardData>();
 
         CardPreview cardPreview = GetComponent<CardPreview>();
+
+
+        if (cardData.IsSupportCard)
+        {
+            DeckManager.Instance.AddCard(cardData.Card,cardPreview);
+        }
+        else
+        {
+            DeckManager.Instance.AddCard(cardData.BattleCard,cardPreview);
+        }
         
-        DeckManager.Instance.AddCard(cardData.Card,cardPreview);
         
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+        
     }
 }
