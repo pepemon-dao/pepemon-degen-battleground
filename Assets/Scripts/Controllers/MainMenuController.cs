@@ -5,6 +5,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 //using Nethereum.Unity.Rpc;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,7 +34,7 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
-    private void Start()
+    private async void Start()
     {
         Application.targetFrameRate = 60;
 
@@ -46,7 +47,7 @@ public class MainMenuController : MonoBehaviour
         _creditsButton.onClick.AddListener(OpenCredits);
     }
 
-    private void HandleGoingBackToMenu()
+    private async void HandleGoingBackToMenu()
     {
         if (PepemonFactoryCardCache.CardsIds.Count == 0)
         {
@@ -66,7 +67,7 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    private void DeInitMainScene(bool toLoadScreen)
+    private async void DeInitMainScene(bool toLoadScreen)
     {
         // assume that when no account was selected and his scene loads, its because the game just launched
 
@@ -98,7 +99,7 @@ public class MainMenuController : MonoBehaviour
         {
             ShowScreen(MainSceneScreensEnum.Menu);
             _startGameButton.interactable = true;
-            if (Web3Controller.instance == null && Web3Controller.instance.SelectedAccountAddress != null)
+            if (Web3Controller.instance != null && await ThirdwebManager.Instance.SDK.Wallet.GetAddress() != null)
             {
                 _manageDecksButton.interactable = true;
                 _leaderboardButton.interactable = true;
@@ -161,9 +162,9 @@ public class MainMenuController : MonoBehaviour
 
     }
 
-    public void OnConnectWalletButtonClick()
+    public async void OnConnectWalletButtonClick()
     {
-        Web3Controller.instance.ConnectWallet();
+        await Web3Controller.instance.ConnectWallet();
     }
 
     public void OnStartGameButtonClick()

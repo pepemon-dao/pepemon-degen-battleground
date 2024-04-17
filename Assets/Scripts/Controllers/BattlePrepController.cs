@@ -10,6 +10,7 @@ using Nethereum.RPC.Eth.DTOs;
 //using Nethereum.Unity.Rpc;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -88,18 +89,19 @@ public class BattlePrepController : MonoBehaviour
             failedToEnter = true;
         }
 
+        var PlayerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+
         // check if the current player's deck is in the matchmaker list of deck owners, if it is, then we can assume the player
         // is in the waitlist
 
         string deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
-
-        string player1addr = Web3Controller.instance.SelectedAccountAddress,
+        string player1addr = PlayerWalletAddress,
                player2addr = null;
 
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
         // However if the battle *has* started, the player's address will be in the first parameter of the BattleCreated event
-        if (deckOwner.Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase))
+        if (deckOwner.Equals(PlayerWalletAddress, StringComparison.OrdinalIgnoreCase))
         {
             player2addr = player1addr;
             player1addr = null;
@@ -189,7 +191,8 @@ public class BattlePrepController : MonoBehaviour
 
         await Task.WhenAll(reqBattleRngSeed, reqPlayer1BattleCard, reqPlayer2BattleCard, reqPlayer1SupportCards, reqPlayer2SupportCards);
 
-        Debug.Log("Battle data loaded");
+        Debug.Log("Battle data loaded"); 
+        var PlayerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
 
         battleData.battleRngSeed = reqBattleRngSeed.Result;
         battleData.player1BattleCard = reqPlayer1BattleCard.Result;
@@ -197,7 +200,7 @@ public class BattlePrepController : MonoBehaviour
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
         battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr
-            .Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase);
+            .Equals(PlayerWalletAddress, StringComparison.OrdinalIgnoreCase);
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }

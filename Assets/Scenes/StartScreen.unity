@@ -10717,6 +10717,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  onStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onConnectionRequested:
+    m_PersistentCalls:
+      m_Calls: []
+  onConnected:
+    m_PersistentCalls:
+      m_Calls: []
+  onConnectionError:
+    m_PersistentCalls:
+      m_Calls: []
+  onDisconnected:
+    m_PersistentCalls:
+      m_Calls: []
+  onSwitchNetwork:
+    m_PersistentCalls:
+      m_Calls: []
   IsConnected: 0
   StarterDeckID: 0
   StarterPepemonID: 0
@@ -11418,6 +11436,9 @@ MonoBehaviour:
   - identifier: fantom-testnet
     chainId: 4002
     rpcOverride: 
+  - identifier: hardhat
+    chainId: 31337
+    rpcOverride: https://localhost:8545
   clientId: 2798514136b55fd11fc6fc94a1ccaec2
   initializeOnAwake: 1
   showDebugLogs: 1

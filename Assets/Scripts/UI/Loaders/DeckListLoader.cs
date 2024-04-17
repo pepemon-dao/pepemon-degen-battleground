@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Nethereum.Web3;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -43,7 +44,7 @@ public class DeckListLoader : MonoBehaviour
         }
 
         // should not happen, but if it happens then it won't crash the game
-        var account = Web3Controller.instance.SelectedAccountAddress;
+        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
         if (string.IsNullOrEmpty(account))
         {
             loadingMessageLabel.text = "Error: No account selected";
@@ -51,7 +52,7 @@ public class DeckListLoader : MonoBehaviour
         }
 
         // load all decks
-        var decks = await PepemonCardDeck.GetPlayerDecks(Web3Controller.instance.SelectedAccountAddress);
+        var decks = await PepemonCardDeck.GetPlayerDecks(account);
 
         var loadingTasks = new List<UniTask>();
 

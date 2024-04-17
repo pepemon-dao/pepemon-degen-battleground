@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,7 +41,7 @@ public class LeaderboardListLoader : MonoBehaviour
         }
 
         // should not happen, but if it happens then it won't crash the game
-        var account = Web3Controller.instance.SelectedAccountAddress;
+        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
         if (string.IsNullOrEmpty(account))
         {
             _loadingMessage.text = "Error: No account selected";

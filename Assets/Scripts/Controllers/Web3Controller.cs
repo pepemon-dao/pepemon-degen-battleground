@@ -1,30 +1,41 @@
 ﻿using Nethereum.Hex.HexTypes;
-//using Nethereum.Unity.Contracts;
-//using Nethereum.Unity.Rpc;
 using Nethereum.Web3.Accounts;
 using UnityEngine;
 using UnityEngine.Events;
-#if !UNITY_EDITOR
-//using Nethereum.Unity.Metamask;
-//using Nethereum.RPC.HostWallet;
-//using System.Collections.Generic;
-#endif
-using Nethereum.RPC.Eth.DTOs;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using UnityEngine.UI;
 using Sirenix.OdinInspector;
 using System.Linq;
 using System;
+using Thirdweb;
+using System.IO;
 
 public class Web3Controller : MonoBehaviour
 {
     public static Web3Controller instance;
 
+    // old
     public Web3Settings settings;
     public UnityEvent onWalletConnected;
     public int CurrentChainId { get; private set; } = 0;
     public string SelectedAccountAddress { get; private set; }
+
+    #region ThirdWeb
+    private Wallet wallet 
+    { 
+        get => ThirdwebManager.Instance.SDK.Wallet;
+    }
+
+    [Header("Events")]
+    public UnityEvent onStart;
+    public UnityEvent<WalletConnection> onConnectionRequested;
+    public UnityEvent<string> onConnected;
+    public UnityEvent<Exception> onConnectionError;
+    public UnityEvent onDisconnected;
+    public UnityEvent onSwitchNetwork;
+    private string _address;
+    #endregion
 
 #if UNITY_EDITOR
     #region Unity editor button for updating hardhat contracts addresses
@@ -85,16 +96,38 @@ public class Web3Controller : MonoBehaviour
         CurrentChainId = settings.defaultChainId;
     }
 
-    public void ConnectWallet()
+    public async UniTask ConnectWallet()
     {
         Debug.Log("Trying to connect");
-#if !UNITY_EDITOR
-        //OpenMetamaskConnectDialog();
+
+#if UNITY_EDITOR
+        var provider = WalletProvider.LocalWallet;
+        await WriteDebugLocalAccount();
 #else
-        Account debugAccount = new Account(settings.debugPrivateKey);
-        NewAccountSelected(debugAccount.Address);
-        ChainChanged(string.Format("0x{0:X}", settings.defaultChainId));
+        var provider = WalletProvider.Metamask;
+#endif
+        var wc = new WalletConnection(provider, settings.defaultChainId);
+        onConnectionRequested.Invoke(wc);
+        _address = await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
         onWalletConnected?.Invoke();
+    }
+
+    private async UniTask WriteDebugLocalAccount()
+    {
+#if UNITY_EDITOR
+        // Thirdweb provides no easy way of connecting a wallet using hardhat's private key,
+        // The lines below create a file with the private key. If it didn't exist, Thirdweb would generate
+        // a random wallet instead.
+        var key = new Nethereum.Signer.EthECKey(settings.debugPrivateKey);
+        var path = Utils.GetAccountPath();
+        var deviceId = Utils.GetDeviceIdentifier();
+        Debug.Log("Encrypting and writing debug key...");
+        await UniTask.RunOnThreadPool(() => 
+        {
+            var content = Utils.EncryptAndGenerateKeyStore(key, deviceId);
+            File.WriteAllText(path, content);
+        });
+        Debug.Log("Done");
 #endif
     }
 
@@ -186,13 +219,6 @@ public class Web3Controller : MonoBehaviour
 #else
         await Task.CompletedTask;
 #endif
-    }
-
-    // callback from js
-    public void NewAccountSelected(string accountAddress)
-    {
-        SelectedAccountAddress = accountAddress;
-        Debug.Log($"Account changed to {SelectedAccountAddress}");
     }
 
     /// <summary>
