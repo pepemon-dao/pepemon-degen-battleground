@@ -242,6 +242,7 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
+        BotTextTutorial.Instance.TriggerTutorialEvent(1);
         //if (_roundNumber <= 1)
         //   yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
@@ -293,6 +294,8 @@ public class GameController : MonoBehaviour
 
         _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
+        BotTextTutorial.Instance.TriggerTutorialEvent(2);
+
         for (int i = 0; i < 2; i++)
         {
             if (!_gameHasFinished)
@@ -360,6 +363,8 @@ public class GameController : MonoBehaviour
                 }
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
+
+                BotTextTutorial.Instance.TriggerTutorialEvent(3);
 
                 Debug.Log("waiting 2.5f");
                 yield return new WaitForSeconds(2.5f);
