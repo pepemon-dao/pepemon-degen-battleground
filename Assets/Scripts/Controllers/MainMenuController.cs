@@ -98,7 +98,7 @@ public class MainMenuController : MonoBehaviour
         {
             ShowScreen(MainSceneScreensEnum.Menu);
             _startGameButton.interactable = true;
-            if (Web3Controller.instance == null && Web3Controller.instance.SelectedAccountAddress != null)
+            if (Web3Controller.instance != null && Web3Controller.instance.SelectedAccountAddress != null)
             {
                 _manageDecksButton.interactable = true;
                 _leaderboardButton.interactable = true;
