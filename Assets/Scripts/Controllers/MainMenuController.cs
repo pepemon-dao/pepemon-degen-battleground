@@ -183,4 +183,9 @@ public class MainMenuController : MonoBehaviour
         _screenLeaderboard.ReloadDefaultLeaderboard();
         ShowScreen(MainSceneScreensEnum.Leaderboard);
     }
+
+    public void UnMuteThemePlayer()
+    {
+        ThemePlayer.Instance.UnMute();
+    }
 }
