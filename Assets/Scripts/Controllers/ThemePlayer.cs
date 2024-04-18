@@ -42,7 +42,7 @@ namespace Scripts.Managers.Sound
 
         private void Start()
         {
-            //_themePlayer.mute = Application.isEditor;
+            _themePlayer.mute = true;
 
             volume = _themePlayer.volume;
             InvokeRepeating(nameof(CheckIfMusicEnded), 0f, 6f);
@@ -182,6 +182,12 @@ namespace Scripts.Managers.Sound
         {
             bool isMuted = !enable;
             _mainGroup.SetFloat("ThemeVolume", isMuted ? -80f : 0f);
+        }
+
+        public void UnMute()
+        {
+            print("theme player unmuted");
+            _themePlayer.mute = false;
         }
     }
 }
