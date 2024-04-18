@@ -23,6 +23,7 @@ public class BotTextTutorial : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
