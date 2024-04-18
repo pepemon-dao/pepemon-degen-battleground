@@ -380,7 +380,8 @@ public class GameController : MonoBehaviour
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
-                BotTextTutorial.Instance.TriggerTutorialEvent(3);
+                if (BotTextTutorial.Instance != null)
+                    BotTextTutorial.Instance.TriggerTutorialEvent(3);
 
                 Debug.Log("waiting 2.5f");
                 yield return new WaitForSeconds(2.5f);
