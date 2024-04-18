@@ -44,6 +44,8 @@ public class MainMenuController : MonoBehaviour
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
         _creditsButton.onClick.AddListener(OpenCredits);
+
+        InvokeRepeating(nameof(WhenWalletIsConnectedUpdateTheBtns), 0f, 1f);
     }
 
     private void HandleGoingBackToMenu()
@@ -103,6 +105,17 @@ public class MainMenuController : MonoBehaviour
                 _manageDecksButton.interactable = true;
                 _leaderboardButton.interactable = true;
             }
+        }
+    }
+
+    private void WhenWalletIsConnectedUpdateTheBtns()
+    {
+        if (Web3Controller.instance != null && Web3Controller.instance.SelectedAccountAddress != null)
+        {
+            if (!_manageDecksButton.interactable)
+                _manageDecksButton.interactable = true;
+            if (!_leaderboardButton.interactable)
+                _leaderboardButton.interactable = true;
         }
     }
 
