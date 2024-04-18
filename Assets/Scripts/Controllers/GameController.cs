@@ -9,6 +9,9 @@ using Nethereum.ABI;
 using Nethereum.RLP;
 using Pepemon.Battle;
 using System.Threading.Tasks;
+using TMPro;
+using DG;
+using DG.Tweening;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -41,6 +44,8 @@ public class GameController : MonoBehaviour
 
     [TitleGroup("Scriptable objects list"), SerializeField] DataContainer CardsScriptableObjsData;
     [TitleGroup("AttackerUI"), SerializeField] List<GameObject> _attackerUIElements;
+    [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText1;
+    [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText2;
 
     [ReadOnly] private BigInteger battleSeed;
 
@@ -242,6 +247,7 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
+        BotTextTutorial.Instance.TriggerTutorialEvent(1);
         //if (_roundNumber <= 1)
         //   yield return new WaitForSeconds(1.2f);
         _uiController.NewRoundDisplay();
@@ -293,6 +299,8 @@ public class GameController : MonoBehaviour
 
         _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
+        BotTextTutorial.Instance.TriggerTutorialEvent(2);
+
         for (int i = 0; i < 2; i++)
         {
             if (!_gameHasFinished)
@@ -329,9 +337,14 @@ public class GameController : MonoBehaviour
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(2.5f);
+                    yield return new WaitForSeconds(1.5f);
+                    int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    _player2.CurrentHP -= dmg;
+                    AttackDisplay(false, dmg);
 
-                    _player2.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    yield return new WaitForSeconds(1.5f);
+
+                    DisableAttackTexts();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -349,8 +362,14 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(3f);
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1f);
-                    _player1.CurrentHP -= totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    yield return new WaitForSeconds(1.5f);
+                    int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    _player1.CurrentHP -= dmg;
+                    AttackDisplay(true, dmg);
+
+                    yield return new WaitForSeconds(1.5f);
+
+                    DisableAttackTexts();
 
                     _uiController.UpdateUI();
                     player1Controller.UpdateCard(_player1);
@@ -360,6 +379,8 @@ public class GameController : MonoBehaviour
                 }
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
+
+                BotTextTutorial.Instance.TriggerTutorialEvent(3);
 
                 Debug.Log("waiting 2.5f");
                 yield return new WaitForSeconds(2.5f);
@@ -748,5 +769,25 @@ public class GameController : MonoBehaviour
         _attackerUIElements[1].SetActive(!isPlayer1Attacker && !disable);
         _attackerUIElements[2].SetActive(!isPlayer1Attacker && !disable);
         _attackerUIElements[3].SetActive(isPlayer1Attacker && !disable);
+    }
+
+    private void AttackDisplay(bool isPlayer1, int dmg)
+    {
+        if (isPlayer1)
+        {
+            dmgText1.text = "-" + dmg.ToString();
+            dmgText1.DOFade(1f, 1.5f);
+        }
+        else
+        {
+            dmgText2.text = "-" + dmg.ToString();
+            dmgText2.DOFade(1f, 1.5f);
+        }
+    }
+
+    private void DisableAttackTexts()
+    {
+        dmgText1.DOFade(0f, 1f);
+        dmgText2.DOFade(0f, 1f);
     }
 }
