@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Unity.Rpc;
+using Scripts.Managers.Sound;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -98,7 +99,7 @@ public class MainMenuController : MonoBehaviour
         {
             ShowScreen(MainSceneScreensEnum.Menu);
             _startGameButton.interactable = true;
-            if (Web3Controller.instance == null && Web3Controller.instance.SelectedAccountAddress != null)
+            if (Web3Controller.instance != null && Web3Controller.instance.SelectedAccountAddress != null)
             {
                 _manageDecksButton.interactable = true;
                 _leaderboardButton.interactable = true;
@@ -158,7 +159,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ToggleAudio(bool enable)
     {
-
+        ThemePlayer.Instance.ToggleAudio(enable);
     }
 
     public void OnConnectWalletButtonClick()
