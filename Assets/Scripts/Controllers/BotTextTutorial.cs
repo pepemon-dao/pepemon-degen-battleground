@@ -18,21 +18,10 @@ public class BotTextTutorial : MonoBehaviour
 
     public static BotTextTutorial Instance;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     private void Start()
     {
+        Instance = this;
+
         currentTutorialStateIndex = PlayerPrefs.GetInt(TUTORIAL_STATE_KEY, 0);
     }
 
