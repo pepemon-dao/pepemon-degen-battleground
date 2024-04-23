@@ -347,16 +347,8 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(1.5f);
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
-                    if (totalAttackPower < totalDefensePower)
-                    {
-                        _player1.CurrentHP -= dmg;
-                        AttackDisplay(true, dmg);
-                    }
-                    else
-                    {
-                        _player2.CurrentHP -= dmg;
-                        AttackDisplay(false, dmg);
-                    }
+                    _player2.CurrentHP -= dmg;
+                    AttackDisplay(false, dmg);
 
                     yield return new WaitForSeconds(1.5f);
 
@@ -381,16 +373,8 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(1.5f);
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
-                    if (totalAttackPower < totalDefensePower)
-                    {
-                        _player2.CurrentHP -= dmg;
-                        AttackDisplay(false, dmg);
-                    }
-                    else
-                    {
-                        _player1.CurrentHP -= dmg;
-                        AttackDisplay(true, dmg);
-                    }
+                    _player1.CurrentHP -= dmg;
+                    AttackDisplay(true, dmg);
 
                     yield return new WaitForSeconds(1.5f);
 
