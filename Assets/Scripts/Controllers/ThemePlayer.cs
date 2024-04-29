@@ -10,6 +10,8 @@ namespace Scripts.Managers.Sound
     {
         [SerializeField] private AudioClip[] _chillSongs;
         [SerializeField] private AudioClip[] _actionSongs;
+        [SerializeField] private AudioClip _loseClip;
+        [SerializeField] private AudioClip _winClip;
         [SerializeField] private AudioSource _themePlayer;
         [SerializeField] private List<string> _chillScenes;
         [SerializeField] private List<string> _actionScenes;
@@ -56,10 +58,15 @@ namespace Scripts.Managers.Sound
             }
         }
 
-        private IEnumerator PlayNextMusic()
+        private IEnumerator PlayNextMusic(AudioClip clip = null)
         {
             int randomClipNumber = GetRandomClipNumber();
             AudioClip nextClip = GetCurrentClip(randomClipNumber);
+
+            if (clip != null)
+            {
+                nextClip = clip;
+            }
 
             // Start volume transition
             StartCoroutine(TransitionVolume(volume, 0f, 0.5f)); // Transition to volume 0
@@ -188,6 +195,18 @@ namespace Scripts.Managers.Sound
         {
             print("theme player unmuted");
             _themePlayer.mute = false;
+        }
+        
+        public void PlayGameOverSong(bool isWon)
+        {
+            if (isWon)
+            {
+                StartCoroutine(PlayNextMusic(_winClip));
+            }
+            else
+            {
+                StartCoroutine(PlayNextMusic(_loseClip));
+            }
         }
     }
 }

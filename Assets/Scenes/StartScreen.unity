@@ -864,9 +864,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chillSongs:
-  - {fileID: 8300000, guid: 33f4b4758a8d7154cbc65ae7f17a54fb, type: 3}
-  _actionSongs:
   - {fileID: 8300000, guid: 03bc520f7084bbc4c97c171b40267ce9, type: 3}
+  _actionSongs:
+  - {fileID: 8300000, guid: c3495cd178f92244a9eaf39148faa86a, type: 3}
+  - {fileID: 8300000, guid: 806a7ac527e42124299f331462e0ecb1, type: 3}
+  - {fileID: 8300000, guid: 64b28bcbfccda4146b3adf768cd2885e, type: 3}
+  _loseClip: {fileID: 8300000, guid: cb640f7607e3d9e40af07e7f5b87c0dd, type: 3}
+  _winClip: {fileID: 8300000, guid: 56158b1421e5dbc419c8d2ec5c0e419a, type: 3}
   _themePlayer: {fileID: 85224073}
   _chillScenes:
   - StartScreen
