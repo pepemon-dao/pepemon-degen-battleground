@@ -106,8 +106,14 @@ public class PostBattleScreenController : MonoBehaviour
         // go back to previous scene
         IsGoingFromBattle = true;
         IsClaimingGift = true;
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex - 1);
+
+        if (!Web3Controller.instance.IsConnected)
+        {
+            Web3Controller.instance.ConnectWallet();
+        }
+
+        //int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        //SceneManager.LoadScene(currentSceneIndex - 1);
     }
 
     #region INIT
