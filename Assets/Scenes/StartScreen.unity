@@ -889,7 +889,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -3474018786988080002, guid: d5532f77320dbe74caba67dd75ab41ff, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1056,7 +1056,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 87644892}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &87644892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1509,6 +1521,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &108302115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1701,6 +1725,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1399361485}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: ProceedToNextScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2342,13 +2378,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: 
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3819,6 +3855,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &552815802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5044,7 +5092,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 33f4b4758a8d7154cbc65ae7f17a54fb, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -5348,7 +5396,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1248269249}
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 453832917}
         m_TargetAssemblyTypeName: DeckListLoader, Assembly-CSharp
         m_MethodName: ReloadAllDecks
         m_Mode: 1
@@ -5819,13 +5879,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: 
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6652,7 +6712,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 969319546}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &969319546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7772,6 +7844,18 @@ MonoBehaviour:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: -1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -9555,6 +9639,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1230827781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10101,6 +10197,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1399361485}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: ProceedToNextScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10669,6 +10777,18 @@ MonoBehaviour:
       - m_Target: {fileID: 453832917}
         m_TargetAssemblyTypeName: DeckListLoader, Assembly-CSharp
         m_MethodName: ReloadAllDecks
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11321,7 +11441,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1379687549}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1379687549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11501,6 +11633,18 @@ MonoBehaviour:
       - m_Target: {fileID: 453832917}
         m_TargetAssemblyTypeName: DeckListLoader, Assembly-CSharp
         m_MethodName: ReloadAllDecks
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12921,7 +13065,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1515001110}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1515001110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16786,7 +16942,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1248269249}
+      - m_Target: {fileID: 1956814984}
+        m_TargetAssemblyTypeName: SFXManager, Assembly-CSharp
+        m_MethodName: BtnSFX
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 453832917}
         m_TargetAssemblyTypeName: DeckListLoader, Assembly-CSharp
         m_MethodName: ReloadAllDecks
         m_Mode: 1
@@ -16848,6 +17016,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1955316666}
   m_CullTransparentMesh: 1
+--- !u!1 &1956814983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1956814985}
+  - component: {fileID: 1956814984}
+  m_Layer: 0
+  m_Name: SFXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1956814984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956814983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bca5360aa4e6ded428993f07b8aa13ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxPlayer: {fileID: 358259827338237820, guid: 2292b391c7fd9be4ea9b55c83fa8284c, type: 3}
+  btnSFX: {fileID: 8300000, guid: 50b637389c9191c44b7a1d60ce11737b, type: 3}
+  dealSFX: {fileID: 8300000, guid: de83605b10f44f944a5dee49cbdd91ae, type: 3}
+  slideSFX: {fileID: 8300000, guid: 2cf5235ed103d484bb6616e64eadf2b9, type: 3}
+--- !u!4 &1956814985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956814983}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1986635108
 GameObject:
   m_ObjectHideFlags: 0

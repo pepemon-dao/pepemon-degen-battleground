@@ -108,6 +108,11 @@ namespace Scripts.Managers.Sound
         {
             if (isMuted) yield break;
 
+            if (!_isChillMode)
+            {
+                targetVolume = Mathf.Min(targetVolume, 0.05f);
+            }
+
             float elapsedTime = 0f;
             float transitionSpeed = 1f / transitionTime;
 

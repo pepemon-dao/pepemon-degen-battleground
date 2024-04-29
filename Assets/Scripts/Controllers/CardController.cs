@@ -103,28 +103,17 @@ public class CardController : MonoBehaviour
     /// <summary>
     /// The cards move foward when they are attacking
     /// </summary>
-    public void SetAttackingTransform(int attackIndex)
-    { 
-        if (attackIndex == 1)
-        {
-            _startingTargetPosition = _targetPostion.position;
+    public void SetAttackingTransform(Vector3 offset)
+    {
+        _startingTargetPosition = _targetPostion.position;
 
-            _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y - 5f, _targetPostion.position.z);// - 15f);
-            _cardGlow.DOFade(1, 2f);
-            transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
+        _targetPostion.position += offset;
+        _cardGlow.DOFade(1, 2f);
+        transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
 
-            _targetScale = _startingScale * 1.1f;
-        }
-        else if (attackIndex == 2)
-        {
-            _startingTargetPosition = _targetPostion.position;
+        _targetScale = _startingScale * 1.1f;
 
-            _targetPostion.position = new Vector3(_targetPostion.position.x, _targetPostion.position.y + 5f, _targetPostion.position.z); //- 15f);
-            _cardGlow.DOFade(1, 2f);
-            transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
-
-            _targetScale = _startingScale * 1.1f;
-        }
+        SFXManager.Instance.SlideSFX();
     }
 
     /// <summary>
