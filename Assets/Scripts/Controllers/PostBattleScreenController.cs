@@ -109,8 +109,16 @@ public class PostBattleScreenController : MonoBehaviour
             Web3Controller.instance.ConnectWallet();
         }
 
-        //int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        //SceneManager.LoadScene(currentSceneIndex - 1);
+        InvokeRepeating(nameof(CheckIfWalletConnected), 0.5f, 0.3f);
+    }
+
+    private void CheckIfWalletConnected()
+    {
+        if (Web3Controller.instance.IsConnected)
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex - 1);
+        }
     }
 
     #region INIT
