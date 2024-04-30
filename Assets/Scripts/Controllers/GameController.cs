@@ -395,13 +395,15 @@ public class GameController : MonoBehaviour
                 }
 
                 Debug.Log("waiting 2.5f");
-                yield return new WaitForSeconds(2.5f);
+                yield return new WaitForSeconds(1.5f);
 
                 // cleanup UI
                 _uiController.FlipCards(3);
                 player1Controller.DeActivateCard();
                 player2Controller.DeActivateCard();
                 Debug.Log(" after slow");
+
+                yield return new WaitForSeconds(1f);
             }
         }
         Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
