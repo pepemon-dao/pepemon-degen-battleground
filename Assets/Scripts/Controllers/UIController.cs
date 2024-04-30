@@ -45,6 +45,8 @@ public class UIController : MonoBehaviour
     Player _player2;
     Transform _sidebar;
 
+    private Coroutine routine;
+
     public void InitialiseGame(Player player1, Player player2)
     {
         _player1 = player1;
@@ -113,12 +115,20 @@ public class UIController : MonoBehaviour
             card.GetComponent<CardController>().SetTargetTransform(go.transform);
             if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
             else _player2Cards.Add(card.GetComponent<CardController>());
+
+            SFXManager.Instance.DealSFX();
         }
+    }
+
+    public void FlipCards(int attackIndex)
+    {
+        if(routine != null) StopCoroutine(routine);
+        routine = StartCoroutine(FlipCardsRoutine(attackIndex));
     }
 
 
     // disables cards based on attacking or defending
-    public void FlipCards(int attackIndex)
+    public IEnumerator FlipCardsRoutine(int attackIndex)
     {
         if (attackIndex == 1) // p1
         {
@@ -126,8 +136,10 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() != false)
                 {
-                    _player1Cards[i].SetAttackingTransform(1);
+                    _player1Cards[i].SetAttackingTransform(new Vector3(0, -5f, 0));
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
+
+                    yield return new WaitForSeconds(0.3f);
                 }
             }
 
@@ -135,8 +147,10 @@ public class UIController : MonoBehaviour
             {
                 if (_player2Cards[i].HostedCard.IsAttackingCard() != true)
                 {
-                    _player2Cards[i].SetAttackingTransform(2);
+                    _player2Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
                     _player2Cards[i].GetComponent<Image>().color = Color.gray;
+
+                    yield return new WaitForSeconds(0.3f);
                 }
             }
         }
@@ -146,9 +160,11 @@ public class UIController : MonoBehaviour
             {
                 if (_player2Cards[i].HostedCard.IsAttackingCard() != false)
                 {
-                    _player2Cards[i].SetAttackingTransform(2);
+                    _player2Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
 
                     _player2Cards[i].GetComponent<Image>().color = Color.gray;
+
+                    yield return new WaitForSeconds(0.3f);
                 }
             }
 
@@ -156,9 +172,11 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() != true)
                 {
-                    _player1Cards[i].SetAttackingTransform(1);
+                    _player1Cards[i].SetAttackingTransform(new Vector3(0, -5f, 0));
 
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
+
+                    yield return new WaitForSeconds(0.3f);
                 }
             }
         }
@@ -169,6 +187,8 @@ public class UIController : MonoBehaviour
                 _player2Cards[i].ReturnToBaseTransform();
 
                 _player2Cards[i].GetComponent<Image>().color = Color.gray;
+
+                yield return new WaitForSeconds(0.1f);
             }
 
             for (int i = 0; i < _player1Cards.Count; i++)
@@ -176,6 +196,8 @@ public class UIController : MonoBehaviour
                 _player1Cards[i].ReturnToBaseTransform();
 
                 _player1Cards[i].GetComponent<Image>().color = Color.gray;
+
+                yield return new WaitForSeconds(0.1f);
             }
         }
 

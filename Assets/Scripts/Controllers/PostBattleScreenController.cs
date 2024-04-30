@@ -7,6 +7,7 @@ using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Scripts.Managers.Sound;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -83,6 +84,8 @@ public class PostBattleScreenController : MonoBehaviour
         }
 
         _btnClaimGift.gameObject.SetActive(isBotMatch);
+
+        ThemePlayer.Instance.PlayGameOverSong(win);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
