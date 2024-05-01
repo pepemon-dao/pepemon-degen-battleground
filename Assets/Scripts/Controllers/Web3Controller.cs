@@ -19,7 +19,6 @@ public class Web3Controller : MonoBehaviour
     public Web3Settings settings;
     public UnityEvent onWalletConnected;
     public int CurrentChainId { get; private set; } = 0;
-    public string SelectedAccountAddress { get; private set; }
 
     #region ThirdWeb
     private Wallet wallet 
@@ -34,7 +33,6 @@ public class Web3Controller : MonoBehaviour
     public UnityEvent<Exception> onConnectionError;
     public UnityEvent onDisconnected;
     public UnityEvent onSwitchNetwork;
-    private string _address;
     #endregion
 
 #if UNITY_EDITOR
@@ -73,10 +71,6 @@ public class Web3Controller : MonoBehaviour
     #endregion
 #endif
 
-#if !UNITY_EDITOR
-    private bool _isMetamaskInitialised = false;
-#endif
-
     [HideInInspector] public bool IsConnected = false;
     [HideInInspector] public ulong StarterDeckID = 0;
     [HideInInspector] public int StarterPepemonID = 0;
@@ -108,7 +102,8 @@ public class Web3Controller : MonoBehaviour
 #endif
         var wc = new WalletConnection(provider, settings.defaultChainId);
         onConnectionRequested.Invoke(wc);
-        _address = await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
+        await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
+        IsConnected = true;
         onWalletConnected?.Invoke();
     }
 
@@ -135,149 +130,4 @@ public class Web3Controller : MonoBehaviour
     {
         return settings.GetChainConfig(CurrentChainId);
     }
-
-    /// <summary>
-    /// Used with QueryUnityRequest to query contract functions (READ operations)
-    /// </summary>
-    /*public IUnityRpcRequestClientFactory GetUnityRpcRequestClientFactory()
-    {
-#if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable()) 
-        {
-            return new MetamaskRequestRpcClientFactory(SelectedAccountAddress, null);
-        }
-        else
-        {
-            DisplayError("Metamask is not available, please install it");
-            return null;
-        }
-#else
-        return new UnityWebRequestRpcClientFactory(settings.debugRpcUrl);
-#endif
-    }*/
-
-    /// <summary>
-    /// Used with QueryUnityRequest to query contract functions (READ operations)
-    /// </summary>
-    /*public IUnityRpcRequestClientFactory GetReadOnlyRpcRequestClientFactory()
-    {
-        return new UnityWebRequestRpcClientFactory(settings.readOnlyRpcUrl);
-    }*/
-
-    /// <summary>
-    /// Used to invoke contract functions (WRITE operations)
-    /// </summary>
-    /*public IContractTransactionUnityRequest GetContractTransactionUnityRequest()
-    {
-#if !UNITY_EDITOR
-        if (MetamaskInterop.IsMetamaskAvailable())
-        {
-            return new MetamaskTransactionUnityRequest(SelectedAccountAddress, GetUnityRpcRequestClientFactory());
-        }
-        else
-        {
-            DisplayError("Metamask is not available, please install it");
-            return null;
-        }
-#else
-        return new TransactionSignedUnityRequest(
-            url: settings.debugRpcUrl,
-            privateKey: settings.debugPrivateKey,
-            chainId: settings.defaultChainId);
-#endif
-    }*/
-
-    // connect wallet in WebGL
-    private void OpenMetamaskConnectDialog()
-    {
-#if !UNITY_EDITOR
-        /*if (MetamaskInterop.IsMetamaskAvailable())
-        {
-            MetamaskInterop.EnableEthereum(Web3Controller.instance.name, nameof(EthereumEnabled), nameof(DisplayError));
-        }
-        else
-        {
-            DisplayError("Metamask is not available, please install it");
-        }*/
-#endif
-    }
-
-    // callback from js
-    public async void EthereumEnabled(string addressSelected)
-    {
-#if !UNITY_EDITOR
-        /*if (!_isMetamaskInitialised)
-        {
-            MetamaskInterop.EthereumInit(gameObject.name, nameof(NewAccountSelected), nameof(ChainChanged));
-            MetamaskInterop.GetChainId(gameObject.name, nameof(ChainChanged), nameof(DisplayError));
-            _isMetamaskInitialised = true;
-        }
-        onWalletConnected?.Invoke();
-        NewAccountSelected(addressSelected);
-        IsConnected = true;*/
-        await Task.CompletedTask;
-#else
-        await Task.CompletedTask;
-#endif
-    }
-
-    /// <summary>
-    /// Displays a popup in metamask asking the user to confirm changing the current network
-    /// </summary>
-    /// <param name="chainId">Network's chain id to switch to</param>
-    /// <returns>Task that must be awaited for the popup to appear</returns>
-    private async Task SwitchChain(int chainId)
-    {
-#if !UNITY_EDITOR
-        /*var addRequest = new WalletAddEthereumChainUnityRequest(GetUnityRpcRequestClientFactory());
-
-        var config = settings.GetChainConfig(chainId);
-        var chainParams = new AddEthereumChainParameter
-        {
-            ChainId = new HexBigInteger(chainId),
-            ChainName = config.chainName,
-            RpcUrls = new List<string> { config.rpcUrl },
-            NativeCurrency = new NativeCurrency
-            {
-                Name = config.chainCurrencyName,
-                Symbol = config.chainCurrencySymbol,
-                Decimals = config.chainCurrencyDecimals
-            }
-        };
-        await addRequest.SendRequest(chainParams);*/
-        
-        await Task.CompletedTask;
-#else
-        await Task.CompletedTask;
-#endif
-    }
-
-    // callback from js
-    public async void ChainChanged(string chainId)
-    {
-        CurrentChainId = (int)new HexBigInteger(chainId).Value;
-        Debug.Log($"Changed chain to {CurrentChainId} (hex: {chainId})");
-
-        if (CurrentChainId != settings.defaultChainId)
-        {
-            Debug.Log($"Attempting to switch chain to {settings.defaultChainId}");
-            await SwitchChain(settings.defaultChainId);
-        }
-    }
-
-    public void DisplayError(string errorMessage)
-    {
-        Debug.LogError(errorMessage);
-    }
-
-    /*public static async Task<TransactionReceipt> GetTransactionReceipt(string transactionHash)
-    {
-        var request = new TransactionReceiptPollingRequest(instance.GetUnityRpcRequestClientFactory());
-        await request.PollForReceipt(transactionHash, 0.25f);
-        if (request.Result != null)
-        {
-            return request.Result;
-        }
-        throw request.Exception;
-    }*/
 }

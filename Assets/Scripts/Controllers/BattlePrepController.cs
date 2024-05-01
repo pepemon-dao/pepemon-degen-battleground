@@ -65,10 +65,10 @@ public class BattlePrepController : MonoBehaviour
         // SetApprovalForAll for CardDeck
         await EnsureDeckTransferApproved();
 
-        var blockNumber = new BlockParameter();
+        var blockNumber = await Blocks.GetLatestBlockNumber();
 
         // filter events starting from the next block, to avoid possibly getting the last battle of the player
-        var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());
+        var nextBlock = new BlockParameter((blockNumber + 1).ToHexBigInteger());
 
         // show the "Waiting for player" screen
         FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.WaitForOpponent);
@@ -123,6 +123,7 @@ public class BattlePrepController : MonoBehaviour
                 player2addr,
                 nextBlock,
                 _cancellationTokenSource.Token);
+        _cancellationTokenSource.Dispose();
 
         // initiate the battle immediatelly if the player initiated the battle
         if (battleEvent != null)

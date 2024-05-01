@@ -11435,7 +11435,7 @@ MonoBehaviour:
     rpcOverride: 
   - identifier: fantom-testnet
     chainId: 4002
-    rpcOverride: 
+    rpcOverride: https://rpc.testnet.fantom.network
   - identifier: hardhat
     chainId: 31337
     rpcOverride: https://localhost:8545

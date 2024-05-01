@@ -119,9 +119,9 @@ public class MainMenuController : MonoBehaviour
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
 
-        if (screenId == 3 && !Web3Controller.instance.IsConnected)  //league selection
+        if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
         {
-            screenId = 9; //starter decks
+            screenId = (int)MainSceneScreensEnum.Tutorial;
         }
 
         for (int i = 0; i < menuScreens.Count; i++)
