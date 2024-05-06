@@ -81,6 +81,31 @@ namespace Scripts.Managers.Sound
 
             _previousClipNumber = randomClipNumber;
         }
+        
+        
+        private IEnumerator PlayNextMusic(AudioClip clip, float newVolume)
+        {
+            int randomClipNumber = GetRandomClipNumber();
+            AudioClip nextClip = GetCurrentClip(randomClipNumber);
+
+            if (clip != null)
+            {
+                nextClip = clip;
+            }
+
+            // Start volume transition
+            StartCoroutine(TransitionVolume(volume, 0f, 0.5f)); // Transition to volume 0
+
+            yield return new WaitForSeconds(0.5f); // Wait for transition to complete
+
+            _themePlayer.clip = nextClip;
+            _themePlayer.Play();
+
+            // Resume volume transition
+            StartCoroutine(TransitionVolume(0f, newVolume, 0.5f)); // Transition to volume 1
+
+            _previousClipNumber = randomClipNumber;
+        }
 
         public void MuteItGradually()
         {
@@ -107,11 +132,6 @@ namespace Scripts.Managers.Sound
         private IEnumerator TransitionVolume(float startVolume, float targetVolume, float transitionTime)
         {
             if (isMuted) yield break;
-
-            if (!_isChillMode)
-            {
-                targetVolume = Mathf.Min(targetVolume, 0.05f);
-            }
 
             float elapsedTime = 0f;
             float transitionSpeed = 1f / transitionTime;
@@ -206,11 +226,11 @@ namespace Scripts.Managers.Sound
         {
             if (isWon)
             {
-                StartCoroutine(PlayNextMusic(_winClip));
+                StartCoroutine(PlayNextMusic(_winClip, 0.3f));
             }
             else
             {
-                StartCoroutine(PlayNextMusic(_loseClip));
+                StartCoroutine(PlayNextMusic(_loseClip, 0.3f));
             }
         }
     }

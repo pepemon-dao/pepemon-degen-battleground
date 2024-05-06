@@ -887,7 +887,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -3474018786988080002, guid: d5532f77320dbe74caba67dd75ab41ff, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 0.05
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -17046,6 +17046,7 @@ MonoBehaviour:
   sfxPlayer: {fileID: 358259827338237820, guid: 2292b391c7fd9be4ea9b55c83fa8284c, type: 3}
   btnSFX: {fileID: 8300000, guid: 50b637389c9191c44b7a1d60ce11737b, type: 3}
   dealSFX: {fileID: 8300000, guid: de83605b10f44f944a5dee49cbdd91ae, type: 3}
+  hitSFX: {fileID: 8300000, guid: 9fdbbff4ed2a9dd46aaddeb8ab6afb75, type: 3}
   slideSFX: {fileID: 8300000, guid: 2cf5235ed103d484bb6616e64eadf2b9, type: 3}
 --- !u!4 &1956814985
 Transform:

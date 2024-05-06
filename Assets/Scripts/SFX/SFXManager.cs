@@ -8,6 +8,7 @@ public class SFXManager : MonoBehaviour
     [SerializeField] private SFXPlayer sfxPlayer;
     [SerializeField] private AudioClip btnSFX;
     [SerializeField] private AudioClip dealSFX;
+    [SerializeField] private AudioClip hitSFX;
     [SerializeField] private AudioClip slideSFX;
 
     public static SFXManager Instance;
@@ -25,6 +26,11 @@ public class SFXManager : MonoBehaviour
     public void DealSFX()
     {
         PlaySFX(dealSFX, 1f);
+    }
+    
+    public void HitSFX()
+    {
+        PlaySFX(hitSFX, 1f);
     }
     
     public void SlideSFX()

@@ -797,6 +797,8 @@ public class GameController : MonoBehaviour
             dmgText2.text = "-" + dmg.ToString();
             dmgText2.DOFade(1f, 1.5f);
         }
+
+        SFXManager.Instance.HitSFX();
     }
 
     private void DisableAttackTexts()
