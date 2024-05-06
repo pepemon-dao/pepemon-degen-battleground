@@ -4391,7 +4391,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 731252688}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -4973,6 +4973,7 @@ RectTransform:
   - {fileID: 1754485980}
   - {fileID: 897114659}
   - {fileID: 128806163}
+  - {fileID: 1270909424}
   - {fileID: 611147079}
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -9027,6 +9028,7 @@ MonoBehaviour:
   sfxPlayer: {fileID: 358259827338237820, guid: 2292b391c7fd9be4ea9b55c83fa8284c, type: 3}
   btnSFX: {fileID: 8300000, guid: 50b637389c9191c44b7a1d60ce11737b, type: 3}
   dealSFX: {fileID: 8300000, guid: b04465c6902e85f4695115a661367c9e, type: 3}
+  hitSFX: {fileID: 8300000, guid: 9fdbbff4ed2a9dd46aaddeb8ab6afb75, type: 3}
   slideSFX: {fileID: 8300000, guid: 2cf5235ed103d484bb6616e64eadf2b9, type: 3}
 --- !u!1 &1233192302
 GameObject:
@@ -9213,7 +9215,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 731252688}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
