@@ -15,24 +15,15 @@ public class Web3Controller : MonoBehaviour
 {
     public static Web3Controller instance;
 
-    // old
     public Web3Settings settings;
     public UnityEvent onWalletConnected;
     public int CurrentChainId { get; private set; } = 0;
 
     #region ThirdWeb
-    private Wallet wallet 
-    { 
-        get => ThirdwebManager.Instance.SDK.Wallet;
-    }
-
     [Header("Events")]
-    public UnityEvent onStart;
     public UnityEvent<WalletConnection> onConnectionRequested;
     public UnityEvent<string> onConnected;
     public UnityEvent<Exception> onConnectionError;
-    public UnityEvent onDisconnected;
-    public UnityEvent onSwitchNetwork;
     #endregion
 
 #if UNITY_EDITOR
@@ -102,9 +93,18 @@ public class Web3Controller : MonoBehaviour
 #endif
         var wc = new WalletConnection(provider, settings.defaultChainId);
         onConnectionRequested.Invoke(wc);
-        await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
-        IsConnected = true;
-        onWalletConnected?.Invoke();
+        try
+        {
+            var address = await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
+            onConnected.Invoke(address);
+            IsConnected = true;
+            onWalletConnected?.Invoke();
+        } 
+        catch (Exception e)
+        {
+            Debug.LogError($"unable to connect wallet: {e}");
+            onConnectionError.Invoke(e);
+        }
     }
 
     private async UniTask WriteDebugLocalAccount()

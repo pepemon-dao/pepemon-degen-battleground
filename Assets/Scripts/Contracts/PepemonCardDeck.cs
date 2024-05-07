@@ -28,7 +28,6 @@ public class PepemonCardDeck
         {
             result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
         }
-        await Task.Delay(1);
         return result;
     }
 
@@ -45,13 +44,15 @@ public class PepemonCardDeck
 
     public static async Task<bool> GetApprovalState(string operatorAddress)
     {
-        return await contract.ERC1155.IsApprovedForAll(Address, operatorAddress);
+        // cant use contract.ERC1155.IsApprovedForAll because it fails in WebGL
+        return await contract.Read<bool>("isApprovedForAll", Address, operatorAddress);
     }
 
 
     public static async Task SetApprovalState(bool approved, string operatorAddress)
     {
-        await contract.ERC1155.SetApprovalForAll(operatorAddress, approved);
+        // cant use contract.ERC1155.SetApprovalForAll because it fails in WebGL
+        await contract.Write("setApprovalForAll", operatorAddress, approved);
     }
 
     public static async Task MintCards()

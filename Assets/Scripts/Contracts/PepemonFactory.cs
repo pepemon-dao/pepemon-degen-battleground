@@ -97,7 +97,8 @@ class PepemonFactory
     /// <returns>result of IsApprovedForAll</returns>
     public static async Task<bool> GetApprovalState(string operatorAddress)
     {
-        return await contract.ERC1155.IsApprovedForAll(Address, operatorAddress);
+        // cant use contract.ERC1155.IsApprovedForAll because it fails in WebGL
+        return await contract.Read<bool>("isApprovedForAll", Address, operatorAddress);
     }
 
     /// <summary>
@@ -108,7 +109,8 @@ class PepemonFactory
     /// <returns>Transaction hash</returns>
     public static async Task SetApprovalState(bool approved, string operatorAddress)
     {
-        await contract.ERC1155.SetApprovalForAll(operatorAddress, approved);
+        // cant use contract.ERC1155.SetApprovalForAll because it fails in WebGL
+        await contract.Write("setApprovalForAll", operatorAddress, approved);
     }
 
     [Serializable]
