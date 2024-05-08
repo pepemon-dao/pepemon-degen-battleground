@@ -1,6 +1,4 @@
-﻿using Contracts.PepemonBattle.abi.ContractDefinition;
-//using Nethereum.Unity.Rpc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +12,7 @@ using Nethereum.Contracts;
 
 class PepemonBattle
 {
+    // used for getting events in native platforms (non-webgl)
     [Event("BattleCreated")]
     public class BattleCreatedEventDto : IEventDTO
     {
@@ -61,34 +60,58 @@ class PepemonBattle
         BlockParameter from,
         CancellationToken cancellationToken)
     {
-        var eventLogs = await new BattleCreatedEventDto()
-            .GetEventABI()
-            .CreateFilterInput(Address, playerAddr1, playerAddr2, from, null)
-            .WaitForEventAsync<BattleCreatedEventDto>(contract, token: cancellationToken);
-
-        var lastEvent = eventLogs.LastOrDefault()?.Event;
-        if (lastEvent == null)
+        if (Utils.IsWebGLBuild())
         {
-            return null;
+            var filter = new Dictionary<string, object>
+            {
+                ["player1Addr"] = playerAddr1,
+                ["player2Addr"] = playerAddr2,
+            };
+            var logs = await ThirdwebExtensions.GetEventsAsync<BattleCreatedEventData>(
+                contract, 
+                "BattleCreated", 
+                filter, 
+                (int)from.BlockNumber.Value, 
+                token: cancellationToken
+            );
+            if (logs.Count == 0)
+            {
+                return null;
+            }
+            return logs.LastOrDefault().data;
         }
-
-        return new BattleCreatedEventData()
+        else
         {
-            BattleId = (ulong) lastEvent.BattleId,
-            Player1Addr = lastEvent.Player1Addr,
-            Player2Addr = lastEvent.Player2Addr,
-            Player1Deck = (ulong)lastEvent.Player1Deck,
-            Player2Deck = (ulong)lastEvent.Player2Deck,
-        };
+            var eventLogs = await new BattleCreatedEventDto()
+                .GetEventABI()
+                .CreateFilterInput(Address, playerAddr1, playerAddr2, from, null)
+                .WaitForEventAsync<BattleCreatedEventDto>(contract, token: cancellationToken);
+
+            var lastEvent = eventLogs.LastOrDefault()?.Event;
+            if (lastEvent == null)
+            {
+                return null;
+            }
+
+            return new BattleCreatedEventData()
+            {
+                BattleId = (ulong)lastEvent.BattleId,
+                Player1Addr = lastEvent.Player1Addr,
+                Player2Addr = lastEvent.Player2Addr,
+                p1DeckId = (ulong)lastEvent.Player1Deck,
+                p2DeckId = (ulong)lastEvent.Player2Deck,
+            };
+        }
     }
 
+    // These fields must match the event fields from the contract in order to work in WebGL
     [Serializable]
     public struct BattleCreatedEventData
     {
-        public ulong BattleId;
         public string Player1Addr;
         public string Player2Addr;
-        public ulong Player1Deck;
-        public ulong Player2Deck;
+        public ulong BattleId;
+        public ulong p1DeckId;
+        public ulong p2DeckId;
     }
 }

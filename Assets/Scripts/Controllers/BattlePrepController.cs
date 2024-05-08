@@ -166,28 +166,28 @@ public class BattlePrepController : MonoBehaviour
         Debug.Log("Loading battle data..");
 
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
-        var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
-        var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
+        var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.p1DeckId);
+        var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.p2DeckId);
 
         Task<IDictionary<ulong, int>> reqPlayer1SupportCards;
         Task<IDictionary<ulong, int>> reqPlayer2SupportCards;
 
-        if (battleEventData.Player1Deck == 10001 || battleEventData.Player1Deck == 10002) //using starter deck
+        if (battleEventData.p1DeckId == 10001 || battleEventData.p1DeckId == 10002) //using starter deck
         {
-            reqPlayer1SupportCards = GetAllSupportCards(battleEventData.Player1Deck);
+            reqPlayer1SupportCards = GetAllSupportCards(battleEventData.p1DeckId);
         }
         else //using own deck
         {
-            reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player1Deck);
+            reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.p1DeckId);
         }
 
-        if (battleEventData.Player2Deck == 10001 || battleEventData.Player2Deck == 10002) //using starter deck
+        if (battleEventData.p2DeckId == 10001 || battleEventData.p2DeckId == 10002) //using starter deck
         {
-            reqPlayer2SupportCards = GetAllSupportCards(battleEventData.Player2Deck);
+            reqPlayer2SupportCards = GetAllSupportCards(battleEventData.p2DeckId);
         }
         else //using own deck
         {
-            reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player2Deck);
+            reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.p2DeckId);
         }
 
         await Task.WhenAll(reqBattleRngSeed, reqPlayer1BattleCard, reqPlayer2BattleCard, reqPlayer1SupportCards, reqPlayer2SupportCards);
