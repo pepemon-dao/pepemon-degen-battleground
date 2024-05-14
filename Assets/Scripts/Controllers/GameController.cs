@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using TMPro;
 using DG;
 using DG.Tweening;
+using Org.BouncyCastle.X509;
+using System.Reflection;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -46,6 +48,8 @@ public class GameController : MonoBehaviour
     [TitleGroup("AttackerUI"), SerializeField] List<GameObject> _attackerUIElements;
     [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText1;
     [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText2;
+    [TitleGroup("HealthBarUI"), SerializeField] HealthSystem healthBar1;
+    [TitleGroup("HealthBarUI"), SerializeField] HealthSystem healthBar2;
 
     [ReadOnly] private BigInteger battleSeed;
 
@@ -223,6 +227,10 @@ public class GameController : MonoBehaviour
         _player1.Initialize();
         _player2.Initialize();
         _uiController.InitialiseGame(_player1, _player2);
+
+        //set health bars
+        healthBar1.SetHealth(_player1.CurrentHP);
+        healthBar2.SetHealth(_player2.CurrentHP);
     }
 
     IEnumerator LoopGame()
@@ -349,6 +357,7 @@ public class GameController : MonoBehaviour
 
                     _player2.CurrentHP -= dmg;
                     AttackDisplay(false, dmg);
+                    healthBar2.TakeDamage(dmg);
 
                     yield return new WaitForSeconds(1f); //1.5
 
@@ -375,6 +384,7 @@ public class GameController : MonoBehaviour
 
                     _player1.CurrentHP -= dmg;
                     AttackDisplay(true, dmg);
+                    healthBar1.TakeDamage(dmg);
 
                     yield return new WaitForSeconds(1f); //1.5
 
