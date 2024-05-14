@@ -297,7 +297,7 @@ public class GameController : MonoBehaviour
         _uiController.DisplayHands();
 
         //delay to show drawing of cards
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f); //3
 
         //! need to think of a better way to display the cards being played
 
@@ -340,17 +340,17 @@ public class GameController : MonoBehaviour
                     player2Controller.ActivateCard(false);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(3f);
+                    yield return new WaitForSeconds(1.5f); //3f
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
                     _player2.CurrentHP -= dmg;
                     AttackDisplay(false, dmg);
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
 
                     DisableAttackTexts();
 
@@ -370,13 +370,13 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(3f);
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
                     _player1.CurrentHP -= dmg;
                     AttackDisplay(true, dmg);
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
 
                     DisableAttackTexts();
 
@@ -395,7 +395,7 @@ public class GameController : MonoBehaviour
                 }
 
                 Debug.Log("waiting 2.5f");
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(1f); //1.5
 
                 // cleanup UI
                 _uiController.FlipCards(3);
@@ -403,7 +403,7 @@ public class GameController : MonoBehaviour
                 player2Controller.DeActivateCard();
                 Debug.Log(" after slow");
 
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(1f); //1
             }
         }
         Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
