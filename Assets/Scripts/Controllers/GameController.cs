@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using TMPro;
 using DG;
 using DG.Tweening;
+using Org.BouncyCastle.X509;
+using System.Reflection;
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -46,6 +48,8 @@ public class GameController : MonoBehaviour
     [TitleGroup("AttackerUI"), SerializeField] List<GameObject> _attackerUIElements;
     [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText1;
     [TitleGroup("AttackerUI"), SerializeField] TMP_Text dmgText2;
+    [TitleGroup("HealthBarUI"), SerializeField] HealthSystem healthBar1;
+    [TitleGroup("HealthBarUI"), SerializeField] HealthSystem healthBar2;
 
     [ReadOnly] private BigInteger battleSeed;
 
@@ -223,6 +227,10 @@ public class GameController : MonoBehaviour
         _player1.Initialize();
         _player2.Initialize();
         _uiController.InitialiseGame(_player1, _player2);
+
+        //set health bars
+        healthBar1.SetHealth(_player1.CurrentHP);
+        healthBar2.SetHealth(_player2.CurrentHP);
     }
 
     IEnumerator LoopGame()
@@ -297,7 +305,7 @@ public class GameController : MonoBehaviour
         _uiController.DisplayHands();
 
         //delay to show drawing of cards
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f); //3
 
         //! need to think of a better way to display the cards being played
 
@@ -340,17 +348,18 @@ public class GameController : MonoBehaviour
                     player2Controller.ActivateCard(false);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(3f);
+                    yield return new WaitForSeconds(1.5f); //3f
 
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
                     _player2.CurrentHP -= dmg;
                     AttackDisplay(false, dmg);
+                    healthBar2.TakeDamage(dmg);
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
 
                     DisableAttackTexts();
 
@@ -370,13 +379,14 @@ public class GameController : MonoBehaviour
                     yield return new WaitForSeconds(3f);
                     _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
                     int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
 
                     _player1.CurrentHP -= dmg;
                     AttackDisplay(true, dmg);
+                    healthBar1.TakeDamage(dmg);
 
-                    yield return new WaitForSeconds(1.5f);
+                    yield return new WaitForSeconds(1f); //1.5
 
                     DisableAttackTexts();
 
@@ -395,7 +405,7 @@ public class GameController : MonoBehaviour
                 }
 
                 Debug.Log("waiting 2.5f");
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(1f); //1.5
 
                 // cleanup UI
                 _uiController.FlipCards(3);
@@ -403,7 +413,7 @@ public class GameController : MonoBehaviour
                 player2Controller.DeActivateCard();
                 Debug.Log(" after slow");
 
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(1f); //1
             }
         }
         Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
