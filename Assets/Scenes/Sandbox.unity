@@ -5348,21 +5348,21 @@ MonoBehaviour:
   _gameController: {fileID: 1869662262}
   _defendIcon: {fileID: 21300000, guid: 4482d92feabb13f4e873b7441d86ecb7, type: 3}
   _attackIcon: {fileID: 21300000, guid: 9c3c2167d3fd248489bcc1ef0a5876d3, type: 3}
-  _player1Health: {fileID: 220155460}
-  _player2Health: {fileID: 1967787644}
+  _player1Health: {fileID: 1967787644}
+  _player2Health: {fileID: 220155460}
   _roundCount: {fileID: 1286222160}
   _index1DeckCount: {fileID: 1927924471}
   _index2DeckCount: {fileID: 1399321424}
-  _index1CardContainer: {fileID: 541548003}
-  _index2CardContainer: {fileID: 1299962426}
-  _deck1Transform: {fileID: 128784404}
-  _deck2Transform: {fileID: 859249683}
+  _index1CardContainer: {fileID: 1299962426}
+  _index2CardContainer: {fileID: 541548003}
+  _deck1Transform: {fileID: 859249683}
+  _deck2Transform: {fileID: 128784404}
   _blurryScreen: {fileID: 904593986}
   _board: {fileID: 495210509}
-  _player1TotalDisplay: {fileID: 724251693}
-  _player2TotalDisplay: {fileID: 1806537176}
-  _player1TotalTextDisplay: {fileID: 417418621}
-  _player2TotalTextDisplay: {fileID: 1813735435}
+  _player1TotalDisplay: {fileID: 1806537176}
+  _player2TotalDisplay: {fileID: 724251693}
+  _player1TotalTextDisplay: {fileID: 1813735435}
+  _player2TotalTextDisplay: {fileID: 417418621}
   _player1Cards: []
   _player2Cards: []
   _newRoundDisplay: {fileID: 1594373887}
@@ -14644,12 +14644,10 @@ MonoBehaviour:
       - {fileID: 11400000, guid: f4bc63fb98618fa4982bdcbc80bb1d26, type: 2}
     PlayedCardCount: 0
   playAutomatically: 1
-  player1Controller: {fileID: 440561646}
-  player2Controller: {fileID: 795337086}
+  player1Controller: {fileID: 795337086}
+  player2Controller: {fileID: 440561646}
   CardsScriptableObjsData: {fileID: 11400000, guid: d1fea7aba5f19cc45991de3bac22c468, type: 2}
   _attackerUIElements:
-  - {fileID: 930516656}
-  - {fileID: 1407158582}
   - {fileID: 1628313076}
   - {fileID: 987754940}
   dmgText1: {fileID: 611147080}
