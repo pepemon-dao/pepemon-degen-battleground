@@ -1,11 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Thirdweb;
 using UnityEngine;
 
 public class PepemonCardDeck
 {
+    public class SupportCardRequest
+    {
+        [Parameter("uint256", "supportCardId", 1)]
+        public virtual BigInteger SupportCardId { get; set; }
+        [Parameter("uint256", "amount", 2)]
+        public virtual BigInteger Amount { get; set; }
+    }
+
     /// <summary>
     /// PepemonCardDeck Contract Address
     /// </summary>

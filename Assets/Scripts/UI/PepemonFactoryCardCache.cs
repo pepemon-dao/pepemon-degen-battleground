@@ -1,5 +1,4 @@
 using NBitcoin;
-//using Nethereum.Unity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

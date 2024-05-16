@@ -1,10 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-//using Nethereum.Unity.Rpc;
-using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
 using UnityEngine.SceneManagement;

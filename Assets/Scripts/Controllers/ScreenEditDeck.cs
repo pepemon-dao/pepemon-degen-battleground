@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
+using static PepemonCardDeck;
 
 /// <summary>
 /// MonoBehavior for Screen_5_EditDeck

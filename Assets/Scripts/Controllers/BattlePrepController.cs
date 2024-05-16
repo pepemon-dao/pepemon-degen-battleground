@@ -1,13 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-//using Nethereum.Unity.Rpc;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using Thirdweb;

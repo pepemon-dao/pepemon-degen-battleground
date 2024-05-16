@@ -1,4 +1,3 @@
-using Contracts.PepemonMatchmaker.abi.ContractDefinition;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
