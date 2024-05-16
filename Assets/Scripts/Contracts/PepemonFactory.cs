@@ -1,4 +1,3 @@
-using Contracts.PepemonFactory.abi.ContractDefinition;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +97,13 @@ class PepemonFactory
     public static async Task<bool> GetApprovalState(string operatorAddress)
     {
         // cant use contract.ERC1155.IsApprovedForAll because it fails in WebGL
-        return await contract.Read<bool>("isApprovedForAll", Address, operatorAddress);
+        var playerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+        if (string.IsNullOrEmpty(playerWalletAddress))
+        {
+            Debug.LogWarning("Unable to call 'isApprovedForAll': Player wallet was not set");
+            return false;
+        }
+        return await contract.Read<bool>("isApprovedForAll", playerWalletAddress, operatorAddress);
     }
 
     /// <summary>
