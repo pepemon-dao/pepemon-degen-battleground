@@ -16,6 +16,7 @@ public class UIController : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] Sprite _attackIcon;
     [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player1Health;
     [TitleGroup("Component References"), SerializeField] TextMeshProUGUI _player2Health;
+    [TitleGroup("Component References"), SerializeField] VersusScreenDisplay _versusScreen;
 
     [BoxGroup("Sidebar")]
     [SerializeField, BoxGroup("Sidebar")] TextMeshProUGUI _roundCount;
@@ -58,6 +59,20 @@ public class UIController : MonoBehaviour
 
         _index1DeckCount.text = player1.PlayerDeck.GetDeck().Count + "cards";
         _index2DeckCount.text = player2.PlayerDeck.GetDeck().Count + "cards";
+
+        SetVersusScreen(player1, player2);
+    }
+
+    private void SetVersusScreen(Player player1, Player player2)
+    {
+        Sprite imgR = player2.PlayerPepemon.CardContent;
+        Sprite imgB = player1.PlayerPepemon.CardContent;
+        Sprite bgR = player2.PlayerPepemon.CardBG;
+        Sprite bgB = player1.PlayerPepemon.CardBG;
+        string rN = player2.PlayerPepemon.DisplayName;
+        string bN = player1.PlayerPepemon.DisplayName;
+
+        _versusScreen.SetVersusScreen(imgR, imgB, bgB, bgR, bN, rN);
     }
 
     public void NewRoundDisplay()
@@ -137,7 +152,7 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() != false)
                 {
-                    _player1Cards[i].SetAttackingTransform(new Vector3(0, -5f, 0));
+                    _player1Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
 
                     yield return new WaitForSeconds(0.3f);
@@ -173,7 +188,7 @@ public class UIController : MonoBehaviour
             {
                 if (_player1Cards[i].HostedCard.IsAttackingCard() != true)
                 {
-                    _player1Cards[i].SetAttackingTransform(new Vector3(0, -5f, 0));
+                    _player1Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
 
                     _player1Cards[i].GetComponent<Image>().color = Color.gray;
 
