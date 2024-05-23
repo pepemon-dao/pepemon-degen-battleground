@@ -60,10 +60,11 @@ public class LeaderboardListLoader : MonoBehaviour
 
             rankings = rankings.OrderByDescending((i) => i.Ranking).Take(TOP_PLAYERS_AMOUNT).ToList();
         }
-        catch(System.Exception)
+        catch(System.Exception e)
         {
             // Might always happen when there are no players in the leaderboard, eg.: new deployment of the Matchmaker contract.
             // Also when there are network issues
+            Debug.Log($"Unable to load leaderboard: {e.Message}");
             _loadingMessage.text = "Unable to load leaderboard";
             return;
         }

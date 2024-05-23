@@ -31,6 +31,7 @@ public class MainMenuController : MonoBehaviour
     private async void Start()
     {
         Application.targetFrameRate = 60;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         // TODO: find a better way to handle re-loading the main scene
         HandleGoingBackToMenu();

@@ -86,17 +86,17 @@ public class PepemonMatchmaker
         PepemonLeagues league, ulong count = 10, ulong offset = 0)
     {
         Thirdweb.Contract contract = contracts(league);
-        var (addresses, rankings) = await contract.Read<(List<string>, List<ulong>)>("getPlayersRankings", count, offset);
+        var result = await contract.Read<RankingReturnType>("getPlayersRankings", count, offset);
         var playersRankings = new List<(string, ulong)>();
 
-        if (addresses.Count != rankings.Count)
+        if (result.addresses.Count != result.rankings.Count)
         {
             Debug.LogWarning("GetPlayersRankings: mismatching array sizes");
         }
 
-        for (int i = 0; i < rankings.Count; i++)
+        for (int i = 0; i < result.rankings.Count; i++)
         {
-            playersRankings.Add((addresses[i], rankings[i]));
+            playersRankings.Add((result.addresses[i], ((ulong)result.rankings[i])));
         }
         return playersRankings;
     }
@@ -114,5 +114,11 @@ public class PepemonMatchmaker
     public static async Task<bool> Exit(PepemonLeagues league, ulong deckId)
     {
         return (await contracts(league).Write("exit", deckId)).receipt.status.IsOne;
+    }
+
+    private class RankingReturnType
+    {
+        public List<string> addresses;
+        public List<BigInteger> rankings;
     }
 }
