@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Scripts.Managers.Sound;
+using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -154,7 +157,7 @@ public class MainMenuController : MonoBehaviour
 
     public void ToggleAudio(bool enable)
     {
-
+        ThemePlayer.Instance.ToggleAudio(enable);
     }
 
     public async void OnConnectWalletButtonClick()
@@ -177,5 +180,10 @@ public class MainMenuController : MonoBehaviour
     {
         _screenLeaderboard.ReloadDefaultLeaderboard();
         ShowScreen(MainSceneScreensEnum.Leaderboard);
+    }
+
+    public void UnMuteThemePlayer()
+    {
+        ThemePlayer.Instance.UnMute();
     }
 }

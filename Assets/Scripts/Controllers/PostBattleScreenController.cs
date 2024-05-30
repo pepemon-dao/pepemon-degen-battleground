@@ -7,6 +7,7 @@ using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Scripts.Managers.Sound;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -83,6 +84,8 @@ public class PostBattleScreenController : MonoBehaviour
         }
 
         _btnClaimGift.gameObject.SetActive(isBotMatch);
+
+        ThemePlayer.Instance.PlayGameOverSong(win);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
@@ -103,8 +106,22 @@ public class PostBattleScreenController : MonoBehaviour
         // go back to previous scene
         IsGoingFromBattle = true;
         IsClaimingGift = true;
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex - 1);
+
+        if (!Web3Controller.instance.IsConnected)
+        {
+            Web3Controller.instance.ConnectWallet();
+        }
+
+        InvokeRepeating(nameof(CheckIfWalletConnected), 0.5f, 0.3f);
+    }
+
+    private void CheckIfWalletConnected()
+    {
+        if (Web3Controller.instance.IsConnected)
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex - 1);
+        }
     }
 
     #region INIT
