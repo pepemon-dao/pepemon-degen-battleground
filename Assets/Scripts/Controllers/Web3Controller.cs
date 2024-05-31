@@ -85,11 +85,13 @@ public class Web3Controller : MonoBehaviour
     {
         Debug.Log("Trying to connect");
 
-#if UNITY_EDITOR
         var provider = WalletProvider.LocalWallet;
+#if UNITY_EDITOR
         await WriteDebugLocalAccount();
+#elif PLATFORM_WEBGL
+        provider = WalletProvider.Metamask;
 #else
-        var provider = WalletProvider.Metamask;
+        provider = WalletProvider.WalletConnect;
 #endif
         var wc = new WalletConnection(provider, settings.defaultChainId);
         onConnectionRequested.Invoke(wc);

@@ -1,6 +1,7 @@
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Nethereum.RPC.Eth.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -86,12 +87,39 @@ public class PepemonMatchmaker
         PepemonLeagues league, ulong count = 10, ulong offset = 0)
     {
         Thirdweb.Contract contract = contracts(league);
-        var result = await contract.Read<RankingReturnType>("getPlayersRankings", count, offset);
+        var result = new RankingReturnType();
         var playersRankings = new List<(string, ulong)>();
+
+        // contract.Read works differently in WebGL, it cant deserialize the result into RankingReturnType because its not using reflection
+        // to find the class' fields, it tries to use Newtonsoft's Deserializer instead.
+        // the return looks like this: {"result":[["0xfef5D85D5113828BF2a74979B4686bB80C9304F4"],["2000"]]}
+        // Internally thirdweb has a generic Result class to wrap it (Result<T> where T is set in Contract.Read<T> below), so
+        // the '{"result":' bit is automatically included
+        if (Utils.IsWebGLBuild()) {
+            var list = await contract.Read<string[][]>("getPlayersRankings", count, offset);
+            if (list.Count() < 2)
+            {
+                Debug.LogWarning("GetPlayersRankings: Invalid format");
+                return playersRankings;
+            }
+            try
+            {
+                result.rankings = list[1].Select(i => BigInteger.Parse(i)).ToList();
+                result.addresses = list[0].ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"GetPlayersRankings: Unable to parse ranking results: {e.Message}");
+            }
+        } 
+        else 
+        {
+            result = await contract.Read<RankingReturnType>("getPlayersRankings", count, offset);
+        }
 
         if (result.addresses.Count != result.rankings.Count)
         {
-            Debug.LogWarning("GetPlayersRankings: mismatching array sizes");
+            Debug.LogWarning("GetPlayersRankings: Mismatching array sizes");
         }
 
         for (int i = 0; i < result.rankings.Count; i++)
