@@ -19,8 +19,14 @@ public class CardPreview : MonoBehaviour
 
     public void ToggleSelected()
     {
+        InvokeRepeating(nameof(SetSelectionGroup), 0.4f, 0.4f);
+    }
+
+    private void SetSelectionGroup()
+    {
+        SelectionGroup selection = GetComponentInParent<SelectionGroup>();
         // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
-        GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
+        selection?.ToggleSelected(GetComponent<SelectionItem>());
     }
 
     public void LoadCardData(ulong cardId)
