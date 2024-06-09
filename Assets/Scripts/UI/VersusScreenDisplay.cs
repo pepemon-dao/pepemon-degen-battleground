@@ -30,7 +30,7 @@ public class VersusScreenDisplay : MonoBehaviour
 
     private IEnumerator Transition()
     {
-        yield return new WaitForSeconds(3.25f);
+        yield return new WaitForSeconds(3.2f);
 
         canvasGroup.DOFade(0f, 1f);
     }
