@@ -41,43 +41,6 @@ public class PepemonMatchmaker
         return await contracts(league).Read<string>("deckOwner", deckId);
     }
 
-    public static async Task<uint> GetBattleFinishedEvents(
-        PepemonLeagues league,
-        string playerAddress,
-        bool asWinner,
-        BlockParameter from,
-        BlockParameter to)
-    {
-        /*if (Utils.IsWebGLBuild())
-        {
-            Thirdweb.Contract contract = contracts(league);
-            var events = await contract.Events.GetAll(
-                new EventQueryOptions
-                {
-                    fromBlock = (int)from.BlockNumber.Value,
-                    toBlock = (int)to.BlockNumber.Value,
-                    filters = new Dictionary<string, object>
-                    {
-                        ["winner"] = asWinner ? playerAddress : null,  // address winner
-                        ["loser"] = asWinner ? null : playerAddress,   // address loser
-                    }
-                });
-            //events.Last().data todo: cast to event type
-        }*/
-        var eventLogs = await new BattleFinishedEventDto()
-            .GetEventABI()
-            .CreateFilterInput(
-                Addresses[(int)league],
-                asWinner ? playerAddress : null,       // address winner
-                asWinner ? null : playerAddress,       // address loser
-                from,
-                to
-             )
-            .GetEventsAsync<BattleFinishedEventDto>(contracts(league));
-
-        return (uint)eventLogs.Last().Event.BattleId;
-    }
-
     public static async Task<ulong> GetLeaderboardPlayersCount(PepemonLeagues league)
     {
         return await contracts(league).Read<ulong>("leaderboardPlayersCount");
