@@ -60,6 +60,7 @@ jobs:
         with:
           unityVersion: 2021.3.12f1
           targetPlatform: WebGL
+          allowDirtyBuild: true
 
       # Output
       - uses: actions/upload-artifact@v3

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Nethereum.Web3;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -15,7 +16,7 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
-    [ReadOnly] public UnityEvent<ulong> onSelectDeck;
+    [ReadOnly] public UnityEvent<ulong, bool> onSelectDeck;
     private bool loadingInProgress = false;
 
     /// <summary>
@@ -38,11 +39,12 @@ public class DeckListLoader : MonoBehaviour
         // destroy before re-creating
         foreach (var deck in _deckList.GetComponentsInChildren<Button>())
         {
-            Destroy(deck.gameObject);
+            if (!deck.name.Contains("StarterDeck"))
+                Destroy(deck.gameObject);
         }
 
         // should not happen, but if it happens then it won't crash the game
-        var account = Web3Controller.instance.SelectedAccountAddress;
+        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
         if (string.IsNullOrEmpty(account))
         {
             loadingMessageLabel.text = "Error: No account selected";
@@ -50,7 +52,7 @@ public class DeckListLoader : MonoBehaviour
         }
 
         // load all decks
-        var decks = await PepemonCardDeck.GetPlayerDecks(Web3Controller.instance.SelectedAccountAddress);
+        var decks = await PepemonCardDeck.GetPlayerDecks(account);
 
         var loadingTasks = new List<UniTask>();
 
@@ -65,7 +67,7 @@ public class DeckListLoader : MonoBehaviour
                 });
             deckInstance.GetComponent<DeckController>().onSelectButtonClicked.AddListener(
                 delegate {
-                    onSelectDeck?.Invoke(deckId);
+                    onSelectDeck?.Invoke(deckId, false);
                 });
 
             // this should set each deck detail in parallel
