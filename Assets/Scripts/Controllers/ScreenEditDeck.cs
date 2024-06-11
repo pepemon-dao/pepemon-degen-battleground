@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
+using static PepemonCardDeck;
 
 /// <summary>
 /// MonoBehavior for Screen_5_EditDeck
@@ -36,7 +37,7 @@ public class ScreenEditDeck : MonoBehaviour
         deckDisplayComponent.ClearSupportCardsList();
 
         currentDeckId = deckId;
-        var account = Web3Controller.instance.SelectedAccountAddress;
+        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
 
         // This only returns unused cards
         var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);

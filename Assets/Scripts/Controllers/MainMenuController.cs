@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Unity.Rpc;
 using Scripts.Managers.Sound;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -34,9 +31,10 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
-    private void Start()
+    private async void Start()
     {
         Application.targetFrameRate = 60;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         // TODO: find a better way to handle re-loading the main scene
         HandleGoingBackToMenu();
@@ -47,7 +45,7 @@ public class MainMenuController : MonoBehaviour
         _creditsButton.onClick.AddListener(OpenCredits);
     }
 
-    private void HandleGoingBackToMenu()
+    private async void HandleGoingBackToMenu()
     {
         if (PepemonFactoryCardCache.CardsIds.Count == 0)
         {
@@ -67,7 +65,7 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    private void DeInitMainScene(bool toLoadScreen)
+    private async void DeInitMainScene(bool toLoadScreen)
     {
         // assume that when no account was selected and his scene loads, its because the game just launched
 
@@ -99,7 +97,7 @@ public class MainMenuController : MonoBehaviour
         {
             ShowScreen(MainSceneScreensEnum.Menu);
             _startGameButton.interactable = true;
-            if (Web3Controller.instance != null && Web3Controller.instance.IsConnected)
+            if (Web3Controller.instance != null && await ThirdwebManager.Instance.SDK.Wallet.GetAddress() != null)
             {
                 _manageDecksButton.interactable = true;
                 _leaderboardButton.interactable = true;
@@ -119,9 +117,9 @@ public class MainMenuController : MonoBehaviour
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
 
-        if (screenId == 3 && !Web3Controller.instance.IsConnected)  //league selection
+        if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
         {
-            screenId = 9; //starter decks
+            screenId = (int)MainSceneScreensEnum.Tutorial;
         }
 
         for (int i = 0; i < menuScreens.Count; i++)
@@ -162,9 +160,9 @@ public class MainMenuController : MonoBehaviour
         ThemePlayer.Instance.ToggleAudio(enable);
     }
 
-    public void OnConnectWalletButtonClick()
+    public async void OnConnectWalletButtonClick()
     {
-        Web3Controller.instance.ConnectWallet();
+        await Web3Controller.instance.ConnectWallet();
     }
 
     public void OnStartGameButtonClick()

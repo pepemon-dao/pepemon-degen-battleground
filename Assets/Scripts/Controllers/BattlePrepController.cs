@@ -1,15 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using Contracts.PepemonCardDeck.abi.ContractDefinition;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Unity.Rpc;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -64,10 +62,10 @@ public class BattlePrepController : MonoBehaviour
         // SetApprovalForAll for CardDeck
         await EnsureDeckTransferApproved();
 
-        var blockNumber = await new BlockParameter().RequestLatestBlockNumber();
+        var blockNumber = await Blocks.GetLatestBlockNumber();
 
         // filter events starting from the next block, to avoid possibly getting the last battle of the player
-        var nextBlock = new BlockParameter((blockNumber.BlockNumber.ToUlong() + 1).ToHexBigInteger());
+        var nextBlock = new BlockParameter((blockNumber + 1).ToHexBigInteger());
 
         // show the "Waiting for player" screen
         FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.WaitForOpponent);
@@ -88,18 +86,19 @@ public class BattlePrepController : MonoBehaviour
             failedToEnter = true;
         }
 
+        var PlayerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+
         // check if the current player's deck is in the matchmaker list of deck owners, if it is, then we can assume the player
         // is in the waitlist
 
         string deckOwner = await PepemonMatchmaker.GetDeckOwner(selectedLeague, selectedDeck);
-
-        string player1addr = Web3Controller.instance.SelectedAccountAddress,
+        string player1addr = PlayerWalletAddress,
                player2addr = null;
 
         // If the player is in the waitlist, then its because a battle has *not* started yet, the current player's address will
         // be in the second parameter of the BattleCreated event in this case.
         // However if the battle *has* started, the player's address will be in the first parameter of the BattleCreated event
-        if (deckOwner.Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase))
+        if (deckOwner.Equals(PlayerWalletAddress, StringComparison.OrdinalIgnoreCase))
         {
             player2addr = player1addr;
             player1addr = null;
@@ -121,6 +120,7 @@ public class BattlePrepController : MonoBehaviour
                 player2addr,
                 nextBlock,
                 _cancellationTokenSource.Token);
+        _cancellationTokenSource.Dispose();
 
         // initiate the battle immediatelly if the player initiated the battle
         if (battleEvent != null)
@@ -163,33 +163,34 @@ public class BattlePrepController : MonoBehaviour
         Debug.Log("Loading battle data..");
 
         var reqBattleRngSeed = PepemonBattle.GetBattleRNGSeed(battleEventData.BattleId);
-        var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player1Deck);
-        var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.Player2Deck);
+        var reqPlayer1BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.p1DeckId);
+        var reqPlayer2BattleCard = PepemonCardDeck.GetBattleCard(battleEventData.p2DeckId);
 
         Task<IDictionary<ulong, int>> reqPlayer1SupportCards;
         Task<IDictionary<ulong, int>> reqPlayer2SupportCards;
 
-        if (battleEventData.Player1Deck == 10001 || battleEventData.Player1Deck == 10002) //using starter deck
+        if (battleEventData.p1DeckId == 10001 || battleEventData.p1DeckId == 10002) //using starter deck
         {
-            reqPlayer1SupportCards = GetAllSupportCards(battleEventData.Player1Deck);
+            reqPlayer1SupportCards = GetAllSupportCards(battleEventData.p1DeckId);
         }
         else //using own deck
         {
-            reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player1Deck);
+            reqPlayer1SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.p1DeckId);
         }
 
-        if (battleEventData.Player2Deck == 10001 || battleEventData.Player2Deck == 10002) //using starter deck
+        if (battleEventData.p2DeckId == 10001 || battleEventData.p2DeckId == 10002) //using starter deck
         {
-            reqPlayer2SupportCards = GetAllSupportCards(battleEventData.Player2Deck);
+            reqPlayer2SupportCards = GetAllSupportCards(battleEventData.p2DeckId);
         }
         else //using own deck
         {
-            reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.Player2Deck);
+            reqPlayer2SupportCards = PepemonCardDeck.GetAllSupportCards(battleEventData.p2DeckId);
         }
 
         await Task.WhenAll(reqBattleRngSeed, reqPlayer1BattleCard, reqPlayer2BattleCard, reqPlayer1SupportCards, reqPlayer2SupportCards);
 
-        Debug.Log("Battle data loaded");
+        Debug.Log("Battle data loaded"); 
+        var PlayerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
 
         battleData.battleRngSeed = reqBattleRngSeed.Result;
         battleData.player1BattleCard = reqPlayer1BattleCard.Result;
@@ -197,7 +198,7 @@ public class BattlePrepController : MonoBehaviour
         battleData.player1SupportCards = reqPlayer1SupportCards.Result;
         battleData.player2SupportCards = reqPlayer2SupportCards.Result;
         battleData.currentPlayerIsPlayer1 = battleEventData.Player1Addr
-            .Equals(Web3Controller.instance.SelectedAccountAddress, StringComparison.OrdinalIgnoreCase);
+            .Equals(PlayerWalletAddress, StringComparison.OrdinalIgnoreCase);
 
         FindObjectOfType<MainMenuController>().ProceedToNextScene();
     }
