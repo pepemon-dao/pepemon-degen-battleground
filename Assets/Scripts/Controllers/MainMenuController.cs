@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Nethereum.Hex.HexTypes;
-using Nethereum.RPC.Eth.DTOs;
-using Nethereum.Unity.Rpc;
+using Scripts.Managers.Sound;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,10 +31,13 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
-    private void Start()
+    private async void Start()
     {
+        Application.targetFrameRate = 60;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         // TODO: find a better way to handle re-loading the main scene
-        DeInitMainScene();
+        HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
@@ -44,11 +45,34 @@ public class MainMenuController : MonoBehaviour
         _creditsButton.onClick.AddListener(OpenCredits);
     }
 
-    private void DeInitMainScene()
+    private async void HandleGoingBackToMenu()
+    {
+        if (PepemonFactoryCardCache.CardsIds.Count == 0)
+        {
+            DeInitMainScene(true);
+        }
+        else if (PostBattleScreenController.IsGoingFromBattle)
+        {
+            PostBattleScreenController.IsGoingFromBattle = false;
+            DeInitMainScene(false);
+        }
+
+
+        if (PostBattleScreenController.IsClaimingGift)
+        {
+            PostBattleScreenController.IsClaimingGift = false;
+            //claim gift
+        }
+    }
+
+    private async void DeInitMainScene(bool toLoadScreen)
     {
         // assume that when no account was selected and his scene loads, its because the game just launched
+
+        /*
         if (Web3Controller.instance == null || Web3Controller.instance.SelectedAccountAddress == null)
         {
+            _startGameButton.interactable = true;
             ShowScreen(defaultScreenId);
         }
         // assume that when an account was already selected, this scene was loaded after a battle that just ended
@@ -58,6 +82,26 @@ public class MainMenuController : MonoBehaviour
             _startGameButton.interactable = true;
             _manageDecksButton.interactable = true;
             _leaderboardButton.interactable = true;
+        }
+
+        */
+
+        // Show load screen in order to load cards into the PepemonFactoryCardCache.
+        // only necessary when launching the game from the battle scene
+        if (toLoadScreen)
+        {
+            _startGameButton.interactable = true;
+            ShowScreen(defaultScreenId);
+        }
+        else
+        {
+            ShowScreen(MainSceneScreensEnum.Menu);
+            _startGameButton.interactable = true;
+            if (Web3Controller.instance != null && await ThirdwebManager.Instance.SDK.Wallet.GetAddress() != null)
+            {
+                _manageDecksButton.interactable = true;
+                _leaderboardButton.interactable = true;
+            }
         }
     }
 
@@ -73,7 +117,12 @@ public class MainMenuController : MonoBehaviour
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
 
-        for(int i = 0; i < menuScreens.Count; i++)
+        if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
+        {
+            screenId = (int)MainSceneScreensEnum.Tutorial;
+        }
+
+        for (int i = 0; i < menuScreens.Count; i++)
         {
             menuScreens[i].SetActive(i == screenId);
         }
@@ -108,12 +157,12 @@ public class MainMenuController : MonoBehaviour
 
     public void ToggleAudio(bool enable)
     {
-
+        ThemePlayer.Instance.ToggleAudio(enable);
     }
 
-    public void OnConnectWalletButtonClick()
+    public async void OnConnectWalletButtonClick()
     {
-        Web3Controller.instance.ConnectWallet();
+        await Web3Controller.instance.ConnectWallet();
     }
 
     public void OnStartGameButtonClick()
@@ -131,5 +180,10 @@ public class MainMenuController : MonoBehaviour
     {
         _screenLeaderboard.ReloadDefaultLeaderboard();
         ShowScreen(MainSceneScreensEnum.Leaderboard);
+    }
+
+    public void UnMuteThemePlayer()
+    {
+        ThemePlayer.Instance.UnMute();
     }
 }

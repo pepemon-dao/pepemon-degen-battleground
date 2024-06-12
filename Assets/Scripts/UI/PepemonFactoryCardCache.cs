@@ -1,5 +1,4 @@
 using NBitcoin;
-using Nethereum.Unity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -132,8 +131,8 @@ class PepemonFactoryCardCache
         }
 
         PepemonFactory.CardMetadata metadata = cardMetadata[tokenId];
-        string url = IpfsUrlService.ResolveIpfsUrlGateway(metadata.image);
-        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
+        //string url = IpfsUrlService.ResolveIpfsUrlGateway();
+        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(metadata.image))
         {
 
             DownloadHandler handle = webRequest.downloadHandler;

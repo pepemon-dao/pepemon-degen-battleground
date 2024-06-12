@@ -1,20 +1,20 @@
-using Contracts.PepemonFactory.abi.ContractDefinition;
-using Cysharp.Threading.Tasks;
-using Nethereum.Unity.Rpc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Thirdweb;
 using UnityEngine;
 
-class PepemonFactory : ERC1155Common
+class PepemonFactory
 {
     /// <summary>
     /// PepemonFactory address (Support cards, Battle cards)
     /// </summary>
     private static string Address => Web3Controller.instance.GetChainConfig().pepemonFactoryAddress;
+    private static string Abi => Web3Controller.instance.GetChainConfig().pepemonFactoryAbi;
+    private static Contract contract => ThirdwebManager.Instance.SDK.GetContract(Address, Abi);
 
     /// <summary>
     /// Gets the stats of multiple battle cards
@@ -77,35 +77,18 @@ class PepemonFactory : ERC1155Common
     /// <returns>List of IDs of owned cards</returns>
     public static async Task<Dictionary<ulong, int>> GetOwnedCards(string address, List<ulong> tokenIds)
     {
-        var request = new QueryUnityRequest<BalanceOfBatchFunction, BalanceOfBatchOutputDTO>(
-            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
-
-        // using NFTsOfUserUnityRequest fails because PepemonFactory uses ERC1155 but NFTsOfUserUnityRequest is for ERC721
-        var response = await request.QueryAsync(
-            new BalanceOfBatchFunction
-            {
-                Ids = tokenIds,
-                Owners = Enumerable.Repeat(address, tokenIds.Count).ToList()
-            },
-            Address);
-
+        var response = await contract.Read<List<ulong>>("balanceOfBatch", Enumerable.Repeat(address, tokenIds.Count).ToList(), tokenIds);
         var ownedCards = new Dictionary<ulong, int>();
-        for (int i = 0; i < (response.ReturnValue1?.Count ?? 0); i++)
-            if (response.ReturnValue1[i] > 0)
-                ownedCards[tokenIds[i]] = (int)response.ReturnValue1[i];
+        for (int i = 0; i < (response?.Count ?? 0); i++)
+            if (response[i] > 0)
+                ownedCards[tokenIds[i]] = (int)response[i];
 
         return ownedCards;
     }
 
     public static async Task<BigInteger> GetTokenSupply(ulong tokenId)
     {
-        var request = new QueryUnityRequest<TotalSupplyFunction, TotalSupplyOutputDTO>(
-            Web3Controller.instance.GetUnityRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
-
-        var response = await request.QueryAsync(new TotalSupplyFunction { Id = tokenId }, Address);
-        return response.ReturnValue1;
+        return await contract.Read<BigInteger>("totalSupply", tokenId);
     }
 
     /// <summary>
@@ -115,7 +98,14 @@ class PepemonFactory : ERC1155Common
     /// <returns>result of IsApprovedForAll</returns>
     public static async Task<bool> GetApprovalState(string operatorAddress)
     {
-        return await GetApproval(Address, operatorAddress);
+        // cant use contract.ERC1155.IsApprovedForAll because it fails in WebGL
+        var playerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+        if (string.IsNullOrEmpty(playerWalletAddress))
+        {
+            Debug.LogWarning("Unable to call 'isApprovedForAll': Player wallet was not set");
+            return false;
+        }
+        return await contract.Read<bool>("isApprovedForAll", playerWalletAddress, operatorAddress);
     }
 
     /// <summary>
@@ -126,7 +116,8 @@ class PepemonFactory : ERC1155Common
     /// <returns>Transaction hash</returns>
     public static async Task SetApprovalState(bool approved, string operatorAddress)
     {
-        await SetApproval(Address, approved, operatorAddress);
+        // cant use contract.ERC1155.SetApprovalForAll because it fails in WebGL
+        await contract.Write("setApprovalForAll", operatorAddress, approved);
     }
 
     [Serializable]

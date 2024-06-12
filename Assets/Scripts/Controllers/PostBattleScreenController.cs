@@ -7,6 +7,7 @@ using Sirenix.OdinInspector;
 using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Scripts.Managers.Sound;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -35,6 +36,7 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] TextReveal _youWinLose;
     [SerializeField] GameObject _rewardDisplay;
     [SerializeField] Button _btnShowMenu;
+    [SerializeField] Button _btnClaimGift;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
@@ -57,14 +59,33 @@ public class PostBattleScreenController : MonoBehaviour
     protected Animator _animator;
     #endregion
 
+    #region EndTransitionBackToMenu
+    public static bool IsGoingFromBattle = false;
+    public static bool IsClaimingGift = false;
+    #endregion
+
     public void SetResult(bool win)
     {
         _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
         _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
 
         // TODO: replace this with the actual gain/loss
-        _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText( (win? RANKING_GAIN: RANKING_LOSS).Replace("#", "10") );
+
+        bool isBotMatch = BattlePrepController.battleData.isBotMatch;
+        if (!isBotMatch)
+        {
+            _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
+        }
+        else
+        {
+            _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText(win ? "Gained Starter Pack" : "");
+        }
+
+        _btnClaimGift.gameObject.SetActive(isBotMatch);
+
+        ThemePlayer.Instance.PlayGameOverSong(win);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
@@ -75,9 +96,32 @@ public class PostBattleScreenController : MonoBehaviour
     public void OnBtnShowMenuClick()
     {
         // go back to previous scene
-        // TODO: skip loading screen
+        IsGoingFromBattle = true;
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
+    }
+    
+    public void OnBtnClaimGiftClick()
+    {
+        // go back to previous scene
+        IsGoingFromBattle = true;
+        IsClaimingGift = true;
+
+        if (!Web3Controller.instance.IsConnected)
+        {
+            Web3Controller.instance.ConnectWallet();
+        }
+
+        InvokeRepeating(nameof(CheckIfWalletConnected), 0.5f, 0.3f);
+    }
+
+    private void CheckIfWalletConnected()
+    {
+        if (Web3Controller.instance.IsConnected)
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex - 1);
+        }
     }
 
     #region INIT
@@ -91,6 +135,8 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
+
+        _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }
 
     private void OnValidate()
