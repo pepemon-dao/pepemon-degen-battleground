@@ -7,9 +7,14 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 
 namespace Contracts.PepemonFactory.abi.ContractDefinition
 {
-    public partial class BattleCardStats : BattleCardStatsBase { }
+    [FunctionOutput]
+    public class BatchGetBattleCardStatsOutputDTO : IFunctionOutputDTO
+    {
+        [Parameter("tuple[]", "", 1)]
+        public virtual List<BattleCardStats> ReturnValue1 { get; set; }
+    }
 
-    public class BattleCardStatsBase 
+    public class BattleCardStats
     {
         [Parameter("uint16", "element", 1)]
         public virtual ushort Element { get; set; }

@@ -1,3 +1,5 @@
+using Contracts.PepemonFactory.abi.ContractDefinition;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,23 +24,8 @@ class PepemonFactory
     /// <returns></returns>
     public static async UniTask<List<BattleCardStats>> BatchGetBattleCardStats(ulong minId, ulong maxId)
     {
-        var request = new QueryUnityRequest<BatchGetBattleCardStatsFunction, BatchGetBattleCardStatsOutputDTO>(
-            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
-
-        BatchGetBattleCardStatsOutputDTO response;
-        try
-        {
-            response = await request.QueryAsync(
-                        new BatchGetBattleCardStatsFunction { MinId = minId, MaxId = maxId },
-                        Address);
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning(e);
-            return null;
-        }
-        return response.ReturnValue1;
+        var result = await contract.ReadRaw<BatchGetBattleCardStatsOutputDTO>("batchGetBattleCardStats", minId, maxId);
+        return result.ReturnValue1;
     }
 
     /// <summary>
@@ -47,26 +34,13 @@ class PepemonFactory
     /// <returns></returns>
     public static async UniTask<List<SupportCardStats>> BatchGetSupportCardStats(ulong minId, ulong maxId)
     {
-        var request = new QueryUnityRequest<BatchGetSupportCardStatsFunction, BatchGetSupportCardStatsOutputDTO>(
-            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
-
-        var response = await request.QueryAsync(
-            new BatchGetSupportCardStatsFunction { MinId = minId, MaxId = maxId },
-            Address);
-
-        return response.ReturnValue1;
+        var result = await contract.ReadRaw<BatchGetSupportCardStatsOutputDTO>("batchGetSupportCardStats", minId, maxId);
+        return result.ReturnValue1;
     }
 
     public static async UniTask<ulong> GetLastCardId()
     {
-        var request = new QueryUnityRequest<GetLastTokenIDFunction, GetLastTokenIDOutputDTO>(
-            Web3Controller.instance.GetReadOnlyRpcRequestClientFactory(),
-            Web3Controller.instance.SelectedAccountAddress);
-
-        var response = await request.QueryAsync(new GetLastTokenIDFunction(), Address);
-
-        return (ulong)response.ReturnValue1;
+        return await contract.Read<ulong>("getLastTokenID");
     }
 
     /// <summary>

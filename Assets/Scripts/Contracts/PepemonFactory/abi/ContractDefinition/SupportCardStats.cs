@@ -7,9 +7,14 @@ using Nethereum.ABI.FunctionEncoding.Attributes;
 
 namespace Contracts.PepemonFactory.abi.ContractDefinition
 {
-    public partial class SupportCardStats : SupportCardStatsBase { }
+    [FunctionOutput]
+    public class BatchGetSupportCardStatsOutputDTO : IFunctionOutputDTO
+    {
+        [Parameter("tuple[]", "", 1)]
+        public virtual List<SupportCardStats> ReturnValue1 { get; set; }
+    }
 
-    public class SupportCardStatsBase 
+    public class SupportCardStats
     {
         [Parameter("bytes32", "currentRoundChanges", 1)]
         public virtual byte[] CurrentRoundChanges { get; set; }
