@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
-using Cysharp.Threading.Tasks;
 using Contracts.PepemonFactory.abi.ContractDefinition;
 
 /// <summary>
@@ -17,8 +16,8 @@ using Contracts.PepemonFactory.abi.ContractDefinition;
 /// </summary>
 class PepemonFactoryCardCache
 {
-    private static ConcurrentDictionary<ulong, Texture2D> cardTextures = new ConcurrentDictionary<ulong, Texture2D>();
-    private static ConcurrentDictionary<ulong, PepemonFactory.CardMetadata> cardMetadata = new ConcurrentDictionary<ulong, PepemonFactory.CardMetadata>();
+    private static ConcurrentDictionary<ulong, Texture2D> cardTextures = new();
+    private static ConcurrentDictionary<ulong, CardMetadata> cardMetadata = new();
 
     public static ICollection<ulong> CardsIds => cardMetadata.Keys;
 
@@ -79,7 +78,7 @@ class PepemonFactoryCardCache
             }
             else
             {
-                cardMetadata[tokenId] = new PepemonFactory.CardMetadata
+                cardMetadata[tokenId] = new CardMetadata
                 {
                     description = battleCardStats[i].Description,
                     image = battleCardStats[i].IpfsAddr,
@@ -111,7 +110,7 @@ class PepemonFactoryCardCache
         {
             var tokenId = (ulong)i + minId;
 
-            cardMetadata[tokenId] = new PepemonFactory.CardMetadata
+            cardMetadata[tokenId] = new CardMetadata
             {
                 description = supportCardStats[i].Description,
                 image = supportCardStats[i].IpfsAddr,
@@ -130,7 +129,7 @@ class PepemonFactoryCardCache
             return;
         }
 
-        PepemonFactory.CardMetadata metadata = cardMetadata[tokenId];
+        CardMetadata metadata = cardMetadata[tokenId];
         //string url = IpfsUrlService.ResolveIpfsUrlGateway();
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(metadata.image))
         {
@@ -176,8 +175,17 @@ class PepemonFactoryCardCache
         return cardTextures.TryGet(tokenId);
     }
 
-    public static PepemonFactory.CardMetadata? GetMetadata(ulong tokenId)
+    public static CardMetadata? GetMetadata(ulong tokenId)
     {
         return cardMetadata.TryGet(tokenId);
     }
+}
+
+[Serializable]
+public struct CardMetadata
+{
+    public string image;
+    public string name;
+    public string description;
+    public bool isSupportCard;
 }

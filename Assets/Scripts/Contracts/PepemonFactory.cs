@@ -103,13 +103,4 @@ class PepemonFactory
         // cant use contract.ERC1155.SetApprovalForAll because it fails in WebGL
         await contract.Write("setApprovalForAll", operatorAddress, approved);
     }
-
-    [Serializable]
-    public struct CardMetadata
-    {
-        public string image;
-        public string name;
-        public string description;
-        public bool isSupportCard;
-    }
 }
