@@ -24,6 +24,11 @@ class PepemonFactory
     /// <returns></returns>
     public static async UniTask<List<BattleCardStats>> BatchGetBattleCardStats(ulong minId, ulong maxId)
     {
+        if (Utils.IsWebGLBuild())
+        {
+            var response = await contract.Read<object[][]>("batchGetBattleCardStats", minId, maxId);
+            return BatchGetBattleCardStatsOutputDTO.FromObject(response).ReturnValue1;
+        }
         var result = await contract.ReadRaw<BatchGetBattleCardStatsOutputDTO>("batchGetBattleCardStats", minId, maxId);
         return result.ReturnValue1;
     }
@@ -34,6 +39,11 @@ class PepemonFactory
     /// <returns></returns>
     public static async UniTask<List<SupportCardStats>> BatchGetSupportCardStats(ulong minId, ulong maxId)
     {
+        if (Utils.IsWebGLBuild())
+        {
+            var response = await contract.Read<object[][]>("batchGetSupportCardStats", minId, maxId);
+            return BatchGetSupportCardStatsOutputDTO.FromObject(response).ReturnValue1;
+        }
         var result = await contract.ReadRaw<BatchGetSupportCardStatsOutputDTO>("batchGetSupportCardStats", minId, maxId);
         return result.ReturnValue1;
     }
