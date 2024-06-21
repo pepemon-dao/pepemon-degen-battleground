@@ -81,7 +81,8 @@ public class Web3Controller : MonoBehaviour
         CurrentChainId = settings.defaultChainId;
     }
 
-    public async UniTask ConnectWallet()
+    // not needed since Thirdweb wallet connect's prefab calls OnWalletConnected
+    /*public async UniTask ConnectWallet()
     {
         Debug.Log("Trying to connect");
 
@@ -107,6 +108,12 @@ public class Web3Controller : MonoBehaviour
             Debug.LogError($"unable to connect wallet: {e}");
             onConnectionError.Invoke(e);
         }
+    }*/
+
+    public void OnWalletConnected()
+    {
+        IsConnected = true;
+        onWalletConnected?.Invoke();
     }
 
     private async UniTask WriteDebugLocalAccount()

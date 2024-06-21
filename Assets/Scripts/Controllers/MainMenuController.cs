@@ -38,7 +38,6 @@ public class MainMenuController : MonoBehaviour
 
         // TODO: find a better way to handle re-loading the main scene
         HandleGoingBackToMenu();
-        _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
@@ -158,11 +157,6 @@ public class MainMenuController : MonoBehaviour
     public void ToggleAudio(bool enable)
     {
         ThemePlayer.Instance.ToggleAudio(enable);
-    }
-
-    public async void OnConnectWalletButtonClick()
-    {
-        await Web3Controller.instance.ConnectWallet();
     }
 
     public void OnStartGameButtonClick()
