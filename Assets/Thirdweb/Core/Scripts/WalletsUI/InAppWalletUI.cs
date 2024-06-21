@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using System.Threading;
 
 namespace Thirdweb.Wallets
 {
@@ -37,6 +38,8 @@ namespace Thirdweb.Wallets
         protected Exception _exception;
         protected string _callbackUrl;
         protected string _customScheme;
+        protected CancellationTokenSource _cancellationTokenSource;
+        protected string _clientId;
 
         #endregion
 
@@ -62,7 +65,7 @@ namespace Thirdweb.Wallets
 
         #region Connection Flow
 
-        public virtual async Task<User> Connect(EmbeddedWallet embeddedWallet, string email, string phoneNumber, AuthOptions authOptions)
+        public virtual async Task<User> Connect(EmbeddedWallet embeddedWallet, string email, string phoneNumber, AuthOptions authOptions, string clientId)
         {
             var config = Resources.Load<ThirdwebConfig>("ThirdwebConfig");
             _customScheme = config != null ? config.customScheme : null;
@@ -71,6 +74,7 @@ namespace Thirdweb.Wallets
             _embeddedWallet = embeddedWallet;
             _email = email;
             _phone = phoneNumber;
+            _clientId = clientId;
             _user = null;
             _exception = null;
             OTPInput.text = "";
@@ -141,8 +145,16 @@ namespace Thirdweb.Wallets
             return _user;
         }
 
+        [ContextMenu("Cancel")]
         public virtual void Cancel()
         {
+            if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
+            {
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+
             _exception = new UnityException("User cancelled");
         }
 
@@ -285,11 +297,27 @@ namespace Thirdweb.Wallets
 
             string redirectUrl = Application.isMobilePlatform ? _customScheme : "http://localhost:8789/";
             CrossPlatformBrowser browser = new();
-            var browserResult = await browser.Login(loginUrl, redirectUrl);
-            if (browserResult.status != BrowserStatus.Success)
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+            var browserResult = await browser.Login(loginUrl, redirectUrl, _cancellationTokenSource.Token);
+
+            if (browserResult.status == BrowserStatus.UserCanceled)
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+                ThirdwebDebug.LogWarning("User cancelled login");
+                return;
+            }
+            else if (browserResult.status != BrowserStatus.Success)
+            {
                 _exception = new UnityException($"Failed to login with {authProviderStr}: {browserResult.status} | {browserResult.error}");
+                return;
+            }
             else
+            {
                 _callbackUrl = browserResult.callbackUrl;
+            }
 
             await new WaitUntil(() => _callbackUrl != null);
 
@@ -340,7 +368,7 @@ namespace Thirdweb.Wallets
             string loginUrl = await _embeddedWallet.FetchHeadlessOauthLoginLinkAsync(authProvider);
             string platform = "unity";
             string redirectUrl = UnityWebRequest.EscapeURL(Application.isMobilePlatform ? _customScheme : "http://localhost:8789/");
-            string developerClientId = UnityWebRequest.EscapeURL(Utils.GetClientId());
+            string developerClientId = UnityWebRequest.EscapeURL(_clientId);
             return $"{loginUrl}?platform={platform}&redirectUrl={redirectUrl}&developerClientId={developerClientId}&authOption={authProvider}";
         }
 

@@ -9,6 +9,8 @@ using Thirdweb;
 using Nethereum.Contracts;
 using Cysharp.Threading.Tasks;
 using System.Linq;
+using Nethereum.Web3;
+using MetaMask.Models;
 
 public static class ThirdwebExtensions
 {
@@ -59,9 +61,8 @@ public static class ThirdwebExtensions
     )
         where TEventDTO : IEventDTO, new()
     {
-        var web3 = Utils.GetWeb3();
+        var web3 = new Web3(new ThirdwebClient(new Uri(ThirdwebManager.Instance.SDK.Session.RPC)));
         var transferEventHandler = web3.Eth.GetEvent<TEventDTO>(contract.Address);
-
         Debug.Log($"Getting events: {typeof(TEventDTO).Name} " +
             $"with {eventFilter.Topics.Length} filter params " +
             $"from blocks {eventFilter.FromBlock.BlockNumber} - {eventFilter.ToBlock.BlockNumber}");
@@ -84,7 +85,7 @@ public static class ThirdwebExtensions
             $"with {eventFilter.Topics.Length} topics " +
             $"from block {eventFilter.FromBlock.BlockNumber}");
 
-        var web3 = Utils.GetWeb3();
+        var web3 = new Web3(new ThirdwebClient(new Uri(ThirdwebManager.Instance.SDK.Session.RPC)));
         var transferEventHandler = web3.Eth.GetEvent<TEventDTO>(contract.Address);
 
         List<EventLog<TEventDTO>> eventLogs;

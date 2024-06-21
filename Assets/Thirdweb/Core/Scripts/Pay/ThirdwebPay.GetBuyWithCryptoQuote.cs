@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Thirdweb.Pay
 {
-    public static partial class ThirdwebPay
+    public partial class ThirdwebPay
     {
         /// <summary>
         /// Get a quote containing a TransactionRequest for swapping any token pair.
@@ -16,9 +16,9 @@ namespace Thirdweb.Pay
         /// <param name="buyWithCryptoParams">Swap parameters <see cref="BuyWithCryptoQuoteParams"/></param>
         /// <returns>Swap quote object <see cref="BuyWithCryptoQuoteResult"/></returns>
         /// <exception cref="Exception"></exception>
-        public static async Task<BuyWithCryptoQuoteResult> GetBuyWithCryptoQuote(BuyWithCryptoQuoteParams buyWithCryptoParams)
+        public async Task<BuyWithCryptoQuoteResult> GetBuyWithCryptoQuote(BuyWithCryptoQuoteParams buyWithCryptoParams)
         {
-            if (string.IsNullOrEmpty(Utils.GetClientId()))
+            if (string.IsNullOrEmpty(_sdk.Session.Options.clientId))
             {
                 throw new Exception("Client ID is not set. Please set it in the ThirdwebManager.");
             }
@@ -34,21 +34,20 @@ namespace Thirdweb.Pay
                 { "toTokenAddress", buyWithCryptoParams.ToTokenAddress },
                 { "toAmount", buyWithCryptoParams.ToAmount },
                 { "toAmountWei", buyWithCryptoParams.ToAmountWei },
-                { "maxSlippageBPS", buyWithCryptoParams.MaxSlippageBPS?.ToString() }
+                { "maxSlippageBPS", buyWithCryptoParams.MaxSlippageBPS?.ToString() },
+                { "intentId", buyWithCryptoParams.IntentId }
             };
 
             var queryStringFormatted = string.Join("&", queryString.Where(kv => kv.Value != null).Select(kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
-            var url = $"{Constants.THIRDWEB_PAY_QUOTE_ENDPOINT}?{queryStringFormatted}";
+            var url = $"{Constants.THIRDWEB_PAY_CRYPTO_QUOTE_ENDPOINT}?{queryStringFormatted}";
 
             using var request = UnityWebRequest.Get(url);
 
-            request.SetRequestHeader("x-sdk-name", "UnitySDK");
-            request.SetRequestHeader("x-sdk-os", Utils.GetRuntimePlatform());
-            request.SetRequestHeader("x-sdk-platform", "unity");
-            request.SetRequestHeader("x-sdk-version", ThirdwebSDK.version);
-            request.SetRequestHeader("x-client-id", Utils.GetClientId());
-            if (!Utils.IsWebGLBuild())
-                request.SetRequestHeader("x-bundle-id", Utils.GetBundleId());
+            var headers = Utils.GetThirdwebHeaders(_sdk.Session.Options.clientId, _sdk.Session.Options.bundleId);
+            foreach (var header in headers)
+            {
+                request.SetRequestHeader(header.Key, header.Value);
+            }
 
             await request.SendWebRequest();
 

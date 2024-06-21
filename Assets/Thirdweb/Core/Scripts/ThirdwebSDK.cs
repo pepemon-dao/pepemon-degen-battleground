@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Newtonsoft.Json;
+using Thirdweb.Pay;
 using UnityEngine;
 
 namespace Thirdweb
@@ -17,9 +18,9 @@ namespace Thirdweb
         public struct Options
         {
             /// <summary>
-            /// Gasless configuration options for the Thirdweb SDK.
+            /// Gasless relayer configuration options for Thirdweb Engine..
             /// </summary>
-            public GaslessOptions? gasless;
+            public RelayerOptions? gasless;
 
             /// <summary>
             /// Storage configuration options for the Thirdweb SDK.
@@ -191,46 +192,19 @@ namespace Thirdweb
             /// The URL of the IPFS gateway.
             /// </summary>
             public string ipfsGatewayUrl;
-
-            /// <summary>
-            /// Custom IPFS Downloader
-            /// </summary>
-            public IStorageDownloader downloaderOverride;
-
-            /// <summary>
-            /// Custom IPFS Uploader
-            /// </summary>
-            public IStorageUploader uploaderOverride;
         }
 
         /// <summary>
-        /// Gasless configuration options.
+        /// Thirdweb Engine Relayer configuration options.
         /// </summary>
         [System.Serializable]
-        public struct GaslessOptions
+        public struct RelayerOptions
         {
-            /// <summary>
-            /// OpenZeppelin Defender Gasless configuration options.
-            /// </summary>
-            public OZDefenderOptions? openzeppelin;
-
-            /// <summary>
-            /// [Obsolete] Biconomy Gasless configuration options. Biconomy is not fully supported and will be removed soon. Use OpenZeppelin Defender instead.
-            /// </summary>
-            [System.Obsolete("Biconomy is not fully supported and will be removed soon. Use OpenZeppelin Defender instead.")]
-            public BiconomyOptions? biconomy;
-
-            /// <summary>
-            /// Indicates whether experimental chainless support is enabled.
-            /// </summary>
-            public bool experimentalChainlessSupport;
+            public EngineRelayerOptions engine;
         }
 
-        /// <summary>
-        /// OpenZeppelin Defender Gasless configuration options.
-        /// </summary>
         [System.Serializable]
-        public struct OZDefenderOptions
+        public struct EngineRelayerOptions
         {
             /// <summary>
             /// The URL of the relayer service.
@@ -253,23 +227,6 @@ namespace Thirdweb
             public string domainVersion;
         }
 
-        /// <summary>
-        /// Biconomy Gasless configuration options.
-        /// </summary>
-        [System.Serializable]
-        public struct BiconomyOptions
-        {
-            /// <summary>
-            /// The API ID for Biconomy.
-            /// </summary>
-            public string apiId;
-
-            /// <summary>
-            /// The API key for Biconomy.
-            /// </summary>
-            public string apiKey;
-        }
-
         private readonly string chainOrRPC;
 
         /// <summary>
@@ -282,9 +239,19 @@ namespace Thirdweb
         /// </summary>
         public Storage Storage { get; internal set; }
 
+        /// <summary>
+        /// Pay with crypto or fiat using the Thirdweb Pay service.
+        /// </summary>
+        public ThirdwebPay Pay { get; internal set; }
+
+        /// <summary>
+        /// Interact with blocks on the active chain.
+        /// </summary>
+        public Blocks Blocks { get; internal set; }
+
         public ThirdwebSession Session { get; internal set; }
 
-        internal const string version = "4.11.0";
+        internal const string version = "4.16.4";
 
         /// <summary>
         /// Create an instance of the Thirdweb SDK.
@@ -294,28 +261,28 @@ namespace Thirdweb
         /// <param name="options">Configuration options.</param>
         public ThirdwebSDK(string chainOrRPC, BigInteger chainId, Options options)
         {
+            if (chainId == null || chainId == 0)
+                throw new UnityException("Chain ID required!");
+
             this.chainOrRPC = chainOrRPC;
-            this.Wallet = new Wallet();
-            this.Storage = new Storage(options.storage, options.clientId);
 
             string rpc = !chainOrRPC.StartsWith("https://")
                 ? (string.IsNullOrEmpty(options.clientId) ? $"https://{chainOrRPC}.rpc.thirdweb.com/" : $"https://{chainOrRPC}.rpc.thirdweb.com/{options.clientId}")
                 : chainOrRPC;
 
-            if (options.clientId != null && new System.Uri(rpc).Host.EndsWith(".thirdweb.com") && !rpc.Contains("bundleId="))
-                rpc = rpc.AppendBundleIdQueryParam();
+            if (options.clientId != null && Utils.IsThirdwebRequest(rpc))
+                rpc = rpc.AppendBundleIdQueryParam(options.bundleId);
 
             if (Utils.IsWebGLBuild())
             {
                 Bridge.Initialize(rpc, options);
-                this.Session = new ThirdwebSession(options, chainId, rpc);
             }
-            else
-            {
-                if (chainId == null)
-                    throw new UnityException("Chain ID override required for native platforms!");
-                this.Session = new ThirdwebSession(options, chainId, rpc);
-            }
+
+            this.Session = new ThirdwebSession(this, options, chainId, rpc);
+            this.Wallet = new Wallet(this);
+            this.Storage = new Storage(this);
+            this.Pay = new ThirdwebPay(this);
+            this.Blocks = new Blocks(this);
 
             if (string.IsNullOrEmpty(options.clientId))
                 ThirdwebDebug.LogWarning(
@@ -333,7 +300,7 @@ namespace Thirdweb
         /// <returns>A contract instance.</returns>
         public Contract GetContract(string address, string abi = null)
         {
-            return new Contract(this.chainOrRPC, address, abi);
+            return new Contract(this, Session.ChainId, address, abi);
         }
     }
 
