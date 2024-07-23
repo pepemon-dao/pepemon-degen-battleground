@@ -89,7 +89,7 @@ public class DeckDisplay : MonoBehaviour
         var cardIsSupportCard = PepemonFactoryCardCache.GetMetadata(cardId)?.isSupportCard ?? false;
 
         // skip battlecards if supportCard=true and skip supportcards if supportCard=false
-        if (cardIsSupportCard ^ supportCard)
+        if (cardIsSupportCard != supportCard)
         {
             return;
         }

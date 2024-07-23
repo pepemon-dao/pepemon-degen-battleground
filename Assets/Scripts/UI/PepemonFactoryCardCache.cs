@@ -94,11 +94,18 @@ class PepemonFactoryCardCache
             return;
         }
 
-        List<SupportCardStats> supportCardStats;
+        List<SupportCardStats> supportCardStats = new();
         try
         {
-            supportCardStats = await PepemonFactory.BatchGetSupportCardStats(
-                supportCardsToFetch[0], supportCardsToFetch[supportCardsToFetch.Count - 1]);
+            var groups = supportCardsToFetch.GroupConsecutive().ToList();
+            foreach (var group in groups)
+            {
+                supportCardStats.AddRange(
+                    await PepemonFactory.BatchGetSupportCardStats(
+                        group.First(), group.Last()
+                    )
+                );
+            }
         }
         catch (Exception ex)
         {
