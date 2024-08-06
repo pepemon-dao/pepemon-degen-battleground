@@ -1,19 +1,26 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if !UNITY_WEBGL || UNITY_EDITOR
+#define ENABLE_CACHE
+#endif
+
+using Cysharp.Threading.Tasks;
+#if ENABLE_CACHE
 using SQLite;
+#endif
 using System;
 using System.IO;
 using UnityEngine;
 
 namespace Assets.Scripts.Cache
 {
-    public class DownloadCache
+    public class CacheController
     {
+#if ENABLE_CACHE
         public const string CACHE_DB_FILENAME = "cache.db";
         public const string CACHE_FOLDER_NAME = "cache";
         private bool dbReady = false;
         private SQLiteAsyncConnection sqlite;
 
-        public DownloadCache()
+        public CacheController()
         {
             UniTask.Void(Init);
         }
@@ -22,7 +29,11 @@ namespace Assets.Scripts.Cache
         {
             dbReady = false;
             string dbPath = GetCacheDbFullPath();
-            await OpenDb(dbPath);
+#if DEBUG
+            Debug.Log($"Opening cache db: {dbPath}");
+#endif
+            await OpenOrCreateDb(dbPath);
+            await InitDbTables(sqlite);
             dbReady = true;
         }
 
@@ -40,7 +51,8 @@ namespace Assets.Scripts.Cache
 
             File.Delete(dbPath);
 
-            await OpenDb(dbPath, true);
+            await OpenOrCreateDb(dbPath, true);
+            await InitDbTables(sqlite);
 
             dbReady = true;
         }
@@ -57,7 +69,7 @@ namespace Assets.Scripts.Cache
             }
             try
             {
-                return (await sqlite.Table<FileCacheEntry>().Where(x => x.Url == url).FirstOrDefaultAsync())?.Data;
+                return (await sqlite.Table<CacheEntry>().Where(x => x.Url == url).FirstOrDefaultAsync())?.Data;
             }
             catch (SQLiteException e)
             {
@@ -83,7 +95,7 @@ namespace Assets.Scripts.Cache
             }
             try
             {
-                await sqlite.InsertOrReplaceAsync(new FileCacheEntry() { Data = data, Url = url });
+                await sqlite.InsertOrReplaceAsync(new CacheEntry() { Data = data, Url = url });
             }
             catch (SQLiteException e)
             {
@@ -95,8 +107,7 @@ namespace Assets.Scripts.Cache
             }
         }
 
-        // also creates the DB if it does not exist
-        private async UniTask OpenDb(string dbPath, bool ignoreError = false)
+        private async UniTask OpenOrCreateDb(string dbPath, bool ignoreError = false)
         {
             try
             {
@@ -115,8 +126,8 @@ namespace Assets.Scripts.Cache
                 }
             }
 
-            // if table FileCacheEntry does not exist
-            if ((await sqlite.GetTableInfoAsync(nameof(FileCacheEntry))).Count == 0)
+            // if table CacheEntry does not exist
+            if ((await sqlite.GetTableInfoAsync(nameof(CacheEntry))).Count == 0)
             {
                 // Firefox uses the same params
                 string[] cmds = new string[]
@@ -144,6 +155,12 @@ namespace Assets.Scripts.Cache
             }
         }
 
+        // Creates the CacheEntry table if it does not exists
+        private async UniTask InitDbTables(SQLiteAsyncConnection conn)
+        {
+            await conn.CreateTableAsync<CacheEntry>();
+        }
+
         public static string GetCacheDbFullPath()
         {
             string path = Path.Combine(Application.temporaryCachePath, CACHE_FOLDER_NAME);
@@ -159,5 +176,9 @@ namespace Assets.Scripts.Cache
             path = Path.Combine(path, CACHE_DB_FILENAME);
             return path;
         }
+#else   // !ENABLE_CACHE
+        public async UniTask Set(string url, byte[] data) => await UniTask.CompletedTask;
+        public async UniTask<byte[]> Get(string url) => await UniTask.FromResult((byte[]) null);
+#endif
     }
 }

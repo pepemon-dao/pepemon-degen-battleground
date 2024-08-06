@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Cache
 {
-    public class FileCacheEntry
+    public class CacheEntry
     {
         [PrimaryKey, AutoIncrement]
         public int? Id { get; set; } = null;
