@@ -26,19 +26,16 @@ jobs:
         run: |
           docker system prune -af
           docker volume prune -f
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          lfs: true
-
-      - name: free disk space
-        run: |
           sudo swapoff -a
           sudo rm -f /swapfile
           sudo apt clean
           docker rmi $(docker image ls -aq)
           df -h
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true
     
       # Cache
       - uses: actions/cache@v3
