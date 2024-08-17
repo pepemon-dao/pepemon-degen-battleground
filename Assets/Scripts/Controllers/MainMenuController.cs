@@ -167,7 +167,8 @@ public class MainMenuController : MonoBehaviour
 
     public void OnStartGameButtonClick()
     {
-        ShowScreen(MainSceneScreensEnum.LeagueSelection);
+        //ShowScreen(MainSceneScreensEnum.LeagueSelection);
+        ShowScreen(MainSceneScreensEnum.Tutorial);
     }
 
     public void OnManageDecksButtonClick()
