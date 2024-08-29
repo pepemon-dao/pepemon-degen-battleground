@@ -35,6 +35,8 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] TextReveal _victoryDefeat;
     [SerializeField] TextReveal _youWinLose;
     [SerializeField] GameObject _rewardDisplay;
+    [SerializeField] GameObject _winDisplay;
+    [SerializeField] GameObject _loseDisplay;
     [SerializeField] Button _btnShowMenu;
     [SerializeField] Button _btnClaimGift;
 
@@ -66,8 +68,10 @@ public class PostBattleScreenController : MonoBehaviour
 
     public void SetResult(bool win)
     {
-        _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
-        _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+        //_victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
+        //_youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+        _winDisplay.SetActive(win);
+        _loseDisplay.SetActive(!win);
 
         // TODO: replace this with the actual gain/loss
 
