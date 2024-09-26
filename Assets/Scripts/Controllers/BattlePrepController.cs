@@ -21,7 +21,7 @@ public class BattlePrepController : MonoBehaviour
     [ReadOnly] private ulong selectedDeck;
     [ReadOnly] private CancellationTokenSource _cancellationTokenSource;
 
-    // used on GameController on the battle scene
+    // Used on GameController on the battle scene
     public static BattleData battleData { get; private set; } = new BattleData();
 
 
