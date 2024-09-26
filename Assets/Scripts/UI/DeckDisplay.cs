@@ -39,13 +39,13 @@ public class DeckDisplay : MonoBehaviour
         if (selectedBattleCard != 0)
         {
             // selected card will appear first, makes it easier to de-select it
-            AddCard(selectedBattleCard, 1, true, isSupportCard: false);
+            AddCard(selectedBattleCard, 1, true, supportCard: false);
         }
 
         // available cards appear after selected one
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
+            AddCard(cardId, availableCardIds[cardId], false, supportCard: false);
         }
     }
 
@@ -78,7 +78,7 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard)
+    private void AddCard(ulong cardId, int count, bool isSelected, bool supportCard)
     {
         if (cardId == 0)
         {
@@ -86,27 +86,16 @@ public class DeckDisplay : MonoBehaviour
             Debug.LogWarning("Invalid card");
             return;
         }
-        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+        var cardIsSupportCard = PepemonFactoryCardCache.GetMetadata(cardId)?.isSupportCard ?? false;
 
-        var cardAttribute = new CardAttribute 
-        { 
-            value = isSupportCard ? "Pepemon Support" : "Pepemon Battle",
-            trait_type = "Set" 
-        };
-
-        // skip battlecards if isSupportCard=true and skip supportcards if isSupportCard=false
-        if (!metadata?.attributes.Contains(cardAttribute) ?? false)
+        // skip battlecards if supportCard=true and skip supportcards if supportCard=false
+        if (cardIsSupportCard != supportCard)
         {
             return;
         }
 
-        var prefab = _battleCardPrefab;
-        var uiList = _battleCardList;
-        if(isSupportCard)
-        {
-            prefab = _supportCardPrefab;
-            uiList = _supportCardList;
-        }
+        var prefab = supportCard ? _battleCardPrefab : _supportCardPrefab;
+        var uiList = supportCard ? _supportCardList : _battleCardList;
 
         for (int i = 0; i < count; i++)
         {

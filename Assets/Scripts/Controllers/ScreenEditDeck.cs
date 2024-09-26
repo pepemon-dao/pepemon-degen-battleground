@@ -40,7 +40,7 @@ public class ScreenEditDeck : MonoBehaviour
         var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
 
         // This only returns unused cards
-        var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds);
+        var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList());
 
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
         supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
