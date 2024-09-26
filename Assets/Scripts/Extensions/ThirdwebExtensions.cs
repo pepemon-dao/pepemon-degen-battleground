@@ -59,7 +59,7 @@ public static class ThirdwebExtensions
     )
         where TEventDTO : IEventDTO, new()
     {
-        var web3 = Utils.GetWeb3();
+        var web3 = Utils.GetWeb3(Web3Controller.instance.CurrentChainId, ThirdwebManager.Instance.clientId, ThirdwebManager.Instance.bundleIdOverride);
         var transferEventHandler = web3.Eth.GetEvent<TEventDTO>(contract.Address);
 
         Debug.Log($"Getting events: {typeof(TEventDTO).Name} " +
@@ -84,7 +84,7 @@ public static class ThirdwebExtensions
             $"with {eventFilter.Topics.Length} topics " +
             $"from block {eventFilter.FromBlock.BlockNumber}");
 
-        var web3 = Utils.GetWeb3();
+        var web3 = Utils.GetWeb3(Web3Controller.instance.CurrentChainId, ThirdwebManager.Instance.clientId, ThirdwebManager.Instance.bundleIdOverride);
         var transferEventHandler = web3.Eth.GetEvent<TEventDTO>(contract.Address);
 
         List<EventLog<TEventDTO>> eventLogs;

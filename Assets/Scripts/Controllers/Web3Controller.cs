@@ -119,9 +119,9 @@ public class Web3Controller : MonoBehaviour
         var path = Utils.GetAccountPath();
         var deviceId = Utils.GetDeviceIdentifier();
         Debug.Log("Encrypting and writing debug key...");
-        await UniTask.RunOnThreadPool(() => 
+        await UniTask.RunOnThreadPool(async () => 
         {
-            var content = Utils.EncryptAndGenerateKeyStore(key, deviceId);
+            var content = await Utils.EncryptAndGenerateKeyStore(key, deviceId);
             File.WriteAllText(path, content);
         });
         Debug.Log("Done");

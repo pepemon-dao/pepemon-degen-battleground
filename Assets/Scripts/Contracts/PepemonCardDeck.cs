@@ -1,5 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Thirdweb;
@@ -97,7 +98,19 @@ public class PepemonCardDeck
     {
         // TODO: Check if max support cards will be reached
         // TODO: Check if the player has the cards
-        await contract.Write("addSupportCardsToDeck", deckId, requests);
+        if (Utils.IsWebGLBuild())
+        {
+            // This fixes an annoying error "Error: invalid BigNumber value" in the webgl build
+            await contract.Write("addSupportCardsToDeck", deckId, requests.Select((a) => new List<object>()
+            {
+                a.SupportCardId,
+                a.Amount
+            }));
+        }
+        else
+        {
+            await contract.Write("addSupportCardsToDeck", deckId, requests);
+        }
     }
 
     /// <summary>
@@ -106,6 +119,18 @@ public class PepemonCardDeck
     public static async Task RemoveSupportCards(ulong deckId, params SupportCardRequest[] requests)
     {
         // TODO: Check if the deck has requested cards before removing
-        await contract.Write("removeSupportCardsFromDeck", deckId, requests);
+        if (Utils.IsWebGLBuild())
+        {
+            // This fixes an annoying error "Error: invalid BigNumber value" in the webgl build
+            await contract.Write("removeSupportCardsFromDeck", deckId, requests.Select((a) => new List<object>()
+            {
+                a.SupportCardId,
+                a.Amount
+            }));
+        }
+        else
+        {
+            await contract.Write("removeSupportCardsFromDeck", deckId, requests);
+        }
     }
 }

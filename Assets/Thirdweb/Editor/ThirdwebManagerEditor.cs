@@ -50,8 +50,8 @@ namespace Thirdweb
         private GUIContent warningIcon;
         private Texture2D bannerImage;
 
-        private static readonly string ExpandedStateKey = "ThirdwebManagerEditor_ExpandedState_4.11.0";
-        private static readonly string OptionalStateKey = "ThirdwebManagerEditor_OptionalState_4.11.0";
+        private static readonly string ExpandedStateKey = "ThirdwebManagerEditor_ExpandedState_4.20.1";
+        private static readonly string OptionalStateKey = "ThirdwebManagerEditor_OptionalState_4.20.1";
 
         private void OnEnable()
         {
@@ -263,13 +263,12 @@ namespace Thirdweb
 
             // OZ Defender Options
             sectionExpanded[3] = DrawSectionWithExpand(
-                "OpenZeppelin Defender Options",
+                "Gasless Relayer Options",
                 sectionExpanded[3],
                 () =>
                 {
                     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                     EditorGUILayout.PropertyField(relayerUrlProperty);
-                    EditorGUILayout.PropertyField(forwarderAddressProperty);
 
                     EditorGUI.BeginChangeCheck();
                     showGaslessOptionalFields = EditorGUILayout.ToggleLeft("Show Optional Fields", showGaslessOptionalFields);
@@ -280,6 +279,7 @@ namespace Thirdweb
 
                     if (showGaslessOptionalFields)
                     {
+                        EditorGUILayout.PropertyField(forwarderAddressProperty);
                         EditorGUILayout.PropertyField(forwarderDomainOverrideProperty);
                         EditorGUILayout.PropertyField(forwaderVersionOverrideProperty);
                     }
@@ -317,7 +317,6 @@ namespace Thirdweb
                 () =>
                 {
                     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                    EditorGUILayout.PropertyField(factoryAddressProperty);
                     EditorGUILayout.PropertyField(gaslessProperty);
 
                     EditorGUI.BeginChangeCheck();
@@ -329,6 +328,7 @@ namespace Thirdweb
 
                     if (showSmartWalletOptionalFields)
                     {
+                        EditorGUILayout.PropertyField(factoryAddressProperty);
                         EditorGUILayout.PropertyField(erc20PaymasterAddressProperty);
                         EditorGUILayout.PropertyField(erc20TokenAddressProperty);
                         EditorGUILayout.PropertyField(bundlerUrlProperty);

@@ -19,7 +19,7 @@ namespace MetaMask.Unity.Providers
     public class JsSDKProvider : BaseProvider
     {
         private IAppConfig _appConfig;
-        private MetaMaskUnity _unitySdk;
+        private IMetaMaskSDK _unitySdk;
         
         [DllImport("__Internal")]
         public static extern bool _InitMetaMaskJS(string dappName, string dappUrl, string dappIcon, 
@@ -38,7 +38,7 @@ namespace MetaMask.Unity.Providers
         [DllImport("__Internal")]
         public static extern bool _HasMetaMaskJSSession();
 
-        public JsSDKProvider(MetaMaskUnity sdk)
+        public JsSDKProvider(IMetaMaskSDK sdk)
         {
             // We need to init this service, because MetaMaskUnity uses it for
             // event propagation... maybe move it out of SocketIO ?
@@ -78,12 +78,6 @@ namespace MetaMask.Unity.Providers
             
             _SendMetaMaskJS(request.Id, request.Method, json, decodedCallback, errorCallback);
         }
-        
-        public override void LoadOrCreateSession(IAppConfig appConfig, IEciesProvider eciesProvider)
-        {
-            // Only save the session data, but nothing else
-            this.Session = new MetaMaskSession(eciesProvider, new MetaMaskSessionData(appConfig));
-        }
 
         public override void ClearSession()
         {
@@ -107,7 +101,7 @@ namespace MetaMask.Unity.Providers
             _DisconnectMetaMaskJS();
         }
 
-        public override void Connect(bool useConnectAndSign = false)
+        public override void Connect(bool extendedInitAllowed = false)
         {
             var providerCallback = JSCallback.Using(ConnectCallback);
             var walletCallback = JSCallback.Using(OnWalletAuthorized);
@@ -129,15 +123,24 @@ namespace MetaMask.Unity.Providers
                 throw new Exception("AppName cannot be null or empty. Please set in Tools > MetaMask > Setup Window");
             }
             
+            this.Session = new MetaMaskSession(new MetaMaskSessionData(_appConfig), new ChannelConfig());
+            
             _InitMetaMaskJS(_appConfig.AppName, _appConfig.AppUrl, _appConfig.AppIcon, 
                 this._unitySdk.InfuraProjectId, JsonConvert.SerializeObject(rpcMap), 
-                walletCallback, providerCallback, errorCallback, eventCallback, !useConnectAndSign, Debug.isDebugBuild);
+                walletCallback, providerCallback, errorCallback, eventCallback, extendedInitAllowed, Debug.isDebugBuild);
         }
 
         private void OnEthereumEvent(string json)
         {
             var payload = JsonConvert.DeserializeObject<JsonRpcPayload>(json);
             EthereumEventReceived?.Invoke(this, new JsonRpcEventArgs(payload, json));
+        }
+
+        protected override void OnWalletAuthorized()
+        {
+            ValidateProvider();
+            
+            base.OnWalletAuthorized();
         }
 
         private void ConnectCallback()

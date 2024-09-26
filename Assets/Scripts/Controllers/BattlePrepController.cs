@@ -62,7 +62,7 @@ public class BattlePrepController : MonoBehaviour
         // SetApprovalForAll for CardDeck
         await EnsureDeckTransferApproved();
 
-        var blockNumber = await Blocks.GetLatestBlockNumber();
+        var blockNumber = await ThirdwebManager.Instance.SDK.Blocks.GetLatestBlockNumber();
 
         // filter events starting from the next block, to avoid possibly getting the last battle of the player
         var nextBlock = new BlockParameter((blockNumber + 1).ToHexBigInteger());

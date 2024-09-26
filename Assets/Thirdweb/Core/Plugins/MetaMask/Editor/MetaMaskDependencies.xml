@@ -78,6 +78,5 @@
          * "subspecs" (optional)
            Subspecs to include for the pod.
      -->
-    <iosPod name="Starscream"></iosPod>
   </iosPods>
 </dependencies>

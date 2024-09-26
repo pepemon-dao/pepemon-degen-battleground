@@ -12,24 +12,6 @@ namespace Thirdweb.Wallets
 {
     public class ThirdwebMetamask : IThirdwebWallet
     {
-        public class MetaMaskThirdwebConfig : MetaMaskConfig
-        {
-            public void SetDefaults(MetaMaskConfig defaults)
-            {
-                this.encrypt = defaults.Encrypt;
-                this.log = defaults.Log;
-                this.encryptionPassword = defaults.EncryptionPassword;
-                this.userAgent = defaults.UserAgent;
-                this.socketUrl = defaults.SocketUrl;
-            }
-
-            public void UpdateConfig(string appName, string appUrl)
-            {
-                this.appName = appName;
-                this.appUrl = appUrl;
-            }
-        }
-
         private Web3 _web3;
         private readonly WalletProvider _provider;
         private readonly WalletProvider _signerProvider;
@@ -47,30 +29,15 @@ namespace Thirdweb.Wallets
             {
                 GameObject.Instantiate(ThirdwebManager.Instance.MetamaskPrefab);
                 await new WaitForSeconds(1f);
-                SetupMetaMask();
             }
-            await MetamaskUI.Instance.Connect();
-            _web3 = MetaMaskUnity.Instance.CreateWeb3();
+            await MetamaskUI.Instance.Connect(walletConnection);
+            _web3 = MetaMaskSDK.Instance.CreateWeb3();
             return await GetAddress();
-        }
-
-        private void SetupMetaMask()
-        {
-            var config = ScriptableObject.CreateInstance<MetaMaskThirdwebConfig>();
-            var defaults = MetaMaskConfig.DefaultInstance;
-
-            config.SetDefaults(defaults);
-
-            var appName = ThirdwebManager.Instance.SDK.Session.Options.wallet?.appName;
-            var appUrl = ThirdwebManager.Instance.SDK.Session.Options.wallet?.appUrl;
-            config.UpdateConfig(appName, appUrl);
-
-            MetaMaskUnity.Instance.Initialize(config);
         }
 
         public Task Disconnect(bool endSession = true)
         {
-            MetaMaskUnity.Instance.Disconnect(endSession);
+            MetaMaskSDK.Instance.Disconnect(endSession);
             _web3 = null;
             return Task.CompletedTask;
         }
@@ -82,7 +49,7 @@ namespace Thirdweb.Wallets
 
         public Task<string> GetAddress()
         {
-            var addy = MetaMaskUnity.Instance.Wallet.SelectedAddress;
+            var addy = MetaMaskSDK.Instance.Wallet.SelectedAddress;
             if (addy != null)
                 addy = addy.ToChecksumAddress();
             return Task.FromResult(addy);
@@ -123,9 +90,17 @@ namespace Thirdweb.Wallets
             return Task.FromResult(_web3 != null);
         }
 
-        public Task<NetworkSwitchAction> PrepareForNetworkSwitch(BigInteger newChainId, string newRpc)
+        public async Task<NetworkSwitchAction> PrepareForNetworkSwitch(BigInteger newChainId, string newRpc)
         {
-            return Task.FromResult(NetworkSwitchAction.ContinueSwitch);
+            var selectedChain = await _web3.Eth.ChainId.SendRequestAsync();
+            if (selectedChain.Value != newChainId)
+            {
+                return NetworkSwitchAction.ContinueSwitch;
+            }
+            else
+            {
+                return NetworkSwitchAction.Handled;
+            }
         }
     }
 }

@@ -11894,7 +11894,7 @@ MonoBehaviour:
   initializeOnAwake: 1
   showDebugLogs: 1
   bundleIdOverride: 
-  thirdwebConfig: {fileID: 0}
+  thirdwebConfig: {fileID: 11400000, guid: 775ff98fee67e374b949a26b2640cabd, type: 2}
   appName: 
   appDescription: 
   appIcons: []
