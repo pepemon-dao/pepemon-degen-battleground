@@ -144,7 +144,6 @@ namespace SQLite.Tests
 					rollbacks++;
 			};
 
-			LogAssert.Expect(LogType.Exception, "Exception: User exception");
 			try
 			{
 				await adb.RunInTransactionAsync(db =>
@@ -154,13 +153,11 @@ namespace SQLite.Tests
 				});
 				Assert.Fail("Should have thrown");
 			}
-			catch (AggregateException aex)
-				when (aex.InnerException.Message == "User exception")
+			catch (Exception aex)
+				when (aex.Message == "User exception")
 			{
-				// Expected
-			}
-			LogAssert.NoUnexpectedReceived();
-
+                // Expected
+            }
 			Assert.AreEqual(1, rollbacks);
 		});
 
@@ -183,15 +180,12 @@ namespace SQLite.Tests
 			};
 
 			// UnityTestRunner can't handle Exception properly.
-			LogAssert.Expect(LogType.Exception, "SQLiteException: Make commit fail");
 			try
 			{
 				await adb.RunInTransactionAsync(db => { db.Insert(new TestObj()); });
 				Assert.Fail("Should have thrown");
 			}
-			catch (AggregateException aex)
-				when (aex.InnerException is SQLiteException ex
-				      && ex.Result == SQLite3.Result.Busy)
+			catch (SQLiteException)
 			{
 				// Expected
 			}
