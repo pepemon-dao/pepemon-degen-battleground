@@ -1,3 +1,7 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
+#define ENABLE_CACHE
+#endif
+
 using NBitcoin;
 using System;
 using System.Collections.Concurrent;
@@ -9,6 +13,7 @@ using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 using Contracts.PepemonFactory.abi.ContractDefinition;
+using Assets.Scripts.Cache;
 
 /// <summary>
 /// Downloads and caches PepemonFactory card information, including metadata 
@@ -18,6 +23,7 @@ class PepemonFactoryCardCache
 {
     private static ConcurrentDictionary<ulong, Texture2D> cardTextures = new();
     private static ConcurrentDictionary<ulong, CardMetadata> cardMetadata = new();
+    private static CacheController cacheController = new();
 
     public static ICollection<ulong> CardsIds => cardMetadata.Keys;
 
@@ -137,10 +143,19 @@ class PepemonFactoryCardCache
         }
 
         CardMetadata metadata = cardMetadata[tokenId];
-        //string url = IpfsUrlService.ResolveIpfsUrlGateway();
+
+        var cachedImage = await cacheController.Get(metadata.image);
+        if (cachedImage != null)
+        {
+            var texture = new Texture2D(8, 8);
+            texture.LoadImage(cachedImage);
+            cardTextures[tokenId] = GenerateMipmaps(texture);
+            cardLoadedCallback?.Invoke(tokenId);
+            return;
+        }
+
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(metadata.image))
         {
-
             DownloadHandler handle = webRequest.downloadHandler;
             try
             {
@@ -164,7 +179,12 @@ class PepemonFactoryCardCache
                     return;
             }
             Debug.Log("Download of card image successful. Card id: " + tokenId);
-            cardTextures[tokenId] = GenerateMipmaps(DownloadHandlerTexture.GetContent(webRequest));
+
+            var texture = DownloadHandlerTexture.GetContent(webRequest);
+#if ENABLE_CACHE
+            await cacheController.Set(metadata.image, texture.EncodeToPNG());
+#endif
+            cardTextures[tokenId] = GenerateMipmaps(texture);
             cardLoadedCallback?.Invoke(tokenId);
         }
     }
