@@ -1,3 +1,5 @@
+using Contracts.PepemonFactory.abi.ContractDefinition;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +19,38 @@ class PepemonFactory
     private static Contract contract => ThirdwebManager.Instance.SDK.GetContract(Address, Abi);
 
     /// <summary>
-    /// Gets the specified card's metadata
+    /// Gets the stats of multiple battle cards
     /// </summary>
     /// <returns></returns>
-    public static async Task<CardMetadata?> GetCardMetadata(ulong tokenId)
+    public static async UniTask<List<BattleCardStats>> BatchGetBattleCardStats(ulong minId, ulong maxId)
     {
-        try
+        if (Utils.IsWebGLBuild())
         {
-            var response = await contract.Read<string>("uri", tokenId);
-            var regexGroups = Regex.Match(response, "^data:application/json;base64[^\\w]+(.+)").Groups;
-            if (regexGroups.Count > 1)
-            {
-                var decoded = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(regexGroups[1].Value));
-                return JsonUtility.FromJson<CardMetadata>(decoded);
-            }
+            var response = await contract.Read<object[][]>("batchGetBattleCardStats", minId, maxId);
+            return BatchGetBattleCardStatsOutputDTO.FromObject(response).ReturnValue1;
         }
-        catch (Exception e)
-        {
-            // Usually tokenId was not found
-            Debug.LogException(e);
-            return null;
-        }
+        var result = await contract.ReadRaw<BatchGetBattleCardStatsOutputDTO>("batchGetBattleCardStats", minId, maxId);
+        return result.ReturnValue1;
+    }
 
-        Debug.LogWarning("Unable to parse metadata of tokenId " + tokenId);
-        return null;
+    /// <summary>
+    /// Gets the stats of multiple support cards
+    /// </summary>
+    /// <returns></returns>
+    public static async UniTask<List<SupportCardStats>> BatchGetSupportCardStats(ulong minId, ulong maxId)
+    {
+        if (Utils.IsWebGLBuild())
+        {
+            var response = await contract.Read<object[][]>("batchGetSupportCardStats", minId, maxId);
+            return BatchGetSupportCardStatsOutputDTO.FromObject(response).ReturnValue1;
+        }
+        var result = await contract.ReadRaw<BatchGetSupportCardStatsOutputDTO>("batchGetSupportCardStats", minId, maxId);
+        return result.ReturnValue1;
+    }
+
+    public static async UniTask<ulong> GetLastCardId()
+    {
+        return await contract.Read<ulong>("getLastTokenID");
     }
 
     /// <summary>
@@ -63,30 +73,6 @@ class PepemonFactory
     public static async Task<BigInteger> GetTokenSupply(ulong tokenId)
     {
         return await contract.Read<BigInteger>("totalSupply", tokenId);
-    }
-
-    public static async Task<ulong> FindMaxTokenId(ulong parallelBatchSize = 5)
-    {
-        ulong batch = 0;
-        ulong maxTokenId = 0;
-        ulong batchTokenMaxId = 0;
-        do
-        {
-            List<Task<ulong>> tasks = new List<Task<ulong>>();
-            Debug.Log($"Checking supply of tokens {batch * parallelBatchSize}...{(batch + 1) * parallelBatchSize - 1}");
-            for (ulong i = 0; i < parallelBatchSize; i++)
-            {
-                ulong tokenId = batch * parallelBatchSize + i;
-                tasks.Add(GetTokenSupply(tokenId).ContinueWith(supply => supply.Result > 0 ? tokenId : 0));
-            }
-            await Task.WhenAll(tasks);
-
-            batchTokenMaxId = tasks.Select(t => t.Result).Max();
-            maxTokenId = Math.Max(maxTokenId, batchTokenMaxId);
-            batch++;
-        } while (batchTokenMaxId > 0);
-        
-        return maxTokenId;
     }
 
     /// <summary>
@@ -116,22 +102,5 @@ class PepemonFactory
     {
         // cant use contract.ERC1155.SetApprovalForAll because it fails in WebGL
         await contract.Write("setApprovalForAll", operatorAddress, approved);
-    }
-
-    [Serializable]
-    public struct CardMetadata
-    {
-        public string external_url;
-        public string image;
-        public string name;
-        public string description;
-        public CardAttribute[] attributes;
-    }
-
-    [Serializable]
-    public struct CardAttribute
-    {
-        public string trait_type;
-        public string value;
     }
 }
