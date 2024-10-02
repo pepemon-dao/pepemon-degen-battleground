@@ -17,7 +17,7 @@ public class ScreenManageDecks : MonoBehaviour
     public void SelectEditDeck(ulong deckId)
     {
         Debug.Log("Editing deck: " + deckId);
-        _screenEditDeck.GetComponent<ScreenEditDeck>().LoadAllCards(deckId);
+        _screenEditDeck.GetComponent<ScreenEditDeck>().LoadAllCards(deckId, FilterController.Instance.currentFilter);
         FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.EditDeck);
     }
 
