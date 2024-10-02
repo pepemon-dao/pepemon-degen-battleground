@@ -37,7 +37,10 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] GameObject _rewardDisplay;
     [SerializeField] GameObject _winDisplay;
     [SerializeField] GameObject _loseDisplay;
+    [SerializeField] GameObject _leaderboardMsg;
+    [SerializeField] GameObject _starterPackMsg;
     [SerializeField] Button _btnShowMenu;
+    [SerializeField] Button _btnShowMenu2;
     [SerializeField] Button _btnClaimGift;
 
     [Title("Screen Events")]
@@ -76,18 +79,25 @@ public class PostBattleScreenController : MonoBehaviour
         // TODO: replace this with the actual gain/loss
 
         bool isBotMatch = BattlePrepController.battleData.isBotMatch;
-        if (!isBotMatch)
+        bool isTutorial = BotTextTutorial.Instance.wasInTutorial;
+        if (isTutorial)
         {
             _rewardDisplay.GetComponentInChildren<TextReveal>()
             .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
         }
         else
         {
-            _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText(win ? "Gained Starter Pack" : "");
+            _rewardDisplay.SetActive(false);
+            //_rewardDisplay.GetComponentInChildren<TextReveal>()
+            //.SetText(win ? "Gained Starter Pack" : "");
         }
 
-        _btnClaimGift.gameObject.SetActive(isBotMatch);
+        bool claimedStarterPack = PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
+        _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
+        _leaderboardMsg.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
+        _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
+        _btnShowMenu.gameObject.SetActive(_btnClaimGift.gameObject.activeSelf);
+        _btnShowMenu2.gameObject.SetActive(!_btnClaimGift.gameObject.activeSelf);
 
         ThemePlayer.Instance.PlayGameOverSong(win);
     }
@@ -139,6 +149,7 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
+        _btnShowMenu2.onClick.AddListener(OnBtnShowMenuClick);
 
         _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }

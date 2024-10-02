@@ -28,7 +28,7 @@ public class ScreenEditDeck : MonoBehaviour
         _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
-    public async void LoadAllCards(ulong deckId)
+    public async void LoadAllCards(ulong deckId, int filter)
     {
         var deckDisplayComponent = _deckDisplay.GetComponent<DeckDisplay>();
 
@@ -45,8 +45,9 @@ public class ScreenEditDeck : MonoBehaviour
         battleCard = await PepemonCardDeck.GetBattleCard(deckId);
         supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
 
-        deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
-        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
+        deckDisplayComponent.ClearMyCardsList();
+        deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard, filter);
+        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
         _textLoading.SetActive(false);
     }
 
@@ -63,7 +64,20 @@ public class ScreenEditDeck : MonoBehaviour
         try
         {
             await PepemonCardDeck.MintCards();
-            LoadAllCards(currentDeckId);
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter);
+        } 
+        finally
+        {
+            setButtonsInteractibleState(true);
+        }
+    }
+    
+    public void FilterCards(int filter)
+    {
+        setButtonsInteractibleState(false);
+        try
+        {
+            LoadAllCards(currentDeckId, filter);
         } 
         finally
         {

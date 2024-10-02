@@ -8,20 +8,24 @@ using UnityEngine;
 public class BotTextTutorial : MonoBehaviour
 {
     [SerializeField] private GameObject tutorialPanel;
+    [SerializeField] private GameObject quitButton;
     [SerializeField] private TMP_Text tutorialText;
     [SerializeField] private List<string> tutorials = new List<string>();
 
     private bool isInTutorial = false;
+
+    public bool IsInTutorial { get { return isInTutorial; } }
 
     private int currentTutorialStateIndex = 0;
     private const string TUTORIAL_STATE_KEY = "TUTORIAL_STATE_INDEX";
 
     public static BotTextTutorial Instance;
 
+    public bool wasInTutorial { get; private set; } = false;
+
     private void Start()
     {
         Instance = this;
-
         currentTutorialStateIndex = PlayerPrefs.GetInt(TUTORIAL_STATE_KEY, 0);
     }
 
@@ -42,14 +46,17 @@ public class BotTextTutorial : MonoBehaviour
         Time.timeScale = 1f;
         isInTutorial = false;
         tutorialPanel.SetActive(false);
+        quitButton.SetActive(true);
     }
 
     private void Show()
     {
         Time.timeScale = 0f;
         isInTutorial = true;
+        wasInTutorial = true;
         tutorialText.text = tutorials[currentTutorialStateIndex - 1].ToString();
         tutorialPanel.SetActive(true);
+        quitButton.SetActive(false);
     }
 
     public void TriggerTutorialEvent(int eventId)

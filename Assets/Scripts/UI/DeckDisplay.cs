@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Amazon.Lambda.Model;
+using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +14,7 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _supportCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardList;
+    [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
 
     public ulong GetSelectedBattleCard()
     {
@@ -34,18 +37,39 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard)
+    public void ClearMyCardsList()
     {
+        List<Transform> children = new List<Transform>();
+
+        foreach (Transform child in _myCardsList.transform)
+        {
+            children.Add(child);
+        }
+
+        foreach (Transform child in children)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard, int filter)
+    {
+        if (filter == 1 || filter == 2)
+        {
+            Debug.Log("battle cards filtered out");
+            return;
+        }
+
         if (selectedBattleCard != 0)
         {
             // selected card will appear first, makes it easier to de-select it
-            AddCard(selectedBattleCard, 1, true, isSupportCard: false);
+            AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
         }
 
         // available cards appear after selected one
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
+            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
         }
     }
 
@@ -63,22 +87,28 @@ public class DeckDisplay : MonoBehaviour
         return result;
     }
 
-    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards)
+    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards, int filter)
     {
+        if (filter == 3)
+        {
+            Debug.Log("support cards filtered out");
+            return;
+        }
+
         // selected cards will appear first, makes it easier to de-select them
         foreach (var cardId in selectedSupportCards.Keys)
         {
-            AddCard(cardId, selectedSupportCards[cardId], true, true);
+            AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
         }
 
         // available cards appear after selected ones
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, true);
+            AddCard(cardId, availableCardIds[cardId], false, true, filter);
         }
     }
 
-    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard)
+    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard, int filter)
     {
         if (cardId == 0)
         {
@@ -101,11 +131,36 @@ public class DeckDisplay : MonoBehaviour
         }
 
         var prefab = _battleCardPrefab;
-        var uiList = _battleCardList;
-        if(isSupportCard)
+        GameObject uiList = null;
+
+        bool isOffense = metadata.Value.description.ToLower().Contains("attack");
+        bool isDefense = metadata.Value.description.ToLower().Contains("defense");
+
+        if (filter == 1 && isDefense)
         {
-            prefab = _supportCardPrefab;
-            uiList = _supportCardList;
+            return; // filter out the defense cards
+        }
+        
+        if (filter == 2 && isOffense)
+        {
+            return; // filter out the defense cards
+        }
+
+        if (isSelected)
+        {
+            if (isDefense)
+            {
+                prefab = _supportCardPrefab;
+                uiList = _supportCardList;
+            }
+            else if (isOffense)
+            {
+                uiList = _battleCardList;
+            }
+        }
+        else
+        {
+            uiList = _myCardsList;
         }
 
         for (int i = 0; i < count; i++)

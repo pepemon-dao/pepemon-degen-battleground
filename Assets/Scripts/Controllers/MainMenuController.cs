@@ -61,6 +61,8 @@ public class MainMenuController : MonoBehaviour
         if (PostBattleScreenController.IsClaimingGift)
         {
             PostBattleScreenController.IsClaimingGift = false;
+            PlayerPrefs.SetInt("GotStarterPack", 1);
+            Debug.LogError("gift claim is not yet implemented");
             //claim gift
         }
     }
@@ -116,7 +118,7 @@ public class MainMenuController : MonoBehaviour
             screenId = screenNavigationHistory[nextPosition % screenNavigationHistory.Length];
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
-
+        
         if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
         {
             screenId = (int)MainSceneScreensEnum.Tutorial;
@@ -167,8 +169,7 @@ public class MainMenuController : MonoBehaviour
 
     public void OnStartGameButtonClick()
     {
-        //ShowScreen(MainSceneScreensEnum.LeagueSelection);
-        ShowScreen(MainSceneScreensEnum.Tutorial);
+        ShowScreen(MainSceneScreensEnum.LeagueSelection);
     }
 
     public void OnManageDecksButtonClick()
