@@ -116,16 +116,10 @@ public class DeckDisplay : MonoBehaviour
             Debug.LogWarning("Invalid card");
             return;
         }
-        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+        var cardIsSupportCard = PepemonFactoryCardCache.GetMetadata(cardId)?.isSupportCard ?? false;
 
-        var cardAttribute = new CardAttribute 
-        { 
-            value = isSupportCard ? "Pepemon Support" : "Pepemon Battle",
-            trait_type = "Set" 
-        };
-
-        // skip battlecards if isSupportCard=true and skip supportcards if isSupportCard=false
-        if (!metadata?.attributes.Contains(cardAttribute) ?? false)
+        // skip battlecards if supportCard=true and skip supportcards if supportCard=false
+        if (cardIsSupportCard != supportCard)
         {
             return;
         }
