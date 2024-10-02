@@ -23,6 +23,11 @@ public class DeckController : MonoBehaviour
     public UnityEvent onSelectButtonClicked;
     public UnityEvent onEditButtonClicked;
 
+    [Header("Starter Deck")]
+    [SerializeField] private bool isStarterDeck = false;
+    [SerializeField] private ulong starterDeckId = 10001; //making it a huge number to a normal deck id would never reach it
+    [SerializeField] private BattlePrepController _battlePrepController;
+
     /// <summary>
     /// Show/Hide edit/select depending on the screen
     /// </summary>
@@ -31,7 +36,10 @@ public class DeckController : MonoBehaviour
         set
         {
             _editButton.gameObject.SetActive(value);
-            _selectButton.gameObject.SetActive(!value);
+            if (!isStarterDeck)
+            {
+                _selectButton.gameObject.SetActive(!value);
+            }
         }
 
         get => _editButton.gameObject.activeSelf;
@@ -44,6 +52,24 @@ public class DeckController : MonoBehaviour
         // set on unity editor, doesn't works if set here
         // GetComponent<SelectionItem>().onDeselected.AddListener(onDeselected);
         // GetComponent<SelectionItem>().onSelected.AddListener(onSelected);
+
+        if (isStarterDeck)
+        {
+            int supportCardCount = 0;
+            if (starterDeckId == 10001)
+            {
+                supportCardCount = _battlePrepController.starterDeck1.Count;
+            }
+            else
+            {
+                supportCardCount = _battlePrepController.starterDeck2.Count;
+            }
+
+            _selectButton.gameObject.SetActive(true);
+
+
+            _supportCardCount.text = supportCardCount + " / " + 60;
+        }
     }
 
     void OnEditClicked()
@@ -51,10 +77,17 @@ public class DeckController : MonoBehaviour
         onEditButtonClicked?.Invoke();
     }
 
-    void OnSelectClicked()
+    public void OnSelectClicked()
     {
-        GetComponent<SelectionItem>().ToggleSelected();
-        onSelectButtonClicked?.Invoke();
+        if (!isStarterDeck)
+        {
+            GetComponent<SelectionItem>().ToggleSelected();
+            onSelectButtonClicked?.Invoke();
+        }
+        else
+        {
+            _battlePrepController.OnDeckSelected(starterDeckId, true);
+        }
     }
 
     public async UniTask<bool> LoadDeckInfo(ulong deckId, bool selectionMode)
