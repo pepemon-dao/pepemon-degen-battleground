@@ -83,6 +83,9 @@ public class PepemonCardController : MonoBehaviour
 
     public void ActivateCard(bool isAttacker)
     {
+        if (BotTextTutorial.Instance.IsInTutorial)
+            return;
+
         Color color = isAttacker ? Color.red : Color.cyan;
 
         _cardGlow.color = color;

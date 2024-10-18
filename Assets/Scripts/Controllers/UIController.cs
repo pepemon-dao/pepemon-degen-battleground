@@ -118,8 +118,8 @@ public class UIController : MonoBehaviour
             yield return new WaitForSeconds(.2f);
             GameObject go = new GameObject("Card Container", typeof(RectTransform));
             GameObject card;
-            if (_whichPlayer == _player1) card = Instantiate(_cardPrefab, _deck1Transform.position, Quaternion.identity);
-            else card = Instantiate(_cardPrefab, _deck2Transform.position, Quaternion.identity);
+            if (_whichPlayer == _player1) card = Instantiate(_cardPrefab, _deck2Transform.position, Quaternion.identity);
+            else card = Instantiate(_cardPrefab, _deck1Transform.position, Quaternion.identity);
             card.transform.SetParent(_board);
 
 

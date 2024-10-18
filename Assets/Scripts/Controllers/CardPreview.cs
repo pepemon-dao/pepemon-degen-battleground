@@ -14,6 +14,10 @@ public class CardPreview : MonoBehaviour
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
     [BoxGroup("Card Components"), SerializeField] public TMP_Text _text;
     [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
+
+    [SerializeField] private GameObject defenseIcon;
+    [SerializeField] private GameObject offenseIcon;
+
     public ulong cardId { get; private set; }
     public bool isSelected { get =>  GetComponentInParent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
 
@@ -38,6 +42,20 @@ public class CardPreview : MonoBehaviour
         if (metadata == null)
         {
             Debug.LogWarning("Unable to locate metadata for card " + cardId);
+        }
+
+        //bool isSupport = metadata.Value.attributes[0].value == "Pepemon Support";
+
+        bool isOffense = metadata.Value.description.ToLower().Contains("attack");
+        bool isDefense = metadata.Value.description.ToLower().Contains("defense");
+
+        if (defenseIcon != null)
+        {
+            defenseIcon.SetActive(isDefense);
+        }
+        if (offenseIcon != null)
+        {
+            offenseIcon.SetActive(isOffense);
         }
 
         Texture2D cardTexture = tex == null ? new Texture2D(8, 8) : tex;

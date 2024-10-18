@@ -102,6 +102,8 @@ public class CardPreviewController : MonoBehaviour
             var go = raycastResultList[i].gameObject;
             bool pepemonCard = go.GetComponentInParent<PepemonCardController>() != null;
             bool card = go.GetComponent<CardController>() != null;
+            bool cardInDeck = go.GetComponentInParent<CardPreview>() != null;
+
             if (card)
             {
                 currentObject = go;
@@ -109,6 +111,10 @@ public class CardPreviewController : MonoBehaviour
             else if (pepemonCard)
             {
                 currentObject = go.transform.parent.gameObject;
+            }
+            else if (cardInDeck)
+            {
+                currentObject = go;
             }
         }
     }
@@ -121,8 +127,9 @@ public class CardPreviewController : MonoBehaviour
         }
 
         isInPreview = true;
-        PepemonCardController cardPepemon = cardGo.GetComponent<PepemonCardController>();
+        PepemonCardController cardPepemon = cardGo.GetComponentInParent<PepemonCardController>();
         CardController card = cardGo.GetComponent<CardController>();
+        CardPreview cardInDeck = cardGo.GetComponentInParent<CardPreview>();
 
         if (card != null)
         {
@@ -130,6 +137,9 @@ public class CardPreviewController : MonoBehaviour
         } else if (cardPepemon != null)
         {
             SetPepemonCardPreview(cardPepemon);
+        } else if (cardInDeck != null)
+        {
+            SetCardInDeckPreview(cardInDeck);
         }
 
         previewPanel.SetActive(true);
@@ -141,6 +151,12 @@ public class CardPreviewController : MonoBehaviour
     {
         PopulateCard(card.BattleCard);
         pepemonCard.SetActive(true);
+    }
+    
+    private void SetCardInDeckPreview(CardPreview card)
+    {
+        _cardImg.sprite = card._cardImage.sprite;
+        gameCard.SetActive(true);
     }
     
     private void SetCardPreview(CardController card)
