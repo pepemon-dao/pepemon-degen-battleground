@@ -1,3 +1,4 @@
+using Amazon.Lambda.Model;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class FilterController : MonoBehaviour
 
     private void Start()
     {
-        SetFilter(0);
+        //SetFilter(0);
     }
 
     public void SetFilter(int filter)
@@ -26,6 +27,12 @@ public class FilterController : MonoBehaviour
         currentFilter = filter;
         deck.FilterCards(filter);
         FilterToggle();
+    }
+
+    public void RefreshCards()
+    {
+        Debug.LogError("refresh");
+        deck.FilterCards(currentFilter); 
     }
 
     public void FilterToggle()

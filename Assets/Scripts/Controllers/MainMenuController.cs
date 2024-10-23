@@ -31,12 +31,15 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
+    public static bool claimedStarterDeck = false;
+
     private async void Start()
     {
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         // TODO: find a better way to handle re-loading the main scene
+        //PostBattleScreenController.IsClaimingGift = true;
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
@@ -64,7 +67,13 @@ public class MainMenuController : MonoBehaviour
             PlayerPrefs.SetInt("GotStarterPack", 1);
             Debug.LogError("gift claim is not yet implemented");
             //claim gift
+            ClaimStarterDeck();
         }
+    }
+
+    private void ClaimStarterDeck()
+    {
+        claimedStarterDeck = true;
     }
 
     private async void DeInitMainScene(bool toLoadScreen)

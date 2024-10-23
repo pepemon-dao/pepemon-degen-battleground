@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -27,6 +28,7 @@ public class DeckController : MonoBehaviour
     [SerializeField] private bool isStarterDeck = false;
     [SerializeField] private ulong starterDeckId = 10001; //making it a huge number to a normal deck id would never reach it
     [SerializeField] private BattlePrepController _battlePrepController;
+    [SerializeField] private List<Card> starterDeck;
 
     /// <summary>
     /// Show/Hide edit/select depending on the screen
@@ -92,11 +94,33 @@ public class DeckController : MonoBehaviour
 
     public async UniTask<bool> LoadDeckInfo(ulong deckId, bool selectionMode)
     {
-        Debug.Log("LoadDeckInfo of deckId " + deckId);
-        var battleCard = await PepemonCardDeck.GetBattleCard(deckId);
+        bool isStarterDeck = deckId == 1234;
+
+        // Example starter deck configuration
+        IDictionary<ulong, int> supportCards = new Dictionary<ulong, int>();
+
+        ulong battleCard = 0;
+
+        if (isStarterDeck)
+        {
+            battleCard = 7;
+            foreach (var card in starterDeck)
+            {
+                ulong id = (ulong)card.ID;
+                supportCards[id] = supportCards.ContainsKey(id) ? supportCards[id] + 1 : 1;
+            }
+        }
+        else
+        {
+            // Fetch the battle card from the contract if it's not a starter deck
+            
+            battleCard = await PepemonCardDeck.GetBattleCard(deckId);
+
+            // Fetch support cards from the contract
+            supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
+        }
 
         var metadata = PepemonFactoryCardCache.GetMetadata(battleCard);
-        var supportCards = await PepemonCardDeck.GetAllSupportCards(deckId);
 
         // TODO: Populate wins/losses
         // TODO: Use on-chain MAX_SUPPORT_CARDS value
@@ -105,11 +129,21 @@ public class DeckController : MonoBehaviour
         var supportCardCount = (supportCards.Values?.Count ?? 0);
         _supportCardCount.text = supportCardCount + " / " + 60;
 
-        if (selectionMode && (metadata?.name == null || supportCardCount == 0))
+        if (isStarterDeck)
         {
-            gameObject.SetActive(false);
-            return false;
+            _supportCardCount.text = starterDeck.Count.ToString();
         }
+
+        //TODO: check if the deck is valid - disable select button, only edit and add a flag that the deck needs to be edited
+        if (!isStarterDeck)
+        {
+            if (selectionMode && (metadata?.name == null || supportCardCount == 0))
+            {
+                gameObject.SetActive(false);
+                return false;
+            }
+        }
+        
         return true;
     }
 }

@@ -104,7 +104,7 @@ public class PostBattleScreenController : MonoBehaviour
 
     public void LoadPepemonDisplay(ulong cardId)
     {
-        _pepemon.LoadCardData(cardId);
+        _pepemon.LoadCardData(cardId, false);
     }
 
     public void OnBtnShowMenuClick()

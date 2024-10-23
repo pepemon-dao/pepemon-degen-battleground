@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Amazon.Lambda.Model;
 using Sirenix.OdinInspector;
+using Thirdweb;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,23 +15,29 @@ public class CardPreview : MonoBehaviour
 {
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
     [BoxGroup("Card Components"), SerializeField] public TMP_Text _text;
-    [BoxGroup("Card Components"), SerializeField] public Text _checkmark;
+    [BoxGroup("Card Components"), SerializeField] public GameObject _checkmark;
 
     [SerializeField] private GameObject defenseIcon;
     [SerializeField] private GameObject offenseIcon;
 
     public ulong cardId { get; private set; }
-    public bool isSelected { get =>  GetComponentInParent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
+    public bool isSelected { get => transform.parent.GetComponent<SelectionGroup>().selection.Contains(GetComponent<SelectionItem>()); }
+
+    public bool isSupport { get; private set; } = false;
+
+    private bool isEquipped = false;
 
     public void ToggleSelected()
     {
         // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
-        GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
+        transform.parent.GetComponent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
+        //GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
     }
 
-    public void LoadCardData(ulong cardId)
+    public void LoadCardData(ulong cardId, bool isSupport)
     {
         this.cardId = cardId;
+        this.isSupport = isSupport;
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
         // set card image. blank if not found
@@ -46,8 +54,14 @@ public class CardPreview : MonoBehaviour
 
         //bool isSupport = metadata.Value.attributes[0].value == "Pepemon Support";
 
-        bool isOffense = metadata.Value.description.ToLower().Contains("attack");
-        bool isDefense = metadata.Value.description.ToLower().Contains("defense");
+        bool isOffense = false;
+        bool isDefense = false;
+
+        if (metadata != null && metadata.Value.description != null)
+        {
+            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
 
         if (defenseIcon != null)
         {
@@ -65,5 +79,23 @@ public class CardPreview : MonoBehaviour
             new Vector2());
 
         _text.text = metadata?.name ?? "Unknown Card";
+    }
+
+    public void ToggleEquipped()
+    {
+        isEquipped = _checkmark.activeSelf;
+        SetEquipped(isEquipped);
+    }
+
+    private void SetEquipped(bool toEquip)
+    {
+        if (isSupport)
+        {
+            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, DeckDisplay.CardType.Support);
+        }
+        else
+        {
+            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, DeckDisplay.CardType.Battle);
+        }
     }
 }

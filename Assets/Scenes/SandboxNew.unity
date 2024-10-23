@@ -4567,8 +4567,8 @@ RectTransform:
   m_Children:
   - {fileID: 1626808798}
   - {fileID: 495210509}
-  - {fileID: 1594373888}
   - {fileID: 1964606638}
+  - {fileID: 1594373888}
   - {fileID: 859249683}
   - {fileID: 128784404}
   - {fileID: 904593987}
@@ -9259,6 +9259,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 795337085}
     m_Modifications:
+    - target: {fileID: 2191101566738735332, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3446478843925475210, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
       propertyPath: m_SortingOrder
       value: 1
@@ -9362,6 +9366,10 @@ PrefabInstance:
     - target: {fileID: 8803193013504172753, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
       propertyPath: m_TagString
       value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 8803193014824083725, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -2.1999998
       objectReference: {fileID: 0}
     - target: {fileID: 9018873407368376917, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
       propertyPath: m_Color.a
@@ -12492,7 +12500,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 11
   m_TargetDisplay: 0
 --- !u!1 &1594373887
 GameObject:
@@ -12525,7 +12533,7 @@ RectTransform:
   m_Children:
   - {fileID: 1579594729}
   m_Father: {fileID: 546803091}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -16427,7 +16435,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 546803091}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -17677,6 +17685,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 440561645}
     m_Modifications:
+    - target: {fileID: 2191101566738735332, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8803193013504172752, guid: ffdbe1dcaa38aa44581a60e89bc42b06, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
