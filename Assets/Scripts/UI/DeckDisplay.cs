@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Amazon.Lambda.Model;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using UnityEngine;
