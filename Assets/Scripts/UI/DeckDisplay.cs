@@ -36,7 +36,7 @@ public class DeckDisplay : MonoBehaviour
 
     public ulong GetSelectedBattleCard()
     {
-        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => !it.GetComponent<Button>().enabled).FirstOrDefault()?.cardId ?? 0;
+        return _heroCardList.GetComponentsInChildren<CardPreview>()?.Where(it => !it.GetComponent<Button>().enabled).FirstOrDefault()?.cardId ?? 0;
     }
 
     public void ClearBattleCardsList()
@@ -133,7 +133,8 @@ public class DeckDisplay : MonoBehaviour
     public Dictionary<ulong, int> GetSelectedSupportCards()
     {
         var result = new Dictionary<ulong, int>();
-        var supportCards = _supportCardList.GetComponentsInChildren<CardPreview>();
+        var supportCards = _supportCardList.GetComponentsInChildren<CardPreview>()
+                     .Concat(_battleCardList.GetComponentsInChildren<CardPreview>());
         foreach (var supportCard in supportCards)
         {
             if (!supportCard.GetComponent<Button>().enabled)

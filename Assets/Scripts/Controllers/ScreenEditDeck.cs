@@ -77,6 +77,12 @@ public class ScreenEditDeck : MonoBehaviour
                 battleCard = deckDisplayComponent.GetSelectedBattleCard();
                 supportCards = deckDisplayComponent.GetSelectedSupportCards();
 
+                foreach (var item in supportCards)
+                {
+                    Debug.LogError(ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(item.Key).CardDescription.ToString());
+                }
+                Debug.LogError(battleCard.ToString());
+
                 foreach (var card in ownedDeck)
                 {
                     ulong id = (ulong)card.ID;
