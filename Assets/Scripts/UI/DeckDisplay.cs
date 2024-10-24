@@ -15,6 +15,7 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _heroCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
+    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
     [TitleGroup("Helpers"), SerializeField] FilterController _filter;
 
     private List<CardPreview> _cardPreviews = new List<CardPreview>();
@@ -199,15 +200,36 @@ public class DeckDisplay : MonoBehaviour
     public void UnEquipCard(ulong cardId, bool isSupportCard)
     {
         RemoveCardFromDeck(cardId, isSupportCard);
+        if (!isSupportCard)
+        {
+            battleCardId = 0;
+            HandleBattleCardZero();
+        }
+    }
+
+    private void HandleBattleCardZero()
+    {
+        bool toDisableSaveBtn = battleCardId == 0;
+
+        _saveDeckButton.SetActive(!toDisableSaveBtn);
     }
 
     public void EquipCard(ulong cardId, bool isSupportCard)
     {
         if (!isSupportCard)
         {
+            if (cardId == battleCardId)
+            {
+                return;
+            }
+        }
+
+        if (!isSupportCard)
+        {
             DeselectPrevBattleCard();
             RemoveBattleCard();
             battleCardId = cardId;
+            HandleBattleCardZero();
         }
 
         AddCardToDeck(cardId, isSupportCard);

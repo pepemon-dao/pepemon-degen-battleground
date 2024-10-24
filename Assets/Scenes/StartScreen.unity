@@ -15529,6 +15529,7 @@ MonoBehaviour:
   _battleCardList: {fileID: 686953497}
   _heroCardList: {fileID: 0}
   _myCardsList: {fileID: 0}
+  _saveDeckButton: {fileID: 0}
   _filter: {fileID: 0}
 --- !u!114 &725896989
 MonoBehaviour:
@@ -29857,6 +29858,7 @@ MonoBehaviour:
   _battleCardList: {fileID: 743503535}
   _heroCardList: {fileID: 1320351632}
   _myCardsList: {fileID: 1386937372}
+  _saveDeckButton: {fileID: 2063767132}
   _filter: {fileID: 896963635}
 --- !u!1 &1306953447
 GameObject:
@@ -49405,7 +49407,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 2
+  m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}

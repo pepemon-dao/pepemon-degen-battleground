@@ -142,23 +142,17 @@ public class ScreenEditDeck : MonoBehaviour
             supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
         }
 
+
+        if (DeckDisplay.battleCardId == 0)
+        {
+            DeckDisplay.battleCardId = battleCard;
+        }
+
         deckDisplayComponent.ClearMyCardsList();
         deckDisplayComponent.LoadSelectedCards(battleCard, supportCards, filter);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard, filter);
         _textLoading.SetActive(false);
-
-        bool toDisableSaveBtn;
-        if (isStarterDeck)
-        {
-            toDisableSaveBtn = DeckDisplay.battleCardId == 0;
-        }
-        else
-        {
-            toDisableSaveBtn = battleCard == 0;
-        }
-
-        _saveDeckButton.GetComponent<Button>().interactable = !toDisableSaveBtn;
 
         isLoading = false;
     }

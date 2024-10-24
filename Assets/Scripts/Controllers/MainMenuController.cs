@@ -38,8 +38,9 @@ public class MainMenuController : MonoBehaviour
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+        //PostBattleScreenController.IsClaimingGift = true; - for testing the gift mechanic with the deck manager
         // TODO: find a better way to handle re-loading the main scene
-        PostBattleScreenController.IsClaimingGift = true;
+
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
