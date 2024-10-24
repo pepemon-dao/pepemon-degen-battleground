@@ -31,12 +31,16 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
+    public static bool claimedStarterDeck = false;
+
     private async void Start()
     {
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+        //PostBattleScreenController.IsClaimingGift = true; - for testing the gift mechanic with the deck manager
         // TODO: find a better way to handle re-loading the main scene
+
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
@@ -61,8 +65,16 @@ public class MainMenuController : MonoBehaviour
         if (PostBattleScreenController.IsClaimingGift)
         {
             PostBattleScreenController.IsClaimingGift = false;
+            PlayerPrefs.SetInt("GotStarterPack", 1);
+            Debug.LogError("gift claim is not yet implemented");
             //claim gift
+            ClaimStarterDeck();
         }
+    }
+
+    private void ClaimStarterDeck()
+    {
+        claimedStarterDeck = true;
     }
 
     private async void DeInitMainScene(bool toLoadScreen)
@@ -116,7 +128,7 @@ public class MainMenuController : MonoBehaviour
             screenId = screenNavigationHistory[nextPosition % screenNavigationHistory.Length];
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
-
+        
         if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
         {
             screenId = (int)MainSceneScreensEnum.Tutorial;

@@ -189,7 +189,8 @@ public class BattlePrepController : MonoBehaviour
 
         await Task.WhenAll(reqBattleRngSeed, reqPlayer1BattleCard, reqPlayer2BattleCard, reqPlayer1SupportCards, reqPlayer2SupportCards);
 
-        Debug.Log("Battle data loaded"); 
+        Debug.Log("Battle data loaded");
+
         var PlayerWalletAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
 
         battleData.battleRngSeed = reqBattleRngSeed.Result;

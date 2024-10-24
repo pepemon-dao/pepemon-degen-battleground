@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
@@ -18,9 +19,14 @@ public class ScreenEditDeck : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _mintCardsButton;
     [TitleGroup("Component References"), SerializeField] GameObject _previousScreenButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
+    [TitleGroup("Helpers"), SerializeField] List<Card> ownedDeck; 
+    [TitleGroup("Helpers"), SerializeField] List<BattleCard> ownedBattleDeck; 
+    [TitleGroup("Helpers"), SerializeField] List<Card> starterDeck; 
     private ulong currentDeckId;
     private ulong battleCard;
-    private Dictionary<ulong, int> supportCards;
+    private Dictionary<ulong, int> supportCards = new Dictionary<ulong, int>();
+
+    private bool isLoading = false;
 
     public void Start()
     {
@@ -28,26 +34,127 @@ public class ScreenEditDeck : MonoBehaviour
         _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
-    public async void LoadAllCards(ulong deckId)
+    public async void LoadAllCards(ulong deckId, int filter)
     {
+        if (isLoading)
+        {
+            return;
+        }
+        isLoading = true;
+
         var deckDisplayComponent = _deckDisplay.GetComponent<DeckDisplay>();
 
         _textLoading.SetActive(true);
-        deckDisplayComponent.ClearBattleCardsList();
-        deckDisplayComponent.ClearSupportCardsList();
 
         currentDeckId = deckId;
-        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+        string account = "";
+        try
+        {
+            account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+        } catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
 
-        // This only returns unused cards
-        var ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList());
+        supportCards = new Dictionary<ulong, int>();
 
-        battleCard = await PepemonCardDeck.GetBattleCard(deckId);
-        supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
+        bool isStarterDeck = account == "";
+        Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
+        Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
-        deckDisplayComponent.LoadAllBattleCards(ownedCardIds, battleCard);
-        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
+        if (isStarterDeck)
+        {
+            bool firstLoad = false;
+            if (DeckDisplay.battleCardId == 0)
+            {
+                DeckDisplay.battleCardId = 7;
+                firstLoad = true;
+            }
+
+            if (!firstLoad) 
+            {
+                // this ensure of the saving while in the process of equip and unequipping
+                battleCard = deckDisplayComponent.GetSelectedBattleCard();
+                supportCards = deckDisplayComponent.GetSelectedSupportCards();
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
+                }
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    if (supportCards.ContainsKey(id))
+                    {
+                        ownedCardIds[id] -= supportCards[id];
+
+                        if (ownedCardIds[id] <= 0)
+                        {
+                            ownedCardIds.Remove(id);
+                        }
+                    }
+                }
+
+                foreach (var card in ownedBattleDeck)
+                {
+                    int cardId = int.Parse(card.ID);
+                    ulong id = (ulong)cardId;
+                    if (id != battleCard)
+                    {
+                        ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
+                    }
+                    
+                }
+            }
+            else
+            {
+                battleCard = DeckDisplay.battleCardId;
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
+                }
+
+
+                foreach (var card in ownedBattleDeck)
+                {
+                    int cardId = int.Parse(card.ID);
+                    ulong id = (ulong)cardId;
+                    ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
+                }
+
+                foreach (var card in starterDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    supportCards[id] = supportCards.ContainsKey(id) ? supportCards[id] + 1 : 1;
+                }
+            }
+        }
+        else
+        {
+            // This only returns unused cards
+            ownedCardIds = await PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList());
+
+            battleCard = await PepemonCardDeck.GetBattleCard(deckId);
+            supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
+        }
+
+
+        if (DeckDisplay.battleCardId == 0)
+        {
+            DeckDisplay.battleCardId = battleCard;
+        }
+
+        deckDisplayComponent.ClearMyCardsList();
+        deckDisplayComponent.LoadSelectedCards(battleCard, supportCards, filter);
+        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
+        deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard, filter);
         _textLoading.SetActive(false);
+
+        isLoading = false;
     }
 
     private void setButtonsInteractibleState(bool interactible)
@@ -63,7 +170,20 @@ public class ScreenEditDeck : MonoBehaviour
         try
         {
             await PepemonCardDeck.MintCards();
-            LoadAllCards(currentDeckId);
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter);
+        } 
+        finally
+        {
+            setButtonsInteractibleState(true);
+        }
+    }
+    
+    public void FilterCards(int filter)
+    {
+        setButtonsInteractibleState(false);
+        try
+        {
+            LoadAllCards(currentDeckId, filter);
         } 
         finally
         {
