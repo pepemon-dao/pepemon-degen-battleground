@@ -28021,6 +28021,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6336132a4bf40534fabb8f8f19907f58, type: 2}
   - {fileID: 11400000, guid: ebf2eb4e75cd2fc41860cb891e6cbf2c, type: 2}
   - {fileID: 11400000, guid: ed441e7f604ed1242a3293d0786af48d, type: 2}
+  - {fileID: 11400000, guid: 0ad976d921ecb10458179cdf7af74d45, type: 2}
   starterDeck:
   - {fileID: 11400000, guid: 41ebd60f34726ca49b82d68c9c5a45fa, type: 2}
   - {fileID: 11400000, guid: a234538c2f067d74fbb9d4cb7b9db11d, type: 2}

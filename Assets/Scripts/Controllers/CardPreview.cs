@@ -27,8 +27,6 @@ public class CardPreview : MonoBehaviour
 
     private bool isEquipped = false;
 
-    public int previewId { get; private set; }
-
     public void ToggleSelected()
     {
         // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
@@ -36,11 +34,10 @@ public class CardPreview : MonoBehaviour
         //GetComponentInParent<SelectionGroup>().ToggleSelected(GetComponent<SelectionItem>());
     }
 
-    public void LoadCardData(ulong cardId, bool isSupport, int previewId = 0)
+    public void LoadCardData(ulong cardId, bool isSupport)
     {
         this.cardId = cardId;
         this.isSupport = isSupport;
-        this.previewId = previewId;
         var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
 
         // set card image. blank if not found
@@ -98,14 +95,13 @@ public class CardPreview : MonoBehaviour
 
     private void SetEquipped(bool toEquip)
     {
-        int previewId = gameObject.GetInstanceID();
         if (isSupport)
         {
-            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, previewId, DeckDisplay.CardType.Support);
+            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, DeckDisplay.CardType.Support);
         }
         else
         {
-            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, previewId, DeckDisplay.CardType.Battle);
+            DeckDisplay.Instance.SetCardEquip(toEquip, cardId, DeckDisplay.CardType.Battle);
         }
     }
 }
