@@ -64,29 +64,73 @@ public class ScreenEditDeck : MonoBehaviour
 
         if (isStarterDeck)
         {
+            bool firstLoad = false;
             if (DeckDisplay.battleCardId == 0)
             {
                 DeckDisplay.battleCardId = 7;
-            }
-            battleCard = DeckDisplay.battleCardId;
-
-            foreach (var card in ownedDeck)
-            {
-                ulong id = (ulong)card.ID;
-                ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
-            }
-            
-            foreach (var card in ownedBattleDeck)
-            {
-                int cardId = int.Parse(card.ID);
-                ulong id = (ulong)cardId;
-                ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
+                firstLoad = true;
             }
 
-            foreach (var card in starterDeck)
+            if (!firstLoad) 
             {
-                ulong id = (ulong)card.ID;
-                supportCards[id] = supportCards.ContainsKey(id) ? supportCards[id] + 1 : 1;
+                // this ensure of the saving while in the process of equip and unequipping
+                battleCard = deckDisplayComponent.GetSelectedBattleCard();
+                supportCards = deckDisplayComponent.GetSelectedSupportCards();
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
+                }
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    if (supportCards.ContainsKey(id))
+                    {
+                        ownedCardIds[id] -= supportCards[id];
+
+                        if (ownedCardIds[id] <= 0)
+                        {
+                            ownedCardIds.Remove(id);
+                        }
+                    }
+                }
+
+                foreach (var card in ownedBattleDeck)
+                {
+                    int cardId = int.Parse(card.ID);
+                    ulong id = (ulong)cardId;
+                    if (id != battleCard)
+                    {
+                        ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
+                    }
+                    
+                }
+            }
+            else
+            {
+                battleCard = DeckDisplay.battleCardId;
+
+                foreach (var card in ownedDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
+                }
+
+
+                foreach (var card in ownedBattleDeck)
+                {
+                    int cardId = int.Parse(card.ID);
+                    ulong id = (ulong)cardId;
+                    ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
+                }
+
+                foreach (var card in starterDeck)
+                {
+                    ulong id = (ulong)card.ID;
+                    supportCards[id] = supportCards.ContainsKey(id) ? supportCards[id] + 1 : 1;
+                }
             }
         }
         else

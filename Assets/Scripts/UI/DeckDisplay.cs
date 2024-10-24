@@ -36,7 +36,7 @@ public class DeckDisplay : MonoBehaviour
 
     public ulong GetSelectedBattleCard()
     {
-        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => it.isSelected).FirstOrDefault()?.cardId ?? 0;
+        return _battleCardList.GetComponentsInChildren<CardPreview>()?.Where(it => !it.GetComponent<Button>().enabled).FirstOrDefault()?.cardId ?? 0;
     }
 
     public void ClearBattleCardsList()
@@ -97,19 +97,13 @@ public class DeckDisplay : MonoBehaviour
         // Load selected battle card first
         if (selectedBattleCard != 0)
         {
-            if (filter != 1 && filter != 2)
-            {
-                AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
-            }
+            AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
         }
 
         // Load selected support cards
         foreach (var cardId in selectedSupportCards.Keys)
         {
-            if (filter != 3)
-            {
-                AddCard(cardId, selectedSupportCards[cardId], true, isSupportCard: true, filter);
-            }
+            AddCard(cardId, selectedSupportCards[cardId], true, isSupportCard: true, filter);
         }
     }
 
@@ -142,7 +136,7 @@ public class DeckDisplay : MonoBehaviour
         var supportCards = _supportCardList.GetComponentsInChildren<CardPreview>();
         foreach (var supportCard in supportCards)
         {
-            if (supportCard.isSelected)
+            if (!supportCard.GetComponent<Button>().enabled)
             {
                 result[supportCard.cardId] = result.ContainsKey(supportCard.cardId) ? result[supportCard.cardId] + 1 : 1;
             }
@@ -324,11 +318,13 @@ public class DeckDisplay : MonoBehaviour
             }
             else
             {
+                prefab = _supportCardPrefab;
                 uiList = _battleCardList;
             }
         }
         else
         {
+            prefab = _battleCardPrefab;
             uiList = _heroCardList;
         }
 
@@ -386,20 +382,28 @@ public class DeckDisplay : MonoBehaviour
             return;
         }
 
+        
         if (isSelected)
         {
-            AddCardToDeck(cardId, isSupportCard);
+            for (int i = 0; i < count; i++)
+            {
+                AddCardToDeck(cardId, isSupportCard);
+            }
         }
 
-        if (filter == 1 && isDefense)
+        if (!isSelected)
         {
-            return; // filter out the defense cards
-        }
+            if (filter == 1 && isDefense)
+            {
+                return; // filter out the defense cards
+            }
 
-        if (filter == 2 && isOffense)
-        {
-            return; // filter out the offense cards
+            if (filter == 2 && isOffense)
+            {
+                return; // filter out the offense cards
+            }
         }
+        
 
         if (isSupportCard)
         {
@@ -417,6 +421,14 @@ public class DeckDisplay : MonoBehaviour
             // set checkmark
             if (isSelected)
             {
+                if (!isSupportCard && ((filter == 1 && isDefense) || (filter == 2 && isOffense)))
+                {
+                    cardInstance.SetActive(false);
+                }
+                if (isSupportCard && filter == 3)
+                {
+                    cardInstance.SetActive(false);
+                }
                 //cardPreviewComponent.ToggleSelected();
             }
 
