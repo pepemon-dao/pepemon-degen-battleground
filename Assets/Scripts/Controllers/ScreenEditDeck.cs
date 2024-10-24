@@ -77,12 +77,6 @@ public class ScreenEditDeck : MonoBehaviour
                 battleCard = deckDisplayComponent.GetSelectedBattleCard();
                 supportCards = deckDisplayComponent.GetSelectedSupportCards();
 
-                foreach (var item in supportCards)
-                {
-                    Debug.LogError(ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(item.Key).CardDescription.ToString());
-                }
-                Debug.LogError(battleCard.ToString());
-
                 foreach (var card in ownedDeck)
                 {
                     ulong id = (ulong)card.ID;
@@ -153,6 +147,18 @@ public class ScreenEditDeck : MonoBehaviour
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard, filter);
         _textLoading.SetActive(false);
+
+        bool toDisableSaveBtn;
+        if (isStarterDeck)
+        {
+            toDisableSaveBtn = DeckDisplay.battleCardId == 0;
+        }
+        else
+        {
+            toDisableSaveBtn = battleCard == 0;
+        }
+
+        _saveDeckButton.GetComponent<Button>().interactable = !toDisableSaveBtn;
 
         isLoading = false;
     }
