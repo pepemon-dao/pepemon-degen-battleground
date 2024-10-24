@@ -99,10 +99,7 @@ public class ScreenEditDeck : MonoBehaviour
         }
 
         deckDisplayComponent.ClearMyCardsList();
-        //deckDisplayComponent.LoadSelectedBattleCard(battleCard, filter);
-        //deckDisplayComponent.LoadSelectedSupportCards(ownedCardIds, filter);
-        //deckDisplayComponent.LoadNotSelectedSupportCards(supportCards, filter);
-        //deckDisplayComponent.LoadNotSelectedBattleCards(ownedCardIds, filter);
+        deckDisplayComponent.LoadSelectedCards(battleCard, supportCards, filter);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard, filter);
         _textLoading.SetActive(false);

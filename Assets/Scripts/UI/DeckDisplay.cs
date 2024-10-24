@@ -91,40 +91,32 @@ public class DeckDisplay : MonoBehaviour
 
         _cardPreviews = new List<CardPreview>();
     }
-    /*
-    public void LoadNotSelectedBattleCards(Dictionary<ulong, int> availableCardIds, int filter)
-    {
-        if (filter == 1 || filter == 2)
-        {
-            Debug.Log("battle cards filtered out");
-            return;
-        }
 
-        // available cards appear after selected one
-        foreach (var cardId in availableCardIds.Keys)
-        {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
-        }
-    }
-    
-    public void LoadSelectedBattleCard(ulong selectedBattleCard, int filter)
+    public void LoadSelectedCards(ulong selectedBattleCard, Dictionary<ulong, int> selectedSupportCards, int filter)
     {
-        if (filter == 1 || filter == 2)
-        {
-            Debug.Log("battle cards filtered out");
-            return;
-        }
-
+        // Load selected battle card first
         if (selectedBattleCard != 0)
         {
-            // selected card will appear first, makes it easier to de-select it
-            AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
+            if (filter != 1 && filter != 2)
+            {
+                AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
+            }
         }
-    }*/
+
+        // Load selected support cards
+        foreach (var cardId in selectedSupportCards.Keys)
+        {
+            if (filter != 3)
+            {
+                AddCard(cardId, selectedSupportCards[cardId], true, isSupportCard: true, filter);
+            }
+        }
+    }
+
 
     public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard, int filter)
     {
-        AddCard(selectedBattleCard,1, true, isSupportCard: false, filter);
+        //AddCard(selectedBattleCard,1, true, isSupportCard: false, filter);
 
         if (filter == 1 || filter == 2)
         {
@@ -164,7 +156,7 @@ public class DeckDisplay : MonoBehaviour
         // selected cards will appear first, makes it easier to de-select them
         foreach (var cardId in selectedSupportCards.Keys)
         {
-            AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
+            //AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
         }
 
         if (filter == 3)
@@ -179,36 +171,6 @@ public class DeckDisplay : MonoBehaviour
             AddCard(cardId, availableCardIds[cardId], false, true, filter);
         }
     }
-    /*
-    public void LoadSelectedSupportCards(Dictionary<ulong, int> selectedSupportCards, int filter)
-    {
-        if (filter == 3)
-        {
-            Debug.Log("support cards filtered out");
-            return;
-        }
-
-        // selected cards will appear first, makes it easier to de-select them
-        foreach (var cardId in selectedSupportCards.Keys)
-        {
-            AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
-        }
-    }
-    
-    public void LoadNotSelectedSupportCards(Dictionary<ulong, int> availableCardIds, int filter)
-    {
-        if (filter == 3)
-        {
-            Debug.Log("support cards filtered out");
-            return;
-        }
-
-        // available cards appear after selected ones
-        foreach (var cardId in availableCardIds.Keys)
-        {
-            AddCard(cardId, availableCardIds[cardId], false, true, filter);
-        }
-    }*/
 
     public void SetCardEquip(bool toEquip, ulong cardId, CardType type)
     {
@@ -340,6 +302,13 @@ public class DeckDisplay : MonoBehaviour
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
+        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+            isDefense = !isOffense;
+        }
+
         if (isOffense && isDefense)
         {
             Debug.LogError("not a valid card");
@@ -387,7 +356,6 @@ public class DeckDisplay : MonoBehaviour
         // skip battlecards if supportCard=true and skip supportcards if supportCard=false
         if (cardIsSupportCard != isSupportCard)
         {
-            Debug.LogError(cardId);
             return;
         }
 
@@ -405,25 +373,32 @@ public class DeckDisplay : MonoBehaviour
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
+        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+            isDefense = !isOffense;
+        }
+
         if (isOffense && isDefense)
         {
             Debug.LogError("not a valid card");
             return;
         }
 
-
-        if (!isSelected)
+        if (isSelected)
         {
-            if (filter == 1 && isDefense)
-            {
-                return; // filter out the defense cards
-            }
+            AddCardToDeck(cardId, isSupportCard);
+        }
 
-            if (filter == 2 && isOffense)
-            {
-                return; // filter out the offense cards
-            }
+        if (filter == 1 && isDefense)
+        {
+            return; // filter out the defense cards
+        }
 
+        if (filter == 2 && isOffense)
+        {
+            return; // filter out the offense cards
         }
 
         if (isSupportCard)
@@ -442,7 +417,6 @@ public class DeckDisplay : MonoBehaviour
             // set checkmark
             if (isSelected)
             {
-                AddCardToDeck(cardId, isSupportCard);
                 //cardPreviewComponent.ToggleSelected();
             }
 

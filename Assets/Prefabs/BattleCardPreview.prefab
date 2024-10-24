@@ -243,6 +243,7 @@ MonoBehaviour:
   _cardImage: {fileID: 4516655869308334404}
   _text: {fileID: 5616305114283069979}
   _checkmark: {fileID: 4516655869266700005}
+  CardsScriptableObjsData: {fileID: 11400000, guid: d1fea7aba5f19cc45991de3bac22c468, type: 2}
   defenseIcon: {fileID: 7071889319083187165}
   offenseIcon: {fileID: 5054615239689119496}
 --- !u!1 &4516655869266700005

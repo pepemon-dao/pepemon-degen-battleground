@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Amazon.Lambda.Model;
+using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using TMPro;
@@ -61,6 +62,13 @@ public class CardPreview : MonoBehaviour
         {
             isOffense = metadata.Value.description.ToLower().Contains("attack");
             isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
+
+        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+            isDefense = !isOffense;
         }
 
         if (defenseIcon != null)
