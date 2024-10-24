@@ -64,7 +64,11 @@ public class ScreenEditDeck : MonoBehaviour
 
         if (isStarterDeck)
         {
-            battleCard = 7;
+            if (DeckDisplay.battleCardId == 0)
+            {
+                DeckDisplay.battleCardId = 7;
+            }
+            battleCard = DeckDisplay.battleCardId;
 
             foreach (var card in ownedDeck)
             {

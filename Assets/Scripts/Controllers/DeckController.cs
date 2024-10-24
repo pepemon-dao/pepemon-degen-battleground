@@ -103,7 +103,7 @@ public class DeckController : MonoBehaviour
 
         if (isStarterDeck)
         {
-            battleCard = 7;
+            battleCard = DeckDisplay.battleCardId == 0 ? 7 : DeckDisplay.battleCardId;
             foreach (var card in starterDeck)
             {
                 ulong id = (ulong)card.ID;

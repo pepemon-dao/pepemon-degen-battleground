@@ -20,7 +20,7 @@ public class DeckDisplay : MonoBehaviour
 
     private List<CardPreview> _cardPreviews = new List<CardPreview>();
 
-    private ulong battleCardId = 0;
+    public static ulong battleCardId = 0;
 
     public enum CardType
     {
@@ -131,16 +131,11 @@ public class DeckDisplay : MonoBehaviour
             return;
         }
 
-        if (selectedBattleCard != 0)
-        {
-            // selected card will appear first, makes it easier to de-select it
-            AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
-        }
-
         // available cards appear after selected one
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
+            bool selected = selectedBattleCard == cardId;
+            AddCard(cardId, availableCardIds[cardId], selected, isSupportCard: false, filter);
         }
     }
 
@@ -209,28 +204,28 @@ public class DeckDisplay : MonoBehaviour
         }
     }*/
 
-    public void SetCardEquip(bool toEquip, ulong cardId, CardType type)
+    public void SetCardEquip(bool toEquip, ulong cardId, int previewId, CardType type)
     {
         switch (type)
         {
             case CardType.Battle:
                 if (toEquip)
                 {
-                    EquipCard(cardId, false);
+                    EquipCard(cardId, previewId, false);
                 }
                 else
                 {
-                    UnEquipCard(cardId, false);
+                    UnEquipCard(previewId, false);
                 }
                 break;
             case CardType.Support:
                 if (toEquip)
                 {
-                    EquipCard(cardId, true);
+                    EquipCard(cardId, previewId, true);
                 }
                 else
                 {
-                    UnEquipCard(cardId, true);
+                    UnEquipCard(previewId, true);
                 }
                 break;
             default:
@@ -238,23 +233,21 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    public void UnEquipCard(ulong cardId, bool isSupportCard)
+    public void UnEquipCard(int previewId, bool isSupportCard)
     {
-        if (!isSupportCard)
-        {
-            battleCardId = 0;
-        }
-
-        RemoveCardFromDeck(cardId);
+        RemoveCardFromDeck(previewId);
     }
 
-    public void EquipCard(ulong cardId, bool isSupportCard)
+    public void EquipCard(ulong cardId, int previewId, bool isSupportCard)
     {
         if (!isSupportCard)
         {
             DeselectPrevBattleCard();
             RemoveBattleCard();
+            battleCardId = cardId;
         }
+
+        RemoveCardFromDeck(previewId);
 
         AddCardToDeck(cardId, isSupportCard);
     }
@@ -268,15 +261,16 @@ public class DeckDisplay : MonoBehaviour
             if (cardPreview != null && isTheMyCardsListAndIsInteractable && cardPreview.cardId == battleCardId)
             {
                 item.SetSelected(false);
+                cardPreview._checkmark.SetActive(false);
                 return;
             }
         }
     }
 
 
-    private void RemoveCardFromDeck(ulong cardId)
+    private void RemoveCardFromDeck(int previewId)
     {
-        var cardPreviewToRemove = _cardPreviews.FirstOrDefault(item => item.cardId == cardId);
+        var cardPreviewToRemove = _cardPreviews.FirstOrDefault(item => item.previewId == previewId);
 
         if (cardPreviewToRemove != null)
         {
@@ -301,11 +295,6 @@ public class DeckDisplay : MonoBehaviour
 
     private void AddCardToDeck(ulong cardId, bool isSupportCard)
     {
-        if (!isSupportCard)
-        {
-            battleCardId = cardId;
-        }
-
         if (cardId == 0)
         {
             // if this shows up there could be a bug in the contract
@@ -360,8 +349,10 @@ public class DeckDisplay : MonoBehaviour
         var cardInstance = Instantiate(prefab);
         var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
 
+        int previewId = cardInstance.gameObject.GetInstanceID();
+
         cardInstance.transform.SetParent(uiList.transform, false);
-        cardPreviewComponent.LoadCardData(cardId, isSupportCard);
+        cardPreviewComponent.LoadCardData(cardId, isSupportCard, previewId);
 
         cardPreviewComponent.GetComponent<Button>().enabled = false;
 
@@ -427,14 +418,17 @@ public class DeckDisplay : MonoBehaviour
         {
             var cardInstance = Instantiate(prefab, uiList.transform);
             var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
-            cardPreviewComponent.LoadCardData(cardId, isSupportCard);
+            int previewId = cardInstance.gameObject.GetInstanceID();
+            cardPreviewComponent.LoadCardData(cardId, isSupportCard, previewId);
 
             // set checkmark
             if (isSelected)
             {
                 AddCardToDeck(cardId, isSupportCard);
-                cardPreviewComponent.ToggleSelected();
+                //cardPreviewComponent.ToggleSelected();
             }
+
+            cardPreviewComponent.SetEquip(isSelected);
         }
 
     }

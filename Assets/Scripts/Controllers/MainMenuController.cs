@@ -39,7 +39,7 @@ public class MainMenuController : MonoBehaviour
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         // TODO: find a better way to handle re-loading the main scene
-        //PostBattleScreenController.IsClaimingGift = true;
+        PostBattleScreenController.IsClaimingGift = true;
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
