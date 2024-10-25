@@ -57,7 +57,6 @@ public class DeckListLoader : MonoBehaviour
         if (string.IsNullOrEmpty(account))
         {
             loadingMessageLabel.text = "Error: No account selected";
-            Debug.LogError("if it crashed then uncomment the next line: return;");
             //return;
         }
 

@@ -1,4 +1,6 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -29,6 +31,26 @@ public class PepemonCardDeck
         return response;
     }
 
+    public static IEnumerator GetBattleCard(ulong deckId, Action<ulong> callback)
+    {
+        var request = contract.Read<ulong>("getBattleCardInDeck", deckId);
+
+        while (!request.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (request.IsFaulted)
+        {
+            Debug.LogError("Error fetching battle card: " + request.Exception);
+            callback?.Invoke(0); // Assuming 0 is a default error state for battleCard
+            yield break;
+        }
+
+        callback?.Invoke(request.Result);
+    }
+
+
     public static async Task<IDictionary<ulong, int>> GetAllSupportCards(ulong deckId)
     {
         var response = await contract.Read<List<ulong>>("getAllSupportCardsInDeck", deckId);
@@ -39,6 +61,32 @@ public class PepemonCardDeck
         }
         return result;
     }
+
+    public static IEnumerator GetAllSupportCards(ulong deckId, Action<IDictionary<ulong, int>> callback)
+    {
+        var request = contract.Read<List<ulong>>("getAllSupportCardsInDeck", deckId);
+        var result = new OrderedDictionary<ulong, int>();
+
+        while (!request.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (request.IsFaulted)
+        {
+            Debug.LogError("Error fetching support cards: " + request.Exception);
+            callback?.Invoke(null);
+            yield break;
+        }
+
+        foreach (var card in request.Result)
+        {
+            result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
+        }
+
+        callback?.Invoke(result);
+    }
+
 
     public static async Task<List<ulong>> GetPlayerDecks(string address)
     {

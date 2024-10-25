@@ -93,7 +93,7 @@ public class DeckDisplay : MonoBehaviour
         _cardPreviews = new List<CardPreview>();
     }
 
-    public void LoadSelectedCards(ulong selectedBattleCard, Dictionary<ulong, int> selectedSupportCards, int filter)
+    public void LoadSelectedCards(ulong selectedBattleCard, IDictionary<ulong, int> selectedSupportCards, int filter)
     {
         // Load selected battle card first
         if (selectedBattleCard != 0)
@@ -146,7 +146,7 @@ public class DeckDisplay : MonoBehaviour
         return result;
     }
 
-    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, Dictionary<ulong, int> selectedSupportCards, int filter)
+    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, IDictionary<ulong, int> selectedSupportCards, int filter)
     {
 
         // selected cards will appear first, makes it easier to de-select them
