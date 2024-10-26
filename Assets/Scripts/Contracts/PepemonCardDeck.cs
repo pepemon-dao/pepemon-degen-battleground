@@ -37,8 +37,11 @@ public class PepemonCardDeck
 
         while (!request.IsCompleted)
         {
+            
             yield return null;
         }
+
+        Debug.LogError("selected battle card for current deck: " + request.Result);
 
         if (request.IsFaulted)
         {
@@ -83,6 +86,8 @@ public class PepemonCardDeck
         {
             result[card] = result.ContainsKey(card) ? result[card] + 1 : 1;
         }
+
+        Debug.LogError("cards in deck: " + result.Count());
 
         callback?.Invoke(result);
     }

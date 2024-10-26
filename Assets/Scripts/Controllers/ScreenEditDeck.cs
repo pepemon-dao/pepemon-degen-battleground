@@ -50,7 +50,14 @@ public class ScreenEditDeck : MonoBehaviour
         _textLoading.SetActive(true);
 
         var deckDisplayComponent = _deckDisplay.GetComponent<DeckDisplay>();
-        currentDeckId = deckId;
+
+        bool loadingNewDeck = false;
+
+        if (currentDeckId != deckId)
+        {
+            currentDeckId = deckId;
+            loadingNewDeck = true;
+        }
         string account = "";
 
         // Getting the address from the wallet
@@ -69,16 +76,20 @@ public class ScreenEditDeck : MonoBehaviour
         }
 
         supportCards = new OrderedDictionary<ulong, int>();
-        bool isStarterDeck = string.IsNullOrEmpty(account);
+        bool isStarterDeck = deckId == 1234;
         Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
         Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
-        Debug.LogError(isStarterDeck + "- is starter deck" + " acc: " + account);
+        if (loadingNewDeck)
+        {
+            //clear it before it thinks tht the previous cards selected is part of this new deck too
+            deckDisplayComponent.ClearMyCardsList();
+        }
 
         // Handle starter deck case
         if (isStarterDeck)
         {
-            SetupStarterDeck(deckDisplayComponent, ownedCardIds, ownedBattleCardIds);
+            SetupStarterDeck(deckDisplayComponent, ownedCardIds, ownedBattleCardIds, loadingNewDeck);
         }
         else
         {
@@ -91,15 +102,28 @@ public class ScreenEditDeck : MonoBehaviour
 
             */
 
-
             // Fetch owned cards
             yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
 
-            // Fetch battle card
-            yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));
+            if (loadingNewDeck)
+            {
+                // Fetch battle card
+                yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));
 
-            // Fetch all support cards
-            yield return StartCoroutine(PepemonCardDeck.GetAllSupportCards(deckId, result => supportCards = result));
+                // Fetch all support cards
+                yield return StartCoroutine(PepemonCardDeck.GetAllSupportCards(deckId, result => supportCards = result));
+            }
+            else
+            {
+                battleCard = deckDisplayComponent.GetSelectedBattleCard();
+                supportCards = deckDisplayComponent.GetSelectedSupportCards();
+            }
+            
+
+            if (battleCard == 0)
+            {
+                battleCard = DeckDisplay.battleCardId;
+            }
         }
 
         // Set battle card if not set
@@ -119,10 +143,9 @@ public class ScreenEditDeck : MonoBehaviour
     }
 
     // Helper method for setting up the starter deck
-    private void SetupStarterDeck(DeckDisplay deckDisplayComponent, Dictionary<ulong, int> ownedCardIds, Dictionary<ulong, int> ownedBattleCardIds)
+    private void SetupStarterDeck(DeckDisplay deckDisplayComponent, Dictionary<ulong, int> ownedCardIds, Dictionary<ulong, int> ownedBattleCardIds, bool IsLoadingNewDeck)
     {
-        bool firstLoad = DeckDisplay.battleCardId == 0;
-        if (firstLoad)
+        if (IsLoadingNewDeck)
         {
             DeckDisplay.battleCardId = 7;
         }
@@ -138,7 +161,7 @@ public class ScreenEditDeck : MonoBehaviour
             ownedCardIds[id] = ownedCardIds.ContainsKey(id) ? ownedCardIds[id] + 1 : 1;
         }
 
-        if (!firstLoad)
+        if (!IsLoadingNewDeck)
         {
             DeductSelectedCardsFromOwned(supportCards, ownedCardIds);
         }
