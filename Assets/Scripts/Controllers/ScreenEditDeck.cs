@@ -23,6 +23,7 @@ public class ScreenEditDeck : MonoBehaviour
     [TitleGroup("Helpers"), SerializeField] List<Card> ownedDeck; 
     [TitleGroup("Helpers"), SerializeField] List<BattleCard> ownedBattleDeck; 
     [TitleGroup("Helpers"), SerializeField] List<Card> starterDeck; 
+    [TitleGroup("Helpers"), SerializeField] FilterController filterController; 
     private ulong currentDeckId;
     private ulong battleCard;
     private IDictionary<ulong, int> supportCards = new Dictionary<ulong, int>();
@@ -84,6 +85,7 @@ public class ScreenEditDeck : MonoBehaviour
         {
             //clear it before it thinks tht the previous cards selected is part of this new deck too
             deckDisplayComponent.ClearMyCardsList();
+            filterController.SetFilter(0);
         }
 
         // Handle starter deck case
@@ -107,6 +109,9 @@ public class ScreenEditDeck : MonoBehaviour
 
             if (loadingNewDeck)
             {
+                DeckDisplay.battleCardId = 0; //safe guards
+                battleCard = 0; //safe guards
+
                 // Fetch battle card
                 yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));
 
@@ -118,10 +123,13 @@ public class ScreenEditDeck : MonoBehaviour
                 battleCard = deckDisplayComponent.GetSelectedBattleCard();
                 supportCards = deckDisplayComponent.GetSelectedSupportCards();
             }
-            
 
             if (battleCard == 0)
             {
+                if (DeckDisplay.battleCardId == 0)
+                {
+                    DeckDisplay.battleCardId = 7;
+                }
                 battleCard = DeckDisplay.battleCardId;
             }
         }
