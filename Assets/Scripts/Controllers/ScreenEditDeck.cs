@@ -81,13 +81,6 @@ public class ScreenEditDeck : MonoBehaviour
         Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
         Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
-        if (loadingNewDeck)
-        {
-            //clear it before it thinks tht the previous cards selected is part of this new deck too
-            deckDisplayComponent.ClearMyCardsList();
-            filterController.SetFilter(0);
-        }
-
         // Handle starter deck case
         if (isStarterDeck)
         {
@@ -138,6 +131,14 @@ public class ScreenEditDeck : MonoBehaviour
         if (DeckDisplay.battleCardId == 0)
         {
             DeckDisplay.battleCardId = battleCard;
+        }
+
+        if (loadingNewDeck)
+        {
+            if (filterController == null && FilterController.Instance != null)
+            {
+                FilterController.Instance.SetFilter(0);
+            }
         }
 
         // Load deck data into the display

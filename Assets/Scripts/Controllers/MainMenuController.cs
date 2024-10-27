@@ -38,7 +38,7 @@ public class MainMenuController : MonoBehaviour
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        PostBattleScreenController.IsClaimingGift = true; //- for testing the gift mechanic with the deck manager
+        //PostBattleScreenController.IsClaimingGift = true; //- for testing the gift mechanic with the deck manager
         // TODO: find a better way to handle re-loading the main scene
 
         HandleGoingBackToMenu();
@@ -65,8 +65,7 @@ public class MainMenuController : MonoBehaviour
         if (PostBattleScreenController.IsClaimingGift)
         {
             PostBattleScreenController.IsClaimingGift = false;
-            PlayerPrefs.SetInt("GotStarterPack", 1);
-            Debug.LogError("gift claim is not yet implemented");
+            
             //claim gift
             ClaimStarterDeck();
         }
@@ -74,6 +73,8 @@ public class MainMenuController : MonoBehaviour
 
     private void ClaimStarterDeck()
     {
+        Debug.LogError("gift claim is not yet implemented");
+        //PlayerPrefs.SetInt("GotStarterPack", 1);
         claimedStarterDeck = true;
     }
 
