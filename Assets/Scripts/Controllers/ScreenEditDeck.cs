@@ -30,6 +30,8 @@ public class ScreenEditDeck : MonoBehaviour
 
     private bool isLoading = false;
 
+    private bool shouldUpdateTheStarterSupportCardsAfterSave = false;
+
     public void Start()
     {
         _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
@@ -77,7 +79,8 @@ public class ScreenEditDeck : MonoBehaviour
         }
 
         supportCards = new OrderedDictionary<ulong, int>();
-        bool isStarterDeck = deckId == 1234;
+        starterSupportCards = new OrderedDictionary<ulong, int>();
+        bool isStarterDeck = false;//deckId == 1234;
         Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
         Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
@@ -117,12 +120,39 @@ public class ScreenEditDeck : MonoBehaviour
                 supportCards = deckDisplayComponent.GetSelectedSupportCards();
             }
 
+            if (!loadingNewDeck)
+            {
+                if (shouldUpdateTheStarterSupportCardsAfterSave)
+                {
+                    starterSupportCards = supportCards;
+                }
+            }
+
+            shouldUpdateTheStarterSupportCardsAfterSave = false;
+
+            var keysToRemove = new List<ulong>();
+
+            foreach (var entry in ownedCardIds)
+            {
+                bool isBattleCard = PepemonFactoryCardCache.GetMetadata(entry.Key).Value.description.Contains("Battle ver");
+                if (isBattleCard)
+                {
+                    // Add to ownedBattleCardIds
+                    ownedBattleCardIds.Add(entry.Key, entry.Value);
+
+                    // Mark the key for removal
+                    keysToRemove.Add(entry.Key);
+                }
+            }
+
+            // Remove the marked keys from ownedCardIds
+            foreach (var key in keysToRemove)
+            {
+                ownedCardIds.Remove(key);
+            }
+
             if (battleCard == 0)
             {
-                if (DeckDisplay.battleCardId == 0)
-                {
-                    DeckDisplay.battleCardId = 7;
-                }
                 battleCard = DeckDisplay.battleCardId;
             }
         }
@@ -260,6 +290,8 @@ public class ScreenEditDeck : MonoBehaviour
 
         if (approvalOk)
         {
+            shouldUpdateTheStarterSupportCardsAfterSave = true;
+
             GetSupportCardsDiff(
                 supportCards,
                 _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
