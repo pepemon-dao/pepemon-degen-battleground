@@ -8,6 +8,7 @@ public class StartDeckChooseController : MonoBehaviour
 {
     [SerializeField] private Image currentPepemonImg;
     [SerializeField] private TMP_Text pepemonName;
+    [SerializeField] private TMP_Text descDisplay;
     [SerializeField] private Button defaultSetting;
 
     private void Start()
@@ -23,5 +24,10 @@ public class StartDeckChooseController : MonoBehaviour
     public void SetName(string name)
     {
         pepemonName.text = name;
+    }
+
+    public void SetDesc(string desc)
+    {
+        descDisplay.text = desc;
     }
 }

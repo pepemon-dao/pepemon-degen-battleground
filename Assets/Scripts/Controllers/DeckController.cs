@@ -20,6 +20,8 @@ public class DeckController : MonoBehaviour
     [BoxGroup("Deck Components"), SerializeField] private TMP_Text _supportCardCount;
     [BoxGroup("Deck Components"), SerializeField] private TMP_Text _winCount;
     [BoxGroup("Deck Components"), SerializeField] private TMP_Text _lossCount;
+    [BoxGroup("Deck Components"), SerializeField] private GameObject _errorDisplay;
+    [BoxGroup("Deck Components"), SerializeField] private TMP_Text _errorText;
 
     public UnityEvent onSelectButtonClicked;
     public UnityEvent onEditButtonClicked;
@@ -126,7 +128,11 @@ public class DeckController : MonoBehaviour
         // TODO: Use on-chain MAX_SUPPORT_CARDS value
         _deckName.text = (metadata?.name ?? "New") + " Deck";
         _battleCard.text = metadata?.name ?? "None";
-        var supportCardCount = (supportCards.Values?.Count ?? 0);
+        int supportCardCount = 0;
+        foreach (var card in supportCards)
+        {
+            supportCardCount += card.Value;
+        }
         _supportCardCount.text = supportCardCount + " / " + 60;
 
         if (isStarterDeck)
@@ -134,14 +140,24 @@ public class DeckController : MonoBehaviour
             _supportCardCount.text = starterDeck.Count.ToString();
         }
 
-        //TODO: check if the deck is valid - disable select button, only edit and add a flag that the deck needs to be edited
         if (!isStarterDeck)
         {
-            if (selectionMode && (metadata?.name == null || supportCardCount == 0))
+            if (metadata?.name == null)
             {
-                gameObject.SetActive(false);
-                return false;
+                _errorDisplay.SetActive(true);
+                _errorText.text = "Pepemon card missing";
+                _selectButton.gameObject.SetActive(false);
+                return true;
             }
+            if (supportCardCount == 0)
+            {
+                _errorDisplay.SetActive(true);
+                _errorText.text = "Support cards missing";
+                _selectButton.gameObject.SetActive(false);
+                return true;
+            }
+            _selectButton.gameObject.SetActive(selectionMode);
+            _errorDisplay.SetActive(false);
         }
         
         return true;

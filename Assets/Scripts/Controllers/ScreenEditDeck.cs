@@ -9,6 +9,7 @@ using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
 using static PepemonCardDeck;
+using static UnityEngine.EventSystems.EventTrigger;
 
 /// <summary>
 /// MonoBehavior for Screen_5_EditDeck
@@ -27,6 +28,7 @@ public class ScreenEditDeck : MonoBehaviour
     private ulong currentDeckId;
     private ulong battleCard;
     private IDictionary<ulong, int> supportCards = new Dictionary<ulong, int>();
+    private IDictionary<ulong, int> starterSupportCards = new Dictionary<ulong, int>();
 
     private bool isLoading = false;
 
@@ -81,13 +83,15 @@ public class ScreenEditDeck : MonoBehaviour
         supportCards = new OrderedDictionary<ulong, int>();
         starterSupportCards = new OrderedDictionary<ulong, int>();
         bool isStarterDeck = false;//deckId == 1234;
+
         Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
         Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
         // Handle starter deck case
         if (isStarterDeck)
         {
-            SetupStarterDeck(deckDisplayComponent, ownedCardIds, ownedBattleCardIds, loadingNewDeck);
+            // we are not using this system currently and would be on chain - TODO: remove all the connected code to this
+            //SetupStarterDeck(deckDisplayComponent, ownedCardIds, ownedBattleCardIds, loadingNewDeck);
         }
         else
         {
@@ -113,6 +117,8 @@ public class ScreenEditDeck : MonoBehaviour
 
                 // Fetch all support cards
                 yield return StartCoroutine(PepemonCardDeck.GetAllSupportCards(deckId, result => supportCards = result));
+
+                starterSupportCards = supportCards;
             }
             else
             {
@@ -165,10 +171,15 @@ public class ScreenEditDeck : MonoBehaviour
 
         if (loadingNewDeck)
         {
-            if (filterController == null && FilterController.Instance != null)
+            if (FilterController.Instance != null)
             {
                 FilterController.Instance.SetFilter(0);
             }
+        }
+
+        foreach(var cardId in ownedCardIds)
+        {
+            Debug.LogError(cardId.Key + " " + ownedCardIds[cardId.Key] + " " + PepemonFactoryCardCache.GetMetadata(cardId.Key).Value.name);
         }
 
         // Load deck data into the display
@@ -202,7 +213,7 @@ public class ScreenEditDeck : MonoBehaviour
 
         if (!IsLoadingNewDeck)
         {
-            DeductSelectedCardsFromOwned(supportCards, ownedCardIds);
+            ownedCardIds = DeductSelectedCardsFromOwned(supportCards, ownedCardIds);
         }
 
         foreach (var card in ownedBattleDeck)
@@ -217,7 +228,7 @@ public class ScreenEditDeck : MonoBehaviour
     }
 
     // Helper method for deducting selected cards from owned cards
-    private void DeductSelectedCardsFromOwned(IDictionary<ulong, int> selectedCards, Dictionary<ulong, int> ownedCardIds)
+    private Dictionary<ulong, int> DeductSelectedCardsFromOwned(IDictionary<ulong, int> selectedCards, Dictionary<ulong, int> ownedCardIds)
     {
         foreach (var card in selectedCards)
         {
@@ -230,6 +241,8 @@ public class ScreenEditDeck : MonoBehaviour
                 }
             }
         }
+
+        return ownedCardIds;
     }
 
     private void setButtonsInteractibleState(bool interactible)
@@ -293,13 +306,17 @@ public class ScreenEditDeck : MonoBehaviour
             shouldUpdateTheStarterSupportCardsAfterSave = true;
 
             GetSupportCardsDiff(
-                supportCards,
+                starterSupportCards,
                 _deckDisplay.GetComponent<DeckDisplay>().GetSelectedSupportCards(),
                 out var supportCardsToBeAdded,
                 out var supportCardsToBeRemoved);
 
             // TODO: wait for transaction receipt
-            await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
+            if (supportCardsToBeAdded.Length > 0 ||supportCardsToBeRemoved.Length > 0)
+            {
+                await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
+            }
+            
             await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
         }
 

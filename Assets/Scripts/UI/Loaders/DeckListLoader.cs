@@ -43,9 +43,9 @@ public class DeckListLoader : MonoBehaviour
             if (!deck.name.Contains("StarterDeck"))
                 Destroy(deck.gameObject);
         }
-
         
         string account = "";
+
         try
         {
             account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();

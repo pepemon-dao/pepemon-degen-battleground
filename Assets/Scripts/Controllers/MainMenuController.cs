@@ -23,6 +23,7 @@ public class MainMenuController : MonoBehaviour
     public Button _manageDecksButton;
     public Button _leaderboardButton;
     public Button _creditsButton;
+    public Button _mintDeckButton;
 
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
@@ -33,7 +34,7 @@ public class MainMenuController : MonoBehaviour
 
     public static bool claimedStarterDeck = false;
 
-    private async void Start()
+    private void Start()
     {
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -43,13 +44,14 @@ public class MainMenuController : MonoBehaviour
 
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
+        _mintDeckButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
         _creditsButton.onClick.AddListener(OpenCredits);
     }
 
-    private async void HandleGoingBackToMenu()
+    private void HandleGoingBackToMenu()
     {
         if (PepemonFactoryCardCache.CardsIds.Count == 0)
         {
@@ -175,7 +177,10 @@ public class MainMenuController : MonoBehaviour
 
     public async void OnConnectWalletButtonClick()
     {
-        await Web3Controller.instance.ConnectWallet();
+        if (!Web3Controller.instance.IsConnected)
+        {
+            await Web3Controller.instance.ConnectWallet();
+        }
     }
 
     public void OnStartGameButtonClick()

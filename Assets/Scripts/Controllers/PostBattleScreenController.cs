@@ -92,7 +92,7 @@ public class PostBattleScreenController : MonoBehaviour
             //.SetText(win ? "Gained Starter Pack" : "");
         }
 
-        bool claimedStarterPack = PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
+        bool claimedStarterPack = false; //PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
         _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
         _leaderboardMsg.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
         _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);

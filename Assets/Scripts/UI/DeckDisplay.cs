@@ -111,8 +111,6 @@ public class DeckDisplay : MonoBehaviour
 
     public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard, int filter)
     {
-        //AddCard(selectedBattleCard,1, true, isSupportCard: false, filter);
-
         if (filter == 1 || filter == 2)
         {
             Debug.Log("battle cards filtered out");
@@ -122,12 +120,7 @@ public class DeckDisplay : MonoBehaviour
         // available cards appear after selected one
         foreach (var cardId in availableCardIds.Keys)
         {
-            bool selected = selectedBattleCard == cardId;
-            if (!selected)
-            {
-                AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
-            }
-            
+            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
         }
     }
 
@@ -153,6 +146,18 @@ public class DeckDisplay : MonoBehaviour
         foreach (var cardId in selectedSupportCards.Keys)
         {
             //AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
+
+            // Deduct the selected amount from available cards
+            if (availableCardIds.ContainsKey(cardId))
+            {
+                availableCardIds[cardId] -= selectedSupportCards[cardId];
+
+                // Remove the card from available if none left
+                if (availableCardIds[cardId] <= 0)
+                {
+                    availableCardIds.Remove(cardId);
+                }
+            }
         }
 
         if (filter == 3)
@@ -245,7 +250,7 @@ public class DeckDisplay : MonoBehaviour
             {
                 item.SetSelected(false);
                 cardPreview._checkmark.SetActive(false);
-                return;
+                //return; we cannot return here, because it is allowed currently to posess more pepemon cards than 1
             }
         }
     }
