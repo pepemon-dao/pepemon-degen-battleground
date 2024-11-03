@@ -16,9 +16,10 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _heroCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
-    [TitleGroup("Helpers"), SerializeField] FilterController _filter;
 
     private List<CardPreview> _cardPreviews = new List<CardPreview>();
+
+    private Dictionary<ulong, CardMetadata?> metadataLookup = new Dictionary<ulong, CardMetadata?>();
 
     public static ulong battleCardId = 0;
 
@@ -93,34 +94,30 @@ public class DeckDisplay : MonoBehaviour
         _cardPreviews = new List<CardPreview>();
     }
 
-    public void LoadSelectedCards(ulong selectedBattleCard, IDictionary<ulong, int> selectedSupportCards, int filter)
+    public void LoadSelectedCards(ulong selectedBattleCard, IDictionary<ulong, int> selectedSupportCards)
     {
         // Load selected battle card first
         if (selectedBattleCard != 0)
         {
-            AddCard(selectedBattleCard, 1, true, isSupportCard: false, filter);
+            AddCard(selectedBattleCard, 1, true, isSupportCard: false);
         }
 
         // Load selected support cards
-        foreach (var cardId in selectedSupportCards.Keys)
+        foreach (var kvp in selectedSupportCards)
         {
-            AddCard(cardId, selectedSupportCards[cardId], true, isSupportCard: true, filter);
+            ulong cardId = kvp.Key;
+            int quantity = kvp.Value;
+            AddCard(cardId, quantity, true, isSupportCard: true);
         }
     }
 
 
-    public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard, int filter)
-    {
-        if (filter == 1 || filter == 2)
-        {
-            Debug.Log("battle cards filtered out");
-            return;
-        }
 
-        // available cards appear after selected one
+    public void LoadAllBattleCards(Dictionary<ulong, int> availableCardIds, ulong selectedBattleCard)
+    {
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false, filter);
+            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
         }
     }
 
@@ -139,39 +136,47 @@ public class DeckDisplay : MonoBehaviour
         return result;
     }
 
-    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, IDictionary<ulong, int> selectedSupportCards, int filter)
+    public void LoadAllSupportCards(Dictionary<ulong, int> availableCardIds, IDictionary<ulong, int> selectedSupportCards)
     {
+        // Create a temporary list to track cards that need to be removed
+        var cardsToRemove = new List<ulong>();
 
-        // selected cards will appear first, makes it easier to de-select them
-        foreach (var cardId in selectedSupportCards.Keys)
+        // Handle selected cards first
+        foreach (var kvp in selectedSupportCards)
         {
-            //AddCard(cardId, selectedSupportCards[cardId], true, true, filter);
+            ulong cardId = kvp.Key;
+            int selectedAmount = kvp.Value;
 
             // Deduct the selected amount from available cards
-            if (availableCardIds.ContainsKey(cardId))
+            if (availableCardIds.TryGetValue(cardId, out int availableAmount))
             {
-                availableCardIds[cardId] -= selectedSupportCards[cardId];
+                availableAmount -= selectedAmount;
 
-                // Remove the card from available if none left
-                if (availableCardIds[cardId] <= 0)
+                // If none left, mark for removal
+                if (availableAmount <= 0)
                 {
-                    availableCardIds.Remove(cardId);
+                    cardsToRemove.Add(cardId);
+                }
+                else
+                {
+                    availableCardIds[cardId] = availableAmount; // Update the remaining amount
                 }
             }
         }
 
-        if (filter == 3)
+        // Remove cards marked for removal
+        foreach (var cardId in cardsToRemove)
         {
-            Debug.Log("support cards filtered out");
-            return;
+            availableCardIds.Remove(cardId);
         }
 
-        // available cards appear after selected ones
-        foreach (var cardId in availableCardIds.Keys)
+        // Now load available cards
+        foreach (var kvp in availableCardIds)
         {
-            AddCard(cardId, availableCardIds[cardId], false, true, filter);
+            AddCard(kvp.Key, kvp.Value, false, true);
         }
     }
+
 
     public void SetCardEquip(bool toEquip, ulong cardId, CardType type)
     {
@@ -298,104 +303,97 @@ public class DeckDisplay : MonoBehaviour
     {
         if (cardId == 0)
         {
-            // if this shows up there could be a bug in the contract
             Debug.LogWarning("Invalid card");
             return;
         }
-        var cardIsSupportCard = PepemonFactoryCardCache.GetMetadata(cardId)?.isSupportCard ?? false;
 
-        // skip battlecards if supportCard=true and skip supportcards if supportCard=false
+        // Check if metadata is already in the lookup table
+        if (!metadataLookup.TryGetValue(cardId, out var metadata))
+        {
+            // Metadata not found in lookup, retrieve it
+            metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+            if (metadata == null)
+            {
+                Debug.LogWarning("Card metadata not found");
+                return;
+            }
+            // Add retrieved metadata to the lookup table
+            metadataLookup[cardId] = metadata;
+        }
+
+        bool cardIsSupportCard = metadata.Value.isSupportCard;
+
+        // Skip if the card type does not match
         if (cardIsSupportCard != isSupportCard)
         {
             return;
         }
 
-        var prefab = _battleCardPrefab;
-        GameObject uiList = null;
+        // Check offense/defense status
+        bool isOffense = metadata.Value.description?.ToLower().Contains("attack") ?? false;
+        bool isDefense = metadata.Value.description?.ToLower().Contains("defense") ?? false;
 
-        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
-
-        bool isOffense = false;
-        bool isDefense = false;
-
-        if (metadata != null && metadata.Value.description != null)
-        {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
-            isDefense = metadata.Value.description.ToLower().Contains("defense");
-        }
-
-        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
-        if (card != null)
-        {
-            isOffense = card.IsAttackingCard();
-            isDefense = !isOffense;
-        }
-
+        // Validate card type
         if (isOffense && isDefense)
         {
-            Debug.LogError("not a valid card");
+            Debug.LogError("Not a valid card");
             return;
         }
 
+        // Determine prefab and UI list based on card type
+        GameObject prefab = isSupportCard ? _supportCardPrefab : _battleCardPrefab;
+        GameObject uiList;
+
         if (isSupportCard)
         {
-            if (isDefense)
-            {
-                prefab = _supportCardPrefab;
-                uiList = _supportCardList;
-            }
-            else
-            {
-                prefab = _supportCardPrefab;
-                uiList = _battleCardList;
-            }
+            uiList = isDefense ? _supportCardList : _battleCardList;
         }
         else
         {
-            prefab = _battleCardPrefab;
             uiList = _heroCardList;
         }
 
-        var cardInstance = Instantiate(prefab);
+        // Instantiate the card and set up the preview component
+        var cardInstance = Instantiate(prefab, uiList.transform);
         var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
-
-        cardInstance.transform.SetParent(uiList.transform, false);
         cardPreviewComponent.LoadCardData(cardId, isSupportCard);
-
         cardPreviewComponent.GetComponent<Button>().enabled = false;
 
         _cardPreviews.Add(cardPreviewComponent);
     }
 
-    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard, int filter)
+
+    private void AddCard(ulong cardId, int count, bool isSelected, bool isSupportCard)
     {
         if (cardId == 0)
         {
-            // if this shows up there could be a bug in the contract
             Debug.LogWarning("Invalid card");
             return;
         }
-        var cardIsSupportCard = PepemonFactoryCardCache.GetMetadata(cardId)?.isSupportCard ?? false;
         
-        // skip battlecards if supportCard=true and skip supportcards if supportCard=false
+        // Check if metadata is already in the lookup table
+        if (!metadataLookup.TryGetValue(cardId, out var metadata))
+        {
+            // Metadata not found in lookup, retrieve it
+            metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+            if (metadata == null)
+            {
+                Debug.LogWarning("Card metadata not found");
+                return;
+            }
+
+            // Add retrieved metadata to the lookup table
+            metadataLookup[cardId] = metadata;
+        }
+
+        bool cardIsSupportCard = metadata.Value.isSupportCard;
         if (cardIsSupportCard != isSupportCard)
         {
-            return;
+            return; // Skip if card type does not match
         }
 
-        var prefab = _battleCardPrefab;
-        GameObject uiList = null;
-
-        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
-
-        bool isOffense = false; 
-        bool isDefense = false;
-
-        if (metadata != null && metadata.Value.description != null)
-        {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
-            isDefense = metadata.Value.description.ToLower().Contains("defense");
-        }
+        bool isOffense = metadata.Value.description?.ToLower().Contains("attack") ?? false;
+        bool isDefense = metadata.Value.description?.ToLower().Contains("defense") ?? false;
 
         Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
         if (card != null)
@@ -410,7 +408,9 @@ public class DeckDisplay : MonoBehaviour
             return;
         }
 
-        
+        GameObject prefab = isSupportCard ? _supportCardPrefab : _battleCardPrefab;
+        GameObject uiList = _myCardsList;
+
         if (isSelected)
         {
             for (int i = 0; i < count; i++)
@@ -419,49 +419,24 @@ public class DeckDisplay : MonoBehaviour
             }
         }
 
-        if (!isSelected)
+        // Check filters and return if the card is filtered out
+        if ((isDefense && !FilterController.Instance.IsFilterOn(FilterController.FilterType.Defense)) ||
+            (isOffense && !FilterController.Instance.IsFilterOn(FilterController.FilterType.Offense)) ||
+            (!isSupportCard && !FilterController.Instance.IsFilterOn(FilterController.FilterType.Pepemon)))
         {
-            if (filter == 1 && isDefense)
+            if (!FilterController.Instance.AreAllFilterOff())
             {
-                return; // filter out the defense cards
-            }
-
-            if (filter == 2 && isOffense)
-            {
-                return; // filter out the offense cards
+                return; // Filter out the card
             }
         }
-        
-
-        if (isSupportCard)
-        {
-            prefab = _supportCardPrefab;
-        }
-
-        uiList = _myCardsList;
 
         for (int i = 0; i < count; i++)
         {
             var cardInstance = Instantiate(prefab, uiList.transform);
             var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
             cardPreviewComponent.LoadCardData(cardId, isSupportCard);
-
-            // set checkmark
-            if (isSelected)
-            {
-                if (!isSupportCard && ((filter == 1 && isDefense) || (filter == 2 && isOffense)))
-                {
-                    cardInstance.SetActive(false);
-                }
-                if (isSupportCard && filter == 3)
-                {
-                    cardInstance.SetActive(false);
-                }
-                //cardPreviewComponent.ToggleSelected();
-            }
-
             cardPreviewComponent.SetEquip(isSelected);
         }
-
     }
+
 }

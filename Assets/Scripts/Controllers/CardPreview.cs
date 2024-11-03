@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static PepemonFactory;
+using static UnityEngine.EventSystems.EventTrigger;
 
 /// <summary>
 /// MonoBehavior for BattleCardTemplate and SupportCardTemplate
@@ -28,6 +29,8 @@ public class CardPreview : MonoBehaviour
 
     private bool isEquipped = false;
 
+    private Dictionary<ulong, CardMetadata?> metadataLookup = new Dictionary<ulong, CardMetadata?>();
+
     public void ToggleSelected()
     {
         // setting SelectionItem.SetSelected directly would mess up the internal state of SelectionGroup
@@ -39,21 +42,22 @@ public class CardPreview : MonoBehaviour
     {
         this.cardId = cardId;
         this.isSupport = isSupport;
-        var metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+        
 
-        // set card image. blank if not found
-        var tex = PepemonFactoryCardCache.GetImage(cardId);
-        if (tex == null)
+        if (!metadataLookup.TryGetValue(cardId, out var metadata))
         {
-            Debug.LogWarning("Unable to locate texture for card " + cardId);
+            // Metadata not found in lookup, retrieve it
+            metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+            if (metadata != null)
+            {
+                metadataLookup[cardId] = metadata;
+            }
         }
 
         if (metadata == null)
         {
             Debug.LogWarning("Unable to locate metadata for card " + cardId);
         }
-
-        //bool isSupport = metadata.Value.attributes[0].value == "Pepemon Support";
 
         bool isOffense = false;
         bool isDefense = false;
@@ -80,14 +84,18 @@ public class CardPreview : MonoBehaviour
             offenseIcon.SetActive(isOffense);
         }
 
-        Texture2D cardTexture = tex == null ? new Texture2D(8, 8) : tex;
-        _cardImage.sprite = Sprite.Create(
-            cardTexture,
-            new Rect(0, 0, cardTexture.width, cardTexture.height),
-            new Vector2());
+
+        // Use the singleton to get the texture
+        TextureData textureData = CardTextureLookup.Instance.GetTextureData(cardId);
+
+        if (textureData != null)
+        {
+            _cardImage.sprite = textureData.Sprite;
+        }
 
         _text.text = metadata?.name ?? "Unknown Card";
     }
+
 
     public void ToggleEquipped()
     {

@@ -77,7 +77,7 @@ public class MainMenuController : MonoBehaviour
     {
         Debug.LogError("gift claim is not yet implemented");
         //PlayerPrefs.SetInt("GotStarterPack", 1);
-        claimedStarterDeck = true;
+        //claimedStarterDeck = true;
     }
 
     private async void DeInitMainScene(bool toLoadScreen)

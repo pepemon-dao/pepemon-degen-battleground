@@ -21,18 +21,25 @@ public class ScreenEditDeck : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _mintCardsButton;
     [TitleGroup("Component References"), SerializeField] GameObject _previousScreenButton;
     [TitleGroup("Component References"), SerializeField] GameObject _textLoading;
-    [TitleGroup("Helpers"), SerializeField] List<Card> ownedDeck; 
-    [TitleGroup("Helpers"), SerializeField] List<BattleCard> ownedBattleDeck; 
-    [TitleGroup("Helpers"), SerializeField] List<Card> starterDeck; 
-    [TitleGroup("Helpers"), SerializeField] FilterController filterController; 
+    //[TitleGroup("Helpers"), SerializeField] List<Card> ownedDeck; 
+    //[TitleGroup("Helpers"), SerializeField] List<BattleCard> ownedBattleDeck; 
+    //[TitleGroup("Helpers"), SerializeField] List<Card> starterDeck; 
+
+    private Dictionary<ulong, CardMetadata?> metadataLookup = new Dictionary<ulong, CardMetadata?>();
+
     private ulong currentDeckId;
     private ulong battleCard;
     private IDictionary<ulong, int> supportCards = new Dictionary<ulong, int>();
     private IDictionary<ulong, int> starterSupportCards = new Dictionary<ulong, int>();
 
+    private Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
+    private Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
+
     private bool isLoading = false;
 
     private bool shouldUpdateTheStarterSupportCardsAfterSave = false;
+
+    private string account = "";
 
     public void Start()
     {
@@ -63,29 +70,32 @@ public class ScreenEditDeck : MonoBehaviour
             currentDeckId = deckId;
             loadingNewDeck = true;
         }
-        string account = "";
+
+        account = "";
 
         // Getting the address from the wallet
-        var getAddressRequest = ThirdwebManager.Instance.SDK.Wallet.GetAddress();
-        while (!getAddressRequest.IsCompleted)
+        
+        if (account == "")
         {
-            yield return null;
-        }
-        if (getAddressRequest.IsFaulted)
-        {
-            Debug.LogError(getAddressRequest.Exception);
-        }
-        else
-        {
-            account = getAddressRequest.Result;
+            var getAddressRequest = ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+
+            while (!getAddressRequest.IsCompleted)
+            {
+                yield return null;
+            }
+            if (getAddressRequest.IsFaulted)
+            {
+                Debug.LogError(getAddressRequest.Exception);
+            }
+            else
+            {
+                account = getAddressRequest.Result;
+            }
         }
 
         supportCards = new OrderedDictionary<ulong, int>();
         starterSupportCards = new OrderedDictionary<ulong, int>();
         bool isStarterDeck = false;//deckId == 1234;
-
-        Dictionary<ulong, int> ownedCardIds = new Dictionary<ulong, int>();
-        Dictionary<ulong, int> ownedBattleCardIds = new Dictionary<ulong, int>();
 
         // Handle starter deck case
         if (isStarterDeck)
@@ -103,14 +113,15 @@ public class ScreenEditDeck : MonoBehaviour
             supportCards = new Dictionary<ulong, int>(await PepemonCardDeck.GetAllSupportCards(deckId));
 
             */
+            
 
-            // Fetch owned cards
-            yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
-
+            
             if (loadingNewDeck)
             {
                 DeckDisplay.battleCardId = 0; //safe guards
                 battleCard = 0; //safe guards
+
+                ownedCardIds = new();
 
                 // Fetch battle card
                 yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));
@@ -118,7 +129,42 @@ public class ScreenEditDeck : MonoBehaviour
                 // Fetch all support cards
                 yield return StartCoroutine(PepemonCardDeck.GetAllSupportCards(deckId, result => supportCards = result));
 
+                // Fetch owned cards
+                yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
+
                 starterSupportCards = supportCards;
+
+                var keysToRemove = new List<ulong>();
+
+                foreach (var entry in ownedCardIds)
+                {
+                    if (!metadataLookup.TryGetValue(entry.Key, out var metadata))
+                    {
+                        // Metadata not found in lookup, retrieve it
+                        metadata = PepemonFactoryCardCache.GetMetadata(entry.Key);
+                        if (metadata != null)
+                        {
+                            metadataLookup[entry.Key] = metadata;
+                        }
+                    }
+
+                    bool isBattleCard = metadata.Value.description.Contains("Battle ver");
+                    if (isBattleCard)
+                    {
+                        // Add to ownedBattleCardIds
+                        ownedBattleCardIds.Add(entry.Key, entry.Value);
+
+                        // Mark the key for removal
+                        keysToRemove.Add(entry.Key);
+                    }
+                }
+
+                // Remove the marked keys from ownedCardIds
+                foreach (var key in keysToRemove)
+                {
+                    ownedCardIds.Remove(key);
+                }
+
             }
             else
             {
@@ -136,27 +182,7 @@ public class ScreenEditDeck : MonoBehaviour
 
             shouldUpdateTheStarterSupportCardsAfterSave = false;
 
-            var keysToRemove = new List<ulong>();
-
-            foreach (var entry in ownedCardIds)
-            {
-                bool isBattleCard = PepemonFactoryCardCache.GetMetadata(entry.Key).Value.description.Contains("Battle ver");
-                if (isBattleCard)
-                {
-                    // Add to ownedBattleCardIds
-                    ownedBattleCardIds.Add(entry.Key, entry.Value);
-
-                    // Mark the key for removal
-                    keysToRemove.Add(entry.Key);
-                }
-            }
-
-            // Remove the marked keys from ownedCardIds
-            foreach (var key in keysToRemove)
-            {
-                ownedCardIds.Remove(key);
-            }
-
+            
             if (battleCard == 0)
             {
                 battleCard = DeckDisplay.battleCardId;
@@ -173,26 +199,22 @@ public class ScreenEditDeck : MonoBehaviour
         {
             if (FilterController.Instance != null)
             {
-                FilterController.Instance.SetFilter(0);
+                FilterController.Instance.ResetFilters();
             }
-        }
-
-        foreach(var cardId in ownedCardIds)
-        {
-            Debug.LogError(cardId.Key + " " + ownedCardIds[cardId.Key] + " " + PepemonFactoryCardCache.GetMetadata(cardId.Key).Value.name);
         }
 
         // Load deck data into the display
         deckDisplayComponent.ClearMyCardsList();
-        deckDisplayComponent.LoadSelectedCards(battleCard, supportCards, filter);
-        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards, filter);
-        deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard, filter);
+        deckDisplayComponent.LoadSelectedCards(battleCard, supportCards);
+        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
+        deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard);
 
         _textLoading.SetActive(false);
         isLoading = false;
     }
 
     // Helper method for setting up the starter deck
+    /*
     private void SetupStarterDeck(DeckDisplay deckDisplayComponent, Dictionary<ulong, int> ownedCardIds, Dictionary<ulong, int> ownedBattleCardIds, bool IsLoadingNewDeck)
     {
         if (IsLoadingNewDeck)
@@ -225,7 +247,7 @@ public class ScreenEditDeck : MonoBehaviour
                 ownedBattleCardIds[id] = ownedBattleCardIds.ContainsKey(id) ? ownedBattleCardIds[id] + 1 : 1;
             }
         }
-    }
+    }*/
 
     // Helper method for deducting selected cards from owned cards
     private Dictionary<ulong, int> DeductSelectedCardsFromOwned(IDictionary<ulong, int> selectedCards, Dictionary<ulong, int> ownedCardIds)
@@ -248,7 +270,7 @@ public class ScreenEditDeck : MonoBehaviour
     private void setButtonsInteractibleState(bool interactible)
     {
         _saveDeckButton.GetComponent<Button>().interactable = interactible;
-        _previousScreenButton.GetComponent<Button>().interactable = interactible;
+        //_previousScreenButton.GetComponent<Button>().interactable = interactible;
         _mintCardsButton.GetComponent<Button>().interactable = interactible;
     }
 
