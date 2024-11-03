@@ -117,7 +117,15 @@ public class DeckDisplay : MonoBehaviour
     {
         foreach (var cardId in availableCardIds.Keys)
         {
-            AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
+            if (cardId != selectedBattleCard)
+            {
+                AddCard(cardId, availableCardIds[cardId], false, isSupportCard: false);
+            }
+            else
+            {
+                int count = availableCardIds[cardId] - 1;
+                AddCard(cardId, count, false, isSupportCard: false);
+            }
         }
     }
 
@@ -330,8 +338,28 @@ public class DeckDisplay : MonoBehaviour
         }
 
         // Check offense/defense status
-        bool isOffense = metadata.Value.description?.ToLower().Contains("attack") ?? false;
-        bool isDefense = metadata.Value.description?.ToLower().Contains("defense") ?? false;
+
+        
+        bool isOffense = false;
+        bool isDefense = false;
+
+        if (metadata != null && metadata.Value.description != null)
+        {
+            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
+
+        Card card = null;
+        if (isSupportCard)
+        {
+            card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        }
+        
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+            isDefense = !isOffense;
+        }
 
         // Validate card type
         if (isOffense && isDefense)
@@ -392,10 +420,20 @@ public class DeckDisplay : MonoBehaviour
             return; // Skip if card type does not match
         }
 
-        bool isOffense = metadata.Value.description?.ToLower().Contains("attack") ?? false;
-        bool isDefense = metadata.Value.description?.ToLower().Contains("defense") ?? false;
+        bool isOffense = false;
+        bool isDefense = false;
 
-        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        if (metadata != null && metadata.Value.description != null)
+        {
+            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
+
+        Card card = null;
+        if (isSupportCard)
+        {
+            card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        }
         if (card != null)
         {
             isOffense = card.IsAttackingCard();

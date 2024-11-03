@@ -122,6 +122,7 @@ public class ScreenEditDeck : MonoBehaviour
                 battleCard = 0; //safe guards
 
                 ownedCardIds = new();
+                ownedBattleCardIds = new();
 
                 // Fetch battle card
                 yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));

@@ -68,12 +68,16 @@ public class CardPreview : MonoBehaviour
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
-        Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
-        if (card != null)
+        if (isSupport)
         {
-            isOffense = card.IsAttackingCard();
-            isDefense = !isOffense;
+            Card card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+            if (card != null)
+            {
+                isOffense = card.IsAttackingCard();
+                isDefense = !isOffense;
+            }
         }
+       
 
         if (defenseIcon != null)
         {
