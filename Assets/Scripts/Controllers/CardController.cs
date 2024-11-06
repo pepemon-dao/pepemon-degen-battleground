@@ -103,11 +103,11 @@ public class CardController : MonoBehaviour
     /// <summary>
     /// The cards move foward when they are attacking
     /// </summary>
-    public void SetAttackingTransform(Vector3 offset)
+    public void SetAttackingTransform(Vector3 to)
     {
         _startingTargetPosition = _targetPostion.position;
 
-        _targetPostion.position += offset;
+        _targetPostion.position += to;
         _cardGlow.DOFade(1, 2f);
         transform.SetAsLastSibling(); //make sure this card is in front of the bottom cards.
 

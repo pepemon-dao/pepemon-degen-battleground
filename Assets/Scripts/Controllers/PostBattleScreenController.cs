@@ -35,7 +35,12 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] TextReveal _victoryDefeat;
     [SerializeField] TextReveal _youWinLose;
     [SerializeField] GameObject _rewardDisplay;
+    [SerializeField] GameObject _winDisplay;
+    [SerializeField] GameObject _loseDisplay;
+    [SerializeField] GameObject _leaderboardMsg;
+    [SerializeField] GameObject _starterPackMsg;
     [SerializeField] Button _btnShowMenu;
+    [SerializeField] Button _btnShowMenu2;
     [SerializeField] Button _btnClaimGift;
 
     [Title("Screen Events")]
@@ -66,31 +71,40 @@ public class PostBattleScreenController : MonoBehaviour
 
     public void SetResult(bool win)
     {
-        _victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
-        _youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+        //_victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
+        //_youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
+        _winDisplay.SetActive(win);
+        _loseDisplay.SetActive(!win);
 
         // TODO: replace this with the actual gain/loss
 
         bool isBotMatch = BattlePrepController.battleData.isBotMatch;
-        if (!isBotMatch)
+        bool isTutorial = BotTextTutorial.Instance.wasInTutorial;
+        if (isTutorial)
         {
             _rewardDisplay.GetComponentInChildren<TextReveal>()
             .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
         }
         else
         {
-            _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText(win ? "Gained Starter Pack" : "");
+            _rewardDisplay.SetActive(false);
+            //_rewardDisplay.GetComponentInChildren<TextReveal>()
+            //.SetText(win ? "Gained Starter Pack" : "");
         }
 
-        _btnClaimGift.gameObject.SetActive(isBotMatch);
+        bool claimedStarterPack = false; //PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
+        _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
+        _leaderboardMsg.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
+        _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
+        _btnShowMenu.gameObject.SetActive(_btnClaimGift.gameObject.activeSelf);
+        _btnShowMenu2.gameObject.SetActive(!_btnClaimGift.gameObject.activeSelf);
 
         ThemePlayer.Instance.PlayGameOverSong(win);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
     {
-        _pepemon.LoadCardData(cardId);
+        _pepemon.LoadCardData(cardId, false);
     }
 
     public void OnBtnShowMenuClick()
@@ -135,6 +149,7 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
+        _btnShowMenu2.onClick.AddListener(OnBtnShowMenuClick);
 
         _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }

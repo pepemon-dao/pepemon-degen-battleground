@@ -23,6 +23,7 @@ public class MainMenuController : MonoBehaviour
     public Button _manageDecksButton;
     public Button _leaderboardButton;
     public Button _creditsButton;
+    public Button _mintDeckButton;
 
     public int defaultScreenId = 0;
     private int screenNavigationPosition = 0;
@@ -31,21 +32,26 @@ public class MainMenuController : MonoBehaviour
     private int selectedLeagueId = 0;
     private ulong selectedDeckId = 0;
 
-    private async void Start()
+    public static bool claimedStarterDeck = false;
+
+    private void Start()
     {
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+        //PostBattleScreenController.IsClaimingGift = true; //- for testing the gift mechanic with the deck manager
         // TODO: find a better way to handle re-loading the main scene
+
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
+        _mintDeckButton.onClick.AddListener(OnConnectWalletButtonClick);
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
         _creditsButton.onClick.AddListener(OpenCredits);
     }
 
-    private async void HandleGoingBackToMenu()
+    private void HandleGoingBackToMenu()
     {
         if (PepemonFactoryCardCache.CardsIds.Count == 0)
         {
@@ -61,8 +67,17 @@ public class MainMenuController : MonoBehaviour
         if (PostBattleScreenController.IsClaimingGift)
         {
             PostBattleScreenController.IsClaimingGift = false;
+            
             //claim gift
+            ClaimStarterDeck();
         }
+    }
+
+    private void ClaimStarterDeck()
+    {
+        Debug.LogError("gift claim is not yet implemented");
+        //PlayerPrefs.SetInt("GotStarterPack", 1);
+        //claimedStarterDeck = true;
     }
 
     private async void DeInitMainScene(bool toLoadScreen)
@@ -116,7 +131,7 @@ public class MainMenuController : MonoBehaviour
             screenId = screenNavigationHistory[nextPosition % screenNavigationHistory.Length];
             screenNavigationPosition = (nextPosition - 1) % screenNavigationHistory.Length;
         }
-
+        
         if (screenId == (int)MainSceneScreensEnum.LeagueSelection && !Web3Controller.instance.IsConnected)
         {
             screenId = (int)MainSceneScreensEnum.Tutorial;
@@ -162,7 +177,10 @@ public class MainMenuController : MonoBehaviour
 
     public async void OnConnectWalletButtonClick()
     {
-        await Web3Controller.instance.ConnectWallet();
+        if (!Web3Controller.instance.IsConnected)
+        {
+            await Web3Controller.instance.ConnectWallet();
+        }
     }
 
     public void OnStartGameButtonClick()

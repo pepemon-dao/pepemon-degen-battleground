@@ -1,6 +1,7 @@
 using Contracts.PepemonFactory.abi.ContractDefinition;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -69,6 +70,37 @@ class PepemonFactory
 
         return ownedCards;
     }
+
+    public static IEnumerator GetOwnedCards(string address, List<ulong> tokenIds, Action<Dictionary<ulong, int>> callback)
+    {
+        Dictionary<ulong, int> ownedCards = new Dictionary<ulong, int>();
+        var request = contract.Read<List<ulong>>("balanceOfBatch", Enumerable.Repeat(address, tokenIds.Count).ToList(), tokenIds);
+
+        // Wait until the request completes
+        while (!request.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (request.IsFaulted)
+        {
+            Debug.LogError("Error fetching owned cards: " + request.Exception);
+            callback?.Invoke(null);
+            yield break;
+        }
+
+        // Populate the owned cards dictionary
+        for (int i = 0; i < (request.Result?.Count ?? 0); i++)
+        {
+            if (request.Result[i] > 0)
+            {
+                ownedCards[tokenIds[i]] = (int)request.Result[i];
+            }
+        }
+
+        callback?.Invoke(ownedCards);
+    }
+
 
     public static async Task<BigInteger> GetTokenSupply(ulong tokenId)
     {
