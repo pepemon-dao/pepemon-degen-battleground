@@ -8,6 +8,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scripts.Managers.Sound;
+using Pepemon.Battle;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -117,6 +118,7 @@ public class PostBattleScreenController : MonoBehaviour
         bool isBotMatch = BattlePrepController.battleData.isBotMatch;
         if (isBotMatch)
         {
+            ThemePlayer.Instance.SkipEndGameMusic();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         else

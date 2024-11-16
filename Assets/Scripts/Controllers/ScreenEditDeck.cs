@@ -210,6 +210,8 @@ public class ScreenEditDeck : MonoBehaviour
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard);
 
+        DeckDisplay.Instance.UpdateCardInDeckDisplay();
+
         _textLoading.SetActive(false);
         isLoading = false;
     }

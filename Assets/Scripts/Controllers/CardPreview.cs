@@ -29,6 +29,8 @@ public class CardPreview : MonoBehaviour
 
     private bool isEquipped = false;
 
+    private bool isOffense = false;
+
     private Dictionary<ulong, CardMetadata?> metadataLookup = new Dictionary<ulong, CardMetadata?>();
 
     public void ToggleSelected()
@@ -76,6 +78,8 @@ public class CardPreview : MonoBehaviour
                 isOffense = card.IsAttackingCard();
                 isDefense = !isOffense;
             }
+
+            this.isOffense = isOffense;
         }
        
 

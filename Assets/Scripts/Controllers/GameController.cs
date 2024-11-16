@@ -136,8 +136,8 @@ public class GameController : MonoBehaviour
 
         if (Web3Controller.instance != null)
         {
-            Web3Controller.instance.StarterDeckID = 0;
-            Web3Controller.instance.StarterPepemonID = 0;
+            //Web3Controller.instance.StarterDeckID = 0;
+            //Web3Controller.instance.StarterPepemonID = 0;
             BattlePrepController.battleData.battleRngSeed = 0;
         }
         

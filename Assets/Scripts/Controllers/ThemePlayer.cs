@@ -221,6 +221,11 @@ namespace Scripts.Managers.Sound
             print("theme player unmuted");
             _themePlayer.mute = false;
         }
+
+        public void SkipEndGameMusic()
+        {
+            StartCoroutine(PlayNextMusic());
+        }
         
         public void PlayGameOverSong(bool isWon)
         {

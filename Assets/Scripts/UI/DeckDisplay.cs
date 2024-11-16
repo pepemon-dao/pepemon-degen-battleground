@@ -16,6 +16,16 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _heroCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
+    [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text offenseCardsInDeck;
+    [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text defenseCardsInDeck;
+
+    private const int MAX_OFFENSE_CARDS = 6;
+    private const int MIN_OFFENSE_CARDS = 4;
+    private const int MAX_DEFENSE_CARDS = 4;
+    private const int MIN_DEFENSE_CARDS = 2;
+
+    private int currentDefenseCardCount = 0;
+    private int currentOffenseCardCount = 0;
 
     private List<CardPreview> _cardPreviews = new List<CardPreview>();
 
@@ -213,6 +223,22 @@ public class DeckDisplay : MonoBehaviour
             default:
                 break;
         }
+
+        UpdateCardInDeckDisplay();
+    }
+
+    public void UpdateCardInDeckDisplay()
+    {
+        currentDefenseCardCount = _supportCardList.transform.childCount;
+        currentOffenseCardCount = _battleCardList.transform.childCount;
+
+        defenseCardsInDeck.text = currentDefenseCardCount.ToString() + "/" + MAX_DEFENSE_CARDS.ToString();
+        offenseCardsInDeck.text = currentOffenseCardCount.ToString() + "/" + MAX_OFFENSE_CARDS.ToString();
+
+        defenseCardsInDeck.color = InCardLimit(false) ? Color.white : Color.red;
+        offenseCardsInDeck.color = InCardLimit(true) ? Color.white : Color.red;
+
+        _saveDeckButton.SetActive(InCardLimit(true) && InCardLimit(false) && battleCardId != 0);
     }
 
     public void UnEquipCard(ulong cardId, bool isSupportCard)
@@ -474,6 +500,18 @@ public class DeckDisplay : MonoBehaviour
             var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
             cardPreviewComponent.LoadCardData(cardId, isSupportCard);
             cardPreviewComponent.SetEquip(isSelected);
+        }
+    }
+
+    public bool InCardLimit(bool isOffense)
+    {
+        if (isOffense)
+        {
+            return currentOffenseCardCount <= MAX_OFFENSE_CARDS && currentOffenseCardCount >= MIN_OFFENSE_CARDS;
+        }
+        else
+        {
+            return currentDefenseCardCount <= MAX_DEFENSE_CARDS && currentDefenseCardCount >= MIN_DEFENSE_CARDS;
         }
     }
 
