@@ -16,6 +16,7 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _heroCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
     [TitleGroup("Component References"), SerializeField] GameObject _saveDeckButton;
+    [TitleGroup("Component References"), SerializeField] GameObject _saveDeckTip;
     [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text offenseCardsInDeck;
     [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text defenseCardsInDeck;
 
@@ -102,6 +103,8 @@ public class DeckDisplay : MonoBehaviour
         }
 
         _cardPreviews = new List<CardPreview>();
+
+        ResetCurrentCardsInDeckNumbersOnFilterUse();
     }
 
     public void LoadSelectedCards(ulong selectedBattleCard, IDictionary<ulong, int> selectedSupportCards)
@@ -223,22 +226,19 @@ public class DeckDisplay : MonoBehaviour
             default:
                 break;
         }
-
-        UpdateCardInDeckDisplay();
     }
 
     public void UpdateCardInDeckDisplay()
     {
-        currentDefenseCardCount = _supportCardList.transform.childCount;
-        currentOffenseCardCount = _battleCardList.transform.childCount;
-
         defenseCardsInDeck.text = currentDefenseCardCount.ToString() + "/" + MAX_DEFENSE_CARDS.ToString();
         offenseCardsInDeck.text = currentOffenseCardCount.ToString() + "/" + MAX_OFFENSE_CARDS.ToString();
 
         defenseCardsInDeck.color = InCardLimit(false) ? Color.white : Color.red;
         offenseCardsInDeck.color = InCardLimit(true) ? Color.white : Color.red;
 
-        _saveDeckButton.SetActive(InCardLimit(true) && InCardLimit(false) && battleCardId != 0);
+        bool validDeck = InCardLimit(true) && InCardLimit(false) && battleCardId != 0;
+        _saveDeckButton.GetComponent<Button>().interactable = validDeck;
+        _saveDeckTip.SetActive(!validDeck);
     }
 
     public void UnEquipCard(ulong cardId, bool isSupportCard)
@@ -253,9 +253,9 @@ public class DeckDisplay : MonoBehaviour
 
     private void HandleBattleCardZero()
     {
-        bool toDisableSaveBtn = battleCardId == 0;
-
-        _saveDeckButton.SetActive(!toDisableSaveBtn);
+        bool validDeck = InCardLimit(true) && InCardLimit(false) && battleCardId != 0;
+        _saveDeckButton.GetComponent<Button>().interactable = validDeck;
+        _saveDeckTip.SetActive(!validDeck);
     }
 
     public void EquipCard(ulong cardId, bool isSupportCard)
@@ -304,6 +304,81 @@ public class DeckDisplay : MonoBehaviour
             Destroy(cardPreviewToRemove.gameObject);
 
             _cardPreviews.Remove(cardPreviewToRemove);
+
+            var result = GetIfOffense(isSupportCard, cardId);
+            if (result.valid)
+            {
+                UpdateCardInDeckCount(isSupportCard, result.isOffense, -1);
+            }
+            
+            UpdateCardInDeckDisplay();
+        }
+    }
+
+    private (bool valid, bool isOffense) GetIfOffense(bool isSupportCard, ulong cardId)
+    {
+        if (!isSupportCard) return (false, false);
+
+        if (!metadataLookup.TryGetValue(cardId, out var metadata))
+        {
+            // Metadata not found in lookup, retrieve it
+            metadata = PepemonFactoryCardCache.GetMetadata(cardId);
+            if (metadata == null)
+            {
+                Debug.LogWarning("Card metadata not found");
+                return (false, false);
+            }
+            // Add retrieved metadata to the lookup table
+            metadataLookup[cardId] = metadata;
+        }
+
+        bool isOffense = false;
+        bool isDefense = false;
+
+        if (metadata != null && metadata.Value.description != null)
+        {
+            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
+
+        Card card = null;
+        if (isSupportCard)
+        {
+            card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+        }
+
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+            isDefense = !isOffense;
+        }
+        card = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetCardById(cardId);
+
+        if (card != null)
+        {
+            isOffense = card.IsAttackingCard();
+        }
+
+        return (true, isOffense);
+    }
+
+    private void ResetCurrentCardsInDeckNumbersOnFilterUse()
+    {
+        currentDefenseCardCount = 0;
+        currentOffenseCardCount = 0;
+    }
+
+    private void UpdateCardInDeckCount(bool isSupportCard, bool isOffense, int value)
+    {
+        if (!isSupportCard) return;
+
+        if (isOffense)
+        {
+            currentOffenseCardCount += value;
+        }
+        else
+        {
+            currentDefenseCardCount += value;
         }
     }
 
@@ -414,6 +489,10 @@ public class DeckDisplay : MonoBehaviour
         cardPreviewComponent.GetComponent<Button>().enabled = false;
 
         _cardPreviews.Add(cardPreviewComponent);
+
+        UpdateCardInDeckCount(isSupportCard, isOffense, 1);
+
+        UpdateCardInDeckDisplay();
     }
 
 
@@ -503,7 +582,7 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    public bool InCardLimit(bool isOffense)
+    private bool InCardLimit(bool isOffense)
     {
         if (isOffense)
         {
