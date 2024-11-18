@@ -272,7 +272,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     private void setButtonsInteractibleState(bool interactible)
     {
-        _saveDeckButton.GetComponent<Button>().interactable = interactible;
+        //_saveDeckButton.GetComponent<Button>().interactable = interactible;
         //_previousScreenButton.GetComponent<Button>().interactable = interactible;
         _mintCardsButton.GetComponent<Button>().interactable = interactible;
     }

@@ -102,8 +102,8 @@ public class PostBattleScreenController : MonoBehaviour
         bool loseMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && !win;
         _loseMsg.SetActive(loseMsgShouldBeDisplayed);
         _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
-        _btnShowMenu.gameObject.SetActive(isBotMatch);
-        _btnPlayAgain.gameObject.SetActive(isBotMatch && claimedStarterPack);
+        _btnShowMenu.gameObject.SetActive(true);
+        _btnPlayAgain.gameObject.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
 
         ThemePlayer.Instance.PlayGameOverSong(win);
     }
@@ -132,6 +132,11 @@ public class PostBattleScreenController : MonoBehaviour
     {
         // go back to previous scene
         IsGoingFromBattle = true;
+
+        //reset the bot battle values
+        Web3Controller.instance.StarterDeckID = 0;
+        Web3Controller.instance.StarterPepemonID = 0;
+
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
