@@ -42,6 +42,7 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] Button _btnShowMenu;
     [SerializeField] Button _btnShowMenu2;
     [SerializeField] Button _btnClaimGift;
+    [SerializeField] TMPro.TMP_Text _resultDisplayTxt;
 
     [Title("Screen Events")]
     private UnityEvent OnShown;
@@ -73,8 +74,9 @@ public class PostBattleScreenController : MonoBehaviour
     {
         //_victoryDefeat.SetText(win ? VICTORY_TEXT : DEFEAT_TEXT);
         //_youWinLose.SetText(win ? YOU_WIN_TEXT : YOU_LOSE_TEXT);
-        _winDisplay.SetActive(win);
-        _loseDisplay.SetActive(!win);
+        _winDisplay.SetActive(true);
+        _resultDisplayTxt.text = win ? "You won!" : "You lost!";
+        //_loseDisplay.SetActive(!win);
 
         // TODO: replace this with the actual gain/loss
 
