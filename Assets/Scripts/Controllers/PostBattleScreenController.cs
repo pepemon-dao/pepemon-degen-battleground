@@ -68,6 +68,7 @@ public class PostBattleScreenController : MonoBehaviour
 
     #region EndTransitionBackToMenu
     public static bool IsGoingFromBattle = false;
+    public static bool IsPlayingAgain = false;
     public static bool IsClaimingGift = false;
     #endregion
 
@@ -123,6 +124,7 @@ public class PostBattleScreenController : MonoBehaviour
         }
         else
         {
+            IsPlayingAgain = true;
             OnBtnShowMenuClick();
         }
         

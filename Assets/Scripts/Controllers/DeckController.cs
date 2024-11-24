@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -32,6 +33,8 @@ public class DeckController : MonoBehaviour
     [SerializeField] private BattlePrepController _battlePrepController;
     [SerializeField] private List<Card> starterDeck;
 
+    private bool notValidDeck = false;
+
     /// <summary>
     /// Show/Hide edit/select depending on the screen
     /// </summary>
@@ -43,6 +46,8 @@ public class DeckController : MonoBehaviour
             if (!isStarterDeck)
             {
                 _selectButton.gameObject.SetActive(!value);
+
+                //gameObject.SetActive(!notValidDeck && !value);
             }
         }
 
@@ -139,6 +144,8 @@ public class DeckController : MonoBehaviour
         {
             _supportCardCount.text = starterDeck.Count.ToString();
         }
+
+        notValidDeck = metadata?.name == null || supportCardCount == 0;
 
         if (!isStarterDeck)
         {

@@ -66,7 +66,7 @@ public class CardPreview : MonoBehaviour
 
         if (metadata != null && metadata.Value.description != null)
         {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isOffense = metadata.Value.description.ToLower().Contains("attack") || metadata.Value.description.ToLower().Contains("offense");
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
@@ -107,9 +107,15 @@ public class CardPreview : MonoBehaviour
 
     public void ToggleEquipped()
     {
+        if (!_checkmark.activeSelf && !DeckDisplay.Instance.InCardLimit(isOffense))
+        {
+            return; //cannot equip card because you reached the limit
+        }
+
         _checkmark.SetActive(!_checkmark.activeSelf);
         isEquipped = _checkmark.activeSelf;
         SetEquipped(isEquipped);
+        _checkmark.SetActive(isEquipped); //set it after too to safeguard it
     }
 
     public void SetEquip(bool toEquip)

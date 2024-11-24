@@ -20,10 +20,10 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text offenseCardsInDeck;
     [TitleGroup("Component References"), SerializeField] TMPro.TMP_Text defenseCardsInDeck;
 
-    private const int MAX_OFFENSE_CARDS = 6;
-    private const int MIN_OFFENSE_CARDS = 4;
-    private const int MAX_DEFENSE_CARDS = 4;
-    private const int MIN_DEFENSE_CARDS = 2;
+    private const int MAX_OFFENSE_CARDS = 10;
+    private const int MIN_OFFENSE_CARDS = 0;
+    private const int MAX_DEFENSE_CARDS = 10;
+    private const int MIN_DEFENSE_CARDS = 0;
 
     private int currentDefenseCardCount = 0;
     private int currentOffenseCardCount = 0;
@@ -264,6 +264,7 @@ public class DeckDisplay : MonoBehaviour
         {
             if (cardId == battleCardId)
             {
+                DeselectPrevBattleCard();
                 return;
             }
         }
@@ -285,9 +286,10 @@ public class DeckDisplay : MonoBehaviour
         {
             var cardPreview = item.GetComponent<CardPreview>();
             bool isTheMyCardsListAndIsInteractable = cardPreview.GetComponent<Button>().enabled;
-            if (cardPreview != null && isTheMyCardsListAndIsInteractable && cardPreview.cardId == battleCardId)
+            bool isBattleCard = cardPreview.gameObject.name.Contains("Battle");
+            if (cardPreview != null && isTheMyCardsListAndIsInteractable && isBattleCard) //&& cardPreview.cardId == battleCardId)
             {
-                item.SetSelected(false);
+                //item.SetSelected(false);
                 cardPreview._checkmark.SetActive(false);
                 //return; we cannot return here, because it is allowed currently to posess more pepemon cards than 1
             }
@@ -337,7 +339,7 @@ public class DeckDisplay : MonoBehaviour
 
         if (metadata != null && metadata.Value.description != null)
         {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isOffense = metadata.Value.description.ToLower().Contains("attack")|| metadata.Value.description.ToLower().Contains("offense");
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
@@ -446,8 +448,13 @@ public class DeckDisplay : MonoBehaviour
 
         if (metadata != null && metadata.Value.description != null)
         {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isOffense = metadata.Value.description.ToLower().Contains("attack") || metadata.Value.description.ToLower().Contains("offense");
             isDefense = metadata.Value.description.ToLower().Contains("defense");
+        }
+
+        if (!InCardLimit(isOffense))
+        {
+            return; //cannot equip card because you reached the limit
         }
 
         Card card = null;
@@ -530,7 +537,7 @@ public class DeckDisplay : MonoBehaviour
 
         if (metadata != null && metadata.Value.description != null)
         {
-            isOffense = metadata.Value.description.ToLower().Contains("attack");
+            isOffense = metadata.Value.description.ToLower().Contains("attack") || metadata.Value.description.ToLower().Contains("offense");
             isDefense = metadata.Value.description.ToLower().Contains("defense");
         }
 
@@ -582,15 +589,15 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    private bool InCardLimit(bool isOffense)
+    public bool InCardLimit(bool isOffense)
     {
         if (isOffense)
         {
-            return currentOffenseCardCount <= MAX_OFFENSE_CARDS && currentOffenseCardCount >= MIN_OFFENSE_CARDS;
+            return currentOffenseCardCount < MAX_OFFENSE_CARDS && currentOffenseCardCount >= MIN_OFFENSE_CARDS;
         }
         else
         {
-            return currentDefenseCardCount <= MAX_DEFENSE_CARDS && currentDefenseCardCount >= MIN_DEFENSE_CARDS;
+            return currentDefenseCardCount < MAX_DEFENSE_CARDS && currentDefenseCardCount >= MIN_DEFENSE_CARDS;
         }
     }
 

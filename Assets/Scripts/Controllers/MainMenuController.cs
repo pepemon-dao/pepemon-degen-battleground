@@ -57,7 +57,14 @@ public class MainMenuController : MonoBehaviour
         {
             DeInitMainScene(true);
         }
-        else if (PostBattleScreenController.IsGoingFromBattle)
+        if (PostBattleScreenController.IsPlayingAgain)
+        {
+            PostBattleScreenController.IsPlayingAgain = false;
+            DeInitMainScene(false);
+
+            ShowScreen(MainSceneScreensEnum.LeagueSelection);
+        }
+        if (PostBattleScreenController.IsGoingFromBattle)
         {
             PostBattleScreenController.IsGoingFromBattle = false;
             DeInitMainScene(false);

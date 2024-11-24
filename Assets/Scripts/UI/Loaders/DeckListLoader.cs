@@ -14,6 +14,7 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _deckPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _deckList;
     [TitleGroup("Component References"), SerializeField] GameObject _loadingMessage;
+    [TitleGroup("Component References"), SerializeField] GameObject _loadingMessage2;
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
@@ -34,8 +35,11 @@ public class DeckListLoader : MonoBehaviour
         loadingInProgress = true;
 
         _loadingMessage.SetActive(true);
+        _loadingMessage2?.SetActive(true);
         var loadingMessageLabel = _loadingMessage.GetComponent<Text>();
         loadingMessageLabel.text = "Loading decks...";
+        if (_loadingMessage2 != null)
+            _loadingMessage2.GetComponent<Text>().text = "Loading decks...";
 
         // destroy before re-creating
         foreach (var deck in _deckList.GetComponentsInChildren<Button>())
@@ -65,7 +69,7 @@ public class DeckListLoader : MonoBehaviour
         if (!string.IsNullOrEmpty(account))
         {
             decks = await PepemonCardDeck.GetPlayerDecks(account);
-        } 
+        }
 
         var loadingTasks = new List<UniTask>();
         if (MainMenuController.claimedStarterDeck)
@@ -107,6 +111,7 @@ public class DeckListLoader : MonoBehaviour
         });
         await UniTask.WhenAll(loadingTasks);
         _loadingMessage.SetActive(false);
+        _loadingMessage2?.SetActive(false);
         loadingInProgress = false;
     }
 
