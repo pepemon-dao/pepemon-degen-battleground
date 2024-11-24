@@ -46,8 +46,10 @@ public class DeckController : MonoBehaviour
             if (!isStarterDeck)
             {
                 _selectButton.gameObject.SetActive(!value);
-
-                //gameObject.SetActive(!notValidDeck && !value);
+                if (!value)
+                {
+                    UpdateNotValidDeckIsNotShowWhenSelecting();
+                }
             }
         }
 
@@ -76,8 +78,15 @@ public class DeckController : MonoBehaviour
 
             _selectButton.gameObject.SetActive(true);
 
-
             _supportCardCount.text = supportCardCount + " / " + 60;
+        }
+    }
+
+    private void UpdateNotValidDeckIsNotShowWhenSelecting()
+    {
+        if(!_editButton.gameObject.activeSelf)
+        {
+            gameObject.SetActive(!notValidDeck); //hide the deck on selection if it is not valid
         }
     }
 
@@ -154,6 +163,7 @@ public class DeckController : MonoBehaviour
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Pepemon card missing";
                 _selectButton.gameObject.SetActive(false);
+                UpdateNotValidDeckIsNotShowWhenSelecting();
                 return true;
             }
             if (supportCardCount == 0)
@@ -161,9 +171,14 @@ public class DeckController : MonoBehaviour
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Support cards missing";
                 _selectButton.gameObject.SetActive(false);
+                UpdateNotValidDeckIsNotShowWhenSelecting();
                 return true;
             }
             _selectButton.gameObject.SetActive(selectionMode);
+            if (selectionMode)
+            {
+                UpdateNotValidDeckIsNotShowWhenSelecting();
+            }
             _errorDisplay.SetActive(false);
         }
         

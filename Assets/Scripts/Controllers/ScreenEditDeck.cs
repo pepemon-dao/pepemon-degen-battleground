@@ -204,13 +204,18 @@ public class ScreenEditDeck : MonoBehaviour
             }
         }
 
+        if (loadingNewDeck)
+        {
+            DeckDisplay.Instance.UnloadPreviousDeck();
+        }
+
         // Load deck data into the display
         deckDisplayComponent.ClearMyCardsList();
         deckDisplayComponent.LoadSelectedCards(battleCard, supportCards);
         deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard);
 
-        DeckDisplay.Instance.UpdateCardInDeckDisplay();
+        DeckDisplay.Instance.UpdateCardInDeckDisplay(loadingNewDeck);
 
         _textLoading.SetActive(false);
         isLoading = false;
@@ -272,7 +277,7 @@ public class ScreenEditDeck : MonoBehaviour
 
     private void setButtonsInteractibleState(bool interactible)
     {
-        //_saveDeckButton.GetComponent<Button>().interactable = interactible;
+        _saveDeckButton.GetComponent<Button>().interactable = interactible;
         //_previousScreenButton.GetComponent<Button>().interactable = interactible;
         _mintCardsButton.GetComponent<Button>().interactable = interactible;
     }

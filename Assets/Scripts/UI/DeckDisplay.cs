@@ -42,6 +42,8 @@ public class DeckDisplay : MonoBehaviour
 
     public static DeckDisplay Instance { get; private set; }
 
+    private bool loaded = false;
+
     private void Awake()
     {
         Instance = this;
@@ -228,7 +230,7 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    public void UpdateCardInDeckDisplay()
+    public void UpdateCardInDeckDisplay(bool firstLoad = false)
     {
         defenseCardsInDeck.text = currentDefenseCardCount.ToString() + "/" + MAX_DEFENSE_CARDS.ToString();
         offenseCardsInDeck.text = currentOffenseCardCount.ToString() + "/" + MAX_OFFENSE_CARDS.ToString();
@@ -237,8 +239,21 @@ public class DeckDisplay : MonoBehaviour
         offenseCardsInDeck.color = InCardLimit(true) ? Color.white : Color.red;
 
         bool validDeck = InCardLimit(true) && InCardLimit(false) && battleCardId != 0;
-        _saveDeckButton.GetComponent<Button>().interactable = validDeck;
         _saveDeckTip.SetActive(!validDeck);
+
+        if (firstLoad)
+        {
+            loaded = true;
+            _saveDeckButton.GetComponent<Button>().interactable = false; //the deck hasn't changed yet so there is nothing to save
+        } else if (loaded)
+        {
+            _saveDeckButton.GetComponent<Button>().interactable = validDeck; //the deck has been updated
+        }
+    }
+
+    public void UnloadPreviousDeck()
+    {
+        loaded = false;
     }
 
     public void UnEquipCard(ulong cardId, bool isSupportCard)
@@ -254,10 +269,13 @@ public class DeckDisplay : MonoBehaviour
     private void HandleBattleCardZero()
     {
         bool validDeck = InCardLimit(true) && InCardLimit(false) && battleCardId != 0;
-        _saveDeckButton.GetComponent<Button>().interactable = validDeck;
+        if (!validDeck)
+        {
+            _saveDeckButton.GetComponent<Button>().interactable = false;
+        }
         _saveDeckTip.SetActive(!validDeck);
     }
-
+    
     public void EquipCard(ulong cardId, bool isSupportCard)
     {
         if (!isSupportCard)
@@ -589,15 +607,28 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    public bool InCardLimit(bool isOffense)
+    private bool InCardLimit(bool isOffense)
     {
         if (isOffense)
         {
-            return currentOffenseCardCount < MAX_OFFENSE_CARDS && currentOffenseCardCount >= MIN_OFFENSE_CARDS;
+            return currentOffenseCardCount <= MAX_OFFENSE_CARDS && currentOffenseCardCount >= MIN_OFFENSE_CARDS;
         }
         else
         {
-            return currentDefenseCardCount < MAX_DEFENSE_CARDS && currentDefenseCardCount >= MIN_DEFENSE_CARDS;
+            return currentDefenseCardCount <= MAX_DEFENSE_CARDS && currentDefenseCardCount >= MIN_DEFENSE_CARDS;
+        }
+    }
+
+    public bool DeckUpLimitReached(bool isOffense)
+    {
+
+        if (isOffense)
+        {
+            return currentOffenseCardCount < MAX_OFFENSE_CARDS;
+        }
+        else
+        {
+            return currentDefenseCardCount < MAX_DEFENSE_CARDS;
         }
     }
 

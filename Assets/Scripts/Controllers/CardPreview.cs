@@ -107,7 +107,7 @@ public class CardPreview : MonoBehaviour
 
     public void ToggleEquipped()
     {
-        if (!_checkmark.activeSelf && !DeckDisplay.Instance.InCardLimit(isOffense))
+        if (!_checkmark.activeSelf && !DeckDisplay.Instance.DeckUpLimitReached(isOffense))
         {
             return; //cannot equip card because you reached the limit
         }

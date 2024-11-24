@@ -41,6 +41,7 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] GameObject _winMsg;
     [SerializeField] GameObject _loseMsg;
     [SerializeField] GameObject _starterPackMsg;
+    [SerializeField] GameObject _starterPackMsg2;
     [SerializeField] Button _btnShowMenu;
     [SerializeField] Button _btnPlayAgain;
     [SerializeField] Button _btnClaimGift;
@@ -103,6 +104,7 @@ public class PostBattleScreenController : MonoBehaviour
         bool loseMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && !win;
         _loseMsg.SetActive(loseMsgShouldBeDisplayed);
         _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
+        _starterPackMsg2.SetActive(isBotMatch && !claimedStarterPack);
         _btnShowMenu.gameObject.SetActive(true);
         _btnPlayAgain.gameObject.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
 

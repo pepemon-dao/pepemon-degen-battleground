@@ -82,7 +82,7 @@ public class FilterController : MonoBehaviour
     public void ResetFilters()
     {
         // Reset all filter states to off
-        filterStates[FilterType.Pepemon] = false;
+        filterStates[FilterType.Pepemon] = true; //pepemon is on by default
         filterStates[FilterType.Defense] = false;
         filterStates[FilterType.Offense] = false;
 
