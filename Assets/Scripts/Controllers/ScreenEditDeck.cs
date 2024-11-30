@@ -71,7 +71,7 @@ public class ScreenEditDeck : MonoBehaviour
             loadingNewDeck = true;
         }
 
-        account = "";
+        account = "0xA6E0303B8037CdFce51fe159a615bD9FA4e43205";
 
         // Getting the address from the wallet
         

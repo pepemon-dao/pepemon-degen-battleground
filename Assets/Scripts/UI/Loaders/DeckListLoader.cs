@@ -60,6 +60,8 @@ public class DeckListLoader : MonoBehaviour
             //return;
         }
 
+        account = "0xA6E0303B8037CdFce51fe159a615bD9FA4e43205";
+
         // load all decks
         List<ulong> decks = new List<ulong>();
         if (!string.IsNullOrEmpty(account))
