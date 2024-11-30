@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scripts.Managers.Sound;
 using Pepemon.Battle;
+using Cysharp.Threading.Tasks.Triggers;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -98,13 +99,21 @@ public class PostBattleScreenController : MonoBehaviour
             .SetText(win && !claimedStarterPack ? "Gained Starter Pack" : "");
         }
 
+        _winMsg.GetComponent<TMPro.TMP_Text>().text = "You won! ";
+        _loseMsg.GetComponent<TMPro.TMP_Text>().text = "You lost! ";
+
         _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
+        /*
         bool winMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && win;
         _winMsg.SetActive(winMsgShouldBeDisplayed);
         bool loseMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && !win;
         _loseMsg.SetActive(loseMsgShouldBeDisplayed);
-        _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
-        _starterPackMsg2.SetActive(isBotMatch && !claimedStarterPack);
+        */
+
+        _winMsg.GetComponent<TMPro.TMP_Text>().text += (isBotMatch && !claimedStarterPack) ? "claim your starter pack" : "- Score will be updated in Leaderboards";
+        //_starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
+        _loseMsg.GetComponent<TMPro.TMP_Text>().text += (isBotMatch && !claimedStarterPack) ? "claim your starter pack" : "- Better luck next time";
+        //_starterPackMsg2.SetActive(isBotMatch && !claimedStarterPack);
         _btnShowMenu.gameObject.SetActive(true);
         _btnPlayAgain.gameObject.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
 
