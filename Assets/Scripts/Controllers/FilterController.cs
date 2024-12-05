@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FilterController : MonoBehaviour
 {
@@ -81,7 +82,7 @@ public class FilterController : MonoBehaviour
     public void ResetFilters()
     {
         // Reset all filter states to off
-        filterStates[FilterType.Pepemon] = false;
+        filterStates[FilterType.Pepemon] = true; //pepemon is on by default
         filterStates[FilterType.Defense] = false;
         filterStates[FilterType.Offense] = false;
 
@@ -91,8 +92,10 @@ public class FilterController : MonoBehaviour
 
     private void ToggleFilteredObjects()
     {
-        pepemonObject.SetActive(filterStates[FilterType.Pepemon]);
-        defenseObject.SetActive(filterStates[FilterType.Defense]);
-        offenseObject.SetActive(filterStates[FilterType.Offense]);
+        Color orange = new Color(1f, 0.5f, 0f); //orange
+
+        pepemonObject.GetComponent<Image>().color = filterStates[FilterType.Pepemon] ? orange : Color.gray;
+        defenseObject.GetComponent<Image>().color = filterStates[FilterType.Defense] ? orange : Color.gray;
+        offenseObject.GetComponent<Image>().color = filterStates[FilterType.Offense] ? orange : Color.gray;
     }
 }

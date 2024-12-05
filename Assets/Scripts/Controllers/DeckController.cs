@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Pepemon.Battle;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -32,6 +33,8 @@ public class DeckController : MonoBehaviour
     [SerializeField] private BattlePrepController _battlePrepController;
     [SerializeField] private List<Card> starterDeck;
 
+    private bool notValidDeck = false;
+
     /// <summary>
     /// Show/Hide edit/select depending on the screen
     /// </summary>
@@ -43,6 +46,10 @@ public class DeckController : MonoBehaviour
             if (!isStarterDeck)
             {
                 _selectButton.gameObject.SetActive(!value);
+                if (!value)
+                {
+                    UpdateNotValidDeckIsNotShowWhenSelecting();
+                }
             }
         }
 
@@ -71,8 +78,15 @@ public class DeckController : MonoBehaviour
 
             _selectButton.gameObject.SetActive(true);
 
-
             _supportCardCount.text = supportCardCount + " / " + 60;
+        }
+    }
+
+    private void UpdateNotValidDeckIsNotShowWhenSelecting()
+    {
+        if(!_editButton.gameObject.activeSelf)
+        {
+            gameObject.SetActive(!notValidDeck); //hide the deck on selection if it is not valid
         }
     }
 
@@ -140,6 +154,8 @@ public class DeckController : MonoBehaviour
             _supportCardCount.text = starterDeck.Count.ToString();
         }
 
+        notValidDeck = metadata?.name == null || supportCardCount == 0;
+
         if (!isStarterDeck)
         {
             if (metadata?.name == null)
@@ -147,6 +163,7 @@ public class DeckController : MonoBehaviour
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Pepemon card missing";
                 _selectButton.gameObject.SetActive(false);
+                UpdateNotValidDeckIsNotShowWhenSelecting();
                 return true;
             }
             if (supportCardCount == 0)
@@ -154,9 +171,14 @@ public class DeckController : MonoBehaviour
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Support cards missing";
                 _selectButton.gameObject.SetActive(false);
+                UpdateNotValidDeckIsNotShowWhenSelecting();
                 return true;
             }
             _selectButton.gameObject.SetActive(selectionMode);
+            if (selectionMode)
+            {
+                UpdateNotValidDeckIsNotShowWhenSelecting();
+            }
             _errorDisplay.SetActive(false);
         }
         

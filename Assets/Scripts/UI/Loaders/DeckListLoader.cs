@@ -34,7 +34,7 @@ public class DeckListLoader : MonoBehaviour
         loadingInProgress = true;
 
         _loadingMessage.SetActive(true);
-        var loadingMessageLabel = _loadingMessage.GetComponent<Text>();
+        var loadingMessageLabel = _loadingMessage.GetComponent<TMPro.TMP_Text>();
         loadingMessageLabel.text = "Loading decks...";
 
         // destroy before re-creating
@@ -65,7 +65,7 @@ public class DeckListLoader : MonoBehaviour
         if (!string.IsNullOrEmpty(account))
         {
             decks = await PepemonCardDeck.GetPlayerDecks(account);
-        } 
+        }
 
         var loadingTasks = new List<UniTask>();
         if (MainMenuController.claimedStarterDeck)

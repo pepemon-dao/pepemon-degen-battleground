@@ -8,6 +8,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scripts.Managers.Sound;
+using Pepemon.Battle;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
 public class PostBattleScreenController : MonoBehaviour
@@ -37,10 +38,12 @@ public class PostBattleScreenController : MonoBehaviour
     [SerializeField] GameObject _rewardDisplay;
     [SerializeField] GameObject _winDisplay;
     [SerializeField] GameObject _loseDisplay;
-    [SerializeField] GameObject _leaderboardMsg;
+    [SerializeField] GameObject _winMsg;
+    [SerializeField] GameObject _loseMsg;
     [SerializeField] GameObject _starterPackMsg;
+    [SerializeField] GameObject _starterPackMsg2;
     [SerializeField] Button _btnShowMenu;
-    [SerializeField] Button _btnShowMenu2;
+    [SerializeField] Button _btnPlayAgain;
     [SerializeField] Button _btnClaimGift;
 
     [Title("Screen Events")]
@@ -66,6 +69,7 @@ public class PostBattleScreenController : MonoBehaviour
 
     #region EndTransitionBackToMenu
     public static bool IsGoingFromBattle = false;
+    public static bool IsPlayingAgain = false;
     public static bool IsClaimingGift = false;
     #endregion
 
@@ -80,7 +84,9 @@ public class PostBattleScreenController : MonoBehaviour
 
         bool isBotMatch = BattlePrepController.battleData.isBotMatch;
         bool isTutorial = BotTextTutorial.Instance.wasInTutorial;
-        if (isTutorial)
+        bool claimedStarterPack = PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
+
+        if (isTutorial || claimedStarterPack)
         {
             _rewardDisplay.GetComponentInChildren<TextReveal>()
             .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
@@ -88,16 +94,19 @@ public class PostBattleScreenController : MonoBehaviour
         else
         {
             _rewardDisplay.SetActive(false);
-            //_rewardDisplay.GetComponentInChildren<TextReveal>()
-            //.SetText(win ? "Gained Starter Pack" : "");
+            _rewardDisplay.GetComponentInChildren<TextReveal>()
+            .SetText(win && !claimedStarterPack ? "Gained Starter Pack" : "");
         }
 
-        bool claimedStarterPack = false; //PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
         _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
-        _leaderboardMsg.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
+        bool winMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && win;
+        _winMsg.SetActive(winMsgShouldBeDisplayed);
+        bool loseMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && !win;
+        _loseMsg.SetActive(loseMsgShouldBeDisplayed);
         _starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
-        _btnShowMenu.gameObject.SetActive(_btnClaimGift.gameObject.activeSelf);
-        _btnShowMenu2.gameObject.SetActive(!_btnClaimGift.gameObject.activeSelf);
+        _starterPackMsg2.SetActive(isBotMatch && !claimedStarterPack);
+        _btnShowMenu.gameObject.SetActive(true);
+        _btnPlayAgain.gameObject.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
 
         ThemePlayer.Instance.PlayGameOverSong(win);
     }
@@ -107,10 +116,31 @@ public class PostBattleScreenController : MonoBehaviour
         _pepemon.LoadCardData(cardId, false);
     }
 
+    public void OnBtnPlayAgainClick()
+    {
+        bool isBotMatch = BattlePrepController.battleData.isBotMatch;
+        if (isBotMatch)
+        {
+            ThemePlayer.Instance.SkipEndGameMusic();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            IsPlayingAgain = true;
+            OnBtnShowMenuClick();
+        }
+        
+    }
+
     public void OnBtnShowMenuClick()
     {
         // go back to previous scene
         IsGoingFromBattle = true;
+
+        //reset the bot battle values
+        Web3Controller.instance.StarterDeckID = 0;
+        Web3Controller.instance.StarterPepemonID = 0;
+
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex - 1);
     }
@@ -149,7 +179,7 @@ public class PostBattleScreenController : MonoBehaviour
     {
         _state = _startHidden ? ScreenState.HIDDEN : ScreenState.SHOWN;
         _btnShowMenu.onClick.AddListener(OnBtnShowMenuClick);
-        _btnShowMenu2.onClick.AddListener(OnBtnShowMenuClick);
+        _btnPlayAgain.onClick.AddListener(OnBtnPlayAgainClick);
 
         _btnClaimGift.onClick.AddListener(OnBtnClaimGiftClick);
     }
