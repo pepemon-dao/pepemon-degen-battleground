@@ -117,7 +117,7 @@ jobs:
         with:
           # if the error "fallocate: invalid length value specified" is thrown in the CI, decrease this value
           root-reserve-mb: 28672
-          swap-size-mb: 4092
+          swap-size-mb: 8192
           remove-dotnet: 'true'
           remove-haskell: 'true'
           remove-android: 'true'
