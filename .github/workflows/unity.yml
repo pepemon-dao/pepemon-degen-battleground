@@ -14,7 +14,6 @@ on:
         required: false
         type: boolean
         default: false
-    branches: ['*']
 
 permissions:
   contents: write
@@ -116,11 +115,12 @@ jobs:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 24576
-          temp-reserve-mb: 1024
+          # if the error "fallocate: invalid length value specified" is thrown in the CI, decrease this value
+          root-reserve-mb: 32768
           swap-size-mb: 1024
-          remove-dotnet: 'false'
+          remove-dotnet: 'true'
           remove-haskell: 'true'
+          remove-android: 'true'
       
       - name: Checkout repository
         uses: actions/checkout@v3
