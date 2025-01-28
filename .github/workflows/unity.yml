@@ -112,12 +112,12 @@ jobs:
     if: ${{ inputs.android_build }}
 
     steps:
+      # This is needed to have enough space in the CI runner to build for android
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
-          root-reserve-mb: 20480
-          temp-reserve-mb: 16384
-          swap-size-mb: 1024
+          root-reserve-mb: 28672
+          swap-size-mb: 4092
           remove-dotnet: 'false'
           remove-haskell: 'true'
       
