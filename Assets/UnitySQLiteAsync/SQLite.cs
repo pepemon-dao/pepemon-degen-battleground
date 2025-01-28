@@ -4001,7 +4001,7 @@ namespace SQLite
 			MultiThread = 2,
 			Serialized = 3
 		}
-#if PLATFORM_ANDROID
+#if PLATFORM_ANDROID && !UNITY_EDITOR
 		const string LibraryPath = "sqliteX";
 #else
 		const string LibraryPath = "sqlite3";
