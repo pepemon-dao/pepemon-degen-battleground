@@ -117,19 +117,18 @@ jobs:
         with:
           root-reserve-mb: 16384
           swap-size-mb: 1024
-          remove-dotnet: 'true'
-      - name: Checkout
+          remove-dotnet: 'false'
+          remove-haskell: 'true'
+      
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          lfs: true
 
       - name: Show free space
         run: |
           echo "Free space:"
           df -h
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          lfs: true
 
       - name: Build Android
         uses: game-ci/unity-builder@v4
@@ -153,3 +152,9 @@ jobs:
         with:
           name: AndroidBuild
           path: build/Android/*.apk
+
+      - name: Show free space
+        if: always()
+        run: |
+          echo "Free space:"
+          df -h
