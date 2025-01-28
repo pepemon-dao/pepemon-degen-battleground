@@ -1,3 +1,5 @@
+// Disable cache on Android in Development Builds, as the Sqlite library doesn't seem to load properly for some reason
+// Also disable sqlite cache in WebGL since the browser has its own cache
 #if (!UNITY_WEBGL || UNITY_EDITOR) && !(UNITY_ANDROID && DEVELOPMENT_BUILD)
 #define ENABLE_CACHE
 #endif

@@ -8,6 +8,12 @@ on:
     # Run Tests -> Build on PRs targeting main
     branches: [main]
   workflow_dispatch:
+    inputs:
+      android_build:
+        description: 'Run android build'
+        required: false
+        type: boolean
+        default: false
     branches: ['*']
 
 permissions:
@@ -19,6 +25,7 @@ jobs:
     name: Build the Pepemon Unity Project
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
+    if: ${{ !inputs.android_build }}
 
     steps:
       
@@ -102,9 +109,23 @@ jobs:
   android-build:
     name: Build Android
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ inputs.android_build }}
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Show free space
+        run: |
+          echo "Free space:"
+          df -h
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
