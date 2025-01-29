@@ -69,3 +69,19 @@ artifacts/
 
 # Ignore the build file
 env/dev/Build/WebGL.data
+
+# Ignore android IL2CPP build output
+**/il2cppOutput/**
+**/*_BackUpThisFolder_ButDontShipItWithYourGame
+
+# Ignore Sirenix backups
+Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll.backup.txt
+Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll.backup.txt.meta
+Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll.backup.txt
+Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll.backup.txt.meta
+Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Utilities.dll.backup.txt
+Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Utilities.dll.backup.txt.meta
+Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Serialization.dll.backup.txt
+Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Serialization.dll.backup.txt.meta
+Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Utilities.dll.backup.txt
+Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Utilities.dll.backup.txt.meta
