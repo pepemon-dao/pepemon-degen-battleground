@@ -102,6 +102,8 @@ public class CardPreview : MonoBehaviour
         }
 
         _text.text = metadata?.name ?? "Unknown Card";
+
+        //to write stat apply
     }
 
 

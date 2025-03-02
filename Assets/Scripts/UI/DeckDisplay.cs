@@ -601,6 +601,7 @@ public class DeckDisplay : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var cardInstance = Instantiate(prefab, uiList.transform);
+
             var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
             cardPreviewComponent.LoadCardData(cardId, isSupportCard);
             cardPreviewComponent.SetEquip(isSelected);

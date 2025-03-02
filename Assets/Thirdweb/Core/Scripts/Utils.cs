@@ -488,6 +488,8 @@ namespace Thirdweb
 
         public static Web3 GetWeb3(BigInteger? chainId = null)
         {
+            Debug.LogError(ThirdwebManager.Instance.SDK.Session.RPC);
+
             return new Web3(new ThirdwebClient(new Uri(chainId == null ? ThirdwebManager.Instance.SDK.Session.RPC : $"https://{chainId}.rpc.thirdweb.com")));
         }
 
