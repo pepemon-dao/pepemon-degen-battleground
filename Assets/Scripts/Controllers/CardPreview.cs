@@ -17,6 +17,14 @@ public class CardPreview : MonoBehaviour
 {
     [BoxGroup("Card Components"), SerializeField] public Image _cardImage;
     [BoxGroup("Card Components"), SerializeField] public TMP_Text _text;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _hpText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _lvlText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _attackText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _sattackText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _defendText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _sdefendText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _speedText;
+    [BoxGroup("Card Components"), SerializeField] public TMP_Text _intellegenceText;
     [BoxGroup("Card Components"), SerializeField] public GameObject _checkmark;
 
     [SerializeField] private GameObject defenseIcon;
@@ -44,7 +52,6 @@ public class CardPreview : MonoBehaviour
     {
         this.cardId = cardId;
         this.isSupport = isSupport;
-        
 
         if (!metadataLookup.TryGetValue(cardId, out var metadata))
         {
@@ -103,7 +110,24 @@ public class CardPreview : MonoBehaviour
 
         _text.text = metadata?.name ?? "Unknown Card";
 
-        //to write stat apply
+
+        var cardData = ScriptableDataContainerSingleton.Instance.CardsScriptableObjsData.GetPepemonById(cardId.ToString());
+
+        if (cardData != null)
+        {
+            if (_hpText != null)
+            {
+                _lvlText.text = cardData.Level.ToString();
+                _hpText.text = cardData.HealthPoints.ToString();
+                _attackText.text = cardData.Attack.ToString();
+                _sattackText.text = cardData.SAttack.ToString();
+                _defendText.text = cardData.Defense.ToString();
+                _sdefendText.text = cardData.SDeffense.ToString();
+                _intellegenceText.text = cardData.Intelligence.ToString();
+                _speedText.text = cardData.Speed.ToString();
+            }
+
+        }
     }
 
 
