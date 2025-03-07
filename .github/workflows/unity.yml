@@ -73,7 +73,7 @@ jobs:
           allowDirtyBuild: true
 
       # Output
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/release' || github.ref == 'refs/heads/staging'
         with:
           name: Build
