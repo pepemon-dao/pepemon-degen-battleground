@@ -12,6 +12,7 @@ public class DeckDisplay : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _supportCardPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _supportCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardPrefab;
+    [TitleGroup("Component References"), SerializeField] GameObject _heroCardPrefab;
     [TitleGroup("Component References"), SerializeField] GameObject _battleCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _heroCardList;
     [TitleGroup("Component References"), SerializeField] GameObject _myCardsList;
@@ -505,6 +506,7 @@ public class DeckDisplay : MonoBehaviour
         else
         {
             uiList = _heroCardList;
+            prefab = _heroCardPrefab;
         }
 
         // Instantiate the card and set up the preview component
@@ -601,6 +603,7 @@ public class DeckDisplay : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var cardInstance = Instantiate(prefab, uiList.transform);
+
             var cardPreviewComponent = cardInstance.GetComponent<CardPreview>();
             cardPreviewComponent.LoadCardData(cardId, isSupportCard);
             cardPreviewComponent.SetEquip(isSelected);

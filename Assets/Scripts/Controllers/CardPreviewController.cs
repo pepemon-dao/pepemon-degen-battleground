@@ -156,13 +156,37 @@ public class CardPreviewController : MonoBehaviour
     private void SetCardInDeckPreview(CardPreview card)
     {
         _cardImg.sprite = card._cardImage.sprite;
-        gameCard.SetActive(true);
+
+        bool isPepemon = card._hpText != null;
+        if (isPepemon)
+        {
+            SetPepemonCardPreview(card);
+            pepemonCard.SetActive(true);
+        }
+
+        gameCard.SetActive(!isPepemon);
     }
     
     private void SetCardPreview(CardController card)
     {
         _cardImg.sprite = card.HostedCard.CardEffectSprite;
         gameCard.SetActive(true);
+    }
+
+    public void SetPepemonCardPreview(CardPreview card)
+    {
+        _nameText.text = card._text.text;
+        _hpText.text = card._hpText.text;
+        _levelText.text = card._lvlText.text;
+        _atkText.text = card._attackText.text;
+        _sAtkText.text = card._sattackText.text;
+        _defText.text = card._defendText.text;
+        _sDefText.text = card._sdefendText.text;
+        _spdText.text = card._speedText.text;
+        _intText.text = card._intellegenceText.text;
+
+        _backDropImage.sprite = card._cardImage.sprite;
+
     }
 
     public void PopulateCard(BattleCard pepemonData)

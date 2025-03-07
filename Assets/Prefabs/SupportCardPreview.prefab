@@ -560,6 +560,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cardImage: {fileID: 5025722706362343929}
   _text: {fileID: 6355061599894790826}
+  _hpText: {fileID: 0}
+  _attackText: {fileID: 0}
+  _sattackText: {fileID: 0}
+  _defendText: {fileID: 0}
+  _sdefendText: {fileID: 0}
+  _speedText: {fileID: 0}
+  _intellegenceText: {fileID: 0}
   _checkmark: {fileID: 5025722706263310884}
   defenseIcon: {fileID: 5266513090562325659}
   offenseIcon: {fileID: 8559313213256166113}
