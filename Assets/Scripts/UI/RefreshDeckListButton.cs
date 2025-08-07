@@ -5,6 +5,10 @@ using UnityEngine.UI;
 public class RefreshDeckListButton : MonoBehaviour
 {
     [SerializeField] DeckListLoader loader;
-    void Awake() => GetComponent<Button>().onClick.AddListener(() =>
-        loader?.ReloadAllDecks(true));
+    
+    void Start()
+    {
+        // Use Start() instead of Awake() to ensure Web3/socket systems are initialized
+        GetComponent<Button>().onClick.AddListener(() => loader?.ReloadAllDecks(true));
+    }
 }
