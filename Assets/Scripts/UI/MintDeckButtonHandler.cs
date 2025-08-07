@@ -15,10 +15,19 @@ public class MintDeckButtonHandler : MonoBehaviour
 
     async void OnButtonClicked()
     {
+        Debug.Log("MintDeckButtonHandler: Button clicked, starting mint process...");
         GetComponent<Button>().interactable = false;
         try
         {
+            Debug.Log("MintDeckButtonHandler: Calling CreateDeck()...");
             await PepemonCardDeck.CreateDeck();
+            Debug.Log("MintDeckButtonHandler: CreateDeck() completed successfully!");
+            
+            // Invalidate cache and force reload after successful mint
+            PepemonCardDeck.InvalidateCache();
+            Debug.Log($"MintDeckButtonHandler: Calling ReloadAllDecks(force=true) on {_deckList.name}...");
+            _deckList.GetComponent<DeckListLoader>().ReloadAllDecks(true);
+            Debug.Log("MintDeckButtonHandler: Forced ReloadAllDecks called!");
         }
         catch (Exception e)
         {
@@ -26,6 +35,5 @@ public class MintDeckButtonHandler : MonoBehaviour
         }
 
         GetComponent<Button>().interactable = true;
-        _deckList.GetComponent<DeckListLoader>().ReloadAllDecks();
     }
 }
