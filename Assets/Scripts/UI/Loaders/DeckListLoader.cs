@@ -28,6 +28,14 @@ public class DeckListLoader : MonoBehaviour
     public async void ReloadAllDecks(bool force = false)
     {
         Debug.Log($"ReloadAllDecks called on {gameObject.name} at {Time.time} (force={force})");
+        
+        // WebGL safety: Additional checks for destroyed/inactive objects
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"ReloadAllDecks: Object is null or inactive, skipping reload");
+            return;
+        }
+        
         // prevent re-reloading things over and over again with old async calls if
         // the user decides to go back and forth very quickly between screens
         if (loadingInProgress && !force) 
@@ -36,7 +44,16 @@ public class DeckListLoader : MonoBehaviour
             return;
         }
 
-        loadingInProgress = true;
+        // WebGL safety: Set loading flag in try-catch
+        try
+        {
+            loadingInProgress = true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"ReloadAllDecks: Failed to set loadingInProgress flag: {ex.Message}");
+            return;
+        }
 
         _loadingMessage.SetActive(true);
         var loadingMessageLabel = _loadingMessage.GetComponent<TMPro.TMP_Text>();
