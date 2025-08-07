@@ -15,13 +15,17 @@ permissions:
   checks: write
 
 jobs:
-  build:
-    name: Build the Pepemon Unity Project
-    runs-on: ubuntu-latest
-    concurrency: ci-${{ github.ref }}
-
-    steps:
+  # Parallel job strategy (2024 trend)
+  test:
+    name: Run Unity Tests
+    runs-on: ubuntu-latest-4-cores
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    
+    env:
+      UNITY_DISABLE_UNITY_HUB: true
+      UNITY_EDITOR_MEMORY: 8192  # 8GB for tests
       
+    steps:
       - name: Cleanup Docker
         run: |
           docker system prune -af
@@ -41,7 +45,7 @@ jobs:
           restore-keys: |
             test-cache-
 
-      # Test
+      # Test only
       - name: Run tests
         uses: game-ci/unity-test-runner@v4
         env:
@@ -51,6 +55,7 @@ jobs:
         with:
           unityVersion: 2021.3.12f1
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: all
           
       # Cache Save
       - uses: actions/cache/save@v4
@@ -59,7 +64,51 @@ jobs:
           path: Library
           key: ${{ steps.test-cache-restore.outputs.cache-primary-key }}
 
-      # Build
+  build:
+    name: Build the Pepemon Unity Project  
+    runs-on: ubuntu-latest-8-cores  # 8 vCPUs, 32GB RAM - Unity builds love RAM
+    needs: test  # Wait for tests only on main
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
+    concurrency: ci-${{ github.ref }}
+    
+    # Set resource limits for Unity
+    env:
+      UNITY_DISABLE_UNITY_HUB: true
+      UNITY_EDITOR_MEMORY: 16384  # 16GB for Unity Editor
+
+    steps:
+      
+      - name: Cleanup Docker
+        run: |
+          docker system prune -af
+          docker volume prune -f
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+      
+      # Install sccache for shader compilation caching (2024 trend)
+      - name: Install sccache
+        run: |
+          wget https://github.com/mozilla/sccache/releases/download/v0.7.4/sccache-v0.7.4-x86_64-unknown-linux-musl.tar.gz
+          tar xzf sccache-v0.7.4-x86_64-unknown-linux-musl.tar.gz
+          sudo mv sccache-v0.7.4-x86_64-unknown-linux-musl/sccache /usr/local/bin/
+          sccache --start-server
+        env:
+          SCCACHE_CACHE_SIZE: 2G
+    
+      # Cache Restore for Build
+      - uses: actions/cache/restore@v4
+        id: build-cache-restore
+        with:
+          path: Library
+          key: build-cache-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            build-cache-
+            test-cache-
+
+      # Build with WebGL-specific optimizations
       - name: Build project
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/release' || github.ref == 'refs/heads/staging'
         uses: game-ci/unity-builder@v4
@@ -71,6 +120,11 @@ jobs:
           unityVersion: 2021.3.12f1
           targetPlatform: WebGL
           allowDirtyBuild: true
+          buildName: pepemon-webgl-${{ github.sha }}
+          # CRITICAL: WebGL build parameters for Thirdweb + Web3 compatibility
+          customParameters: |
+            -quit -batchmode -nographics
+            -logFile -
 
       # Output
       - uses: actions/upload-artifact@v4
