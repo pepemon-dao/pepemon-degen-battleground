@@ -24,12 +24,17 @@ public class DeckListLoader : MonoBehaviour
     /// Removes all elements in _deckList and loads all decks using _deckPrefab.
     /// Each deck element invokes onItemSelected when clicked, the deckId is passed as a parameter of this event
     /// </summary>
-    public async void ReloadAllDecks()
+    /// <param name="force">If true, bypasses the loadingInProgress guard to force a reload</param>
+    public async void ReloadAllDecks(bool force = false)
     {
+        Debug.Log($"ReloadAllDecks called on {gameObject.name} at {Time.time} (force={force})");
         // prevent re-reloading things over and over again with old async calls if
         // the user decides to go back and forth very quickly between screens
-        if (loadingInProgress) 
+        if (loadingInProgress && !force) 
+        {
+            Debug.Log($"ReloadAllDecks early-out: loadingInProgress is true on {gameObject.name}");
             return;
+        }
 
         loadingInProgress = true;
 
