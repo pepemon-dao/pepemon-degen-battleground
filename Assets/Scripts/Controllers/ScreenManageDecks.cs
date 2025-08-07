@@ -9,6 +9,12 @@ public class ScreenManageDecks : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] public GameObject _editDeckListLoader;
     [TitleGroup("Component References"), SerializeField] public GameObject _screenEditDeck;
 
+    private void Awake()
+    {
+        // Add the refresh button handler to this GameObject
+        gameObject.AddComponent<RefreshButtonHandler>();
+    }
+
     private void Start()
     {
         _editDeckListLoader.GetComponent<DeckListLoader>().onEditDeck.AddListener(SelectEditDeck);

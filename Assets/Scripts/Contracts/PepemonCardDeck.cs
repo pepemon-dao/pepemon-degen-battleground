@@ -7,9 +7,20 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Thirdweb;
 using UnityEngine;
+using Nethereum.RPC.Eth.DTOs;
 
 public class PepemonCardDeck
 {
+    [Event("DeckCreated")]
+    public class DeckCreatedEventDTO : IEventDTO
+    {
+        [Parameter("address", "owner", 1, true)]
+        public virtual string Owner { get; set; }
+
+        [Parameter("uint256", "deckId", 2, true)]
+        public virtual BigInteger DeckId { get; set; }
+    }
+
     public class SupportCardRequest
     {
         [Parameter("uint256", "supportCardId", 1)]
@@ -126,8 +137,28 @@ public class PepemonCardDeck
 
     public static async Task CreateDeck()
     {
+        var playerAddress = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+        var web3 = Thirdweb.Utils.GetWeb3();
+        var fromBlock = await web3.Eth.Blocks.GetBlockNumber.SendRequestAsync();
+
         // note: deck is created using the sender's address
         await contract.Write("createDeck");
+
+        if (Thirdweb.Utils.IsWebGLBuild())
+        {
+            var filter = new Dictionary<string, object> { { "owner", playerAddress } };
+            await ThirdwebExtensions.GetEventsAsync<DeckCreatedEventDTO>(contract, "DeckCreated", filter, (int)fromBlock.Value);
+        }
+        else
+        {
+            var eventHandler = web3.Eth.GetEvent<DeckCreatedEventDTO>(Address);
+            var filterInput = eventHandler.CreateFilterInput(
+                fromBlock: new BlockParameter(fromBlock.Value)
+            );
+            // Manually set topic for the owner since CreateFilterInput with all params is not available
+            filterInput.Topics = new object[] { new DeckCreatedEventDTO().GetTopicForOwner(playerAddress) };
+            await ThirdwebExtensions.WaitForEventAsync<DeckCreatedEventDTO>(filterInput, contract);
+        }
     }
 
     public static async Task SetBattleCard(ulong deckId, ulong battleCardId)
