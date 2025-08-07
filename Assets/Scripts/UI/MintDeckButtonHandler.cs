@@ -26,6 +26,6 @@ public class MintDeckButtonHandler : MonoBehaviour
         }
 
         GetComponent<Button>().interactable = true;
-        _deckList.GetComponent<DeckListLoader>().ReloadAllDecks();
+        _deckList.GetComponent<DeckListLoader>().ReloadAllDecks(true);
     }
 }
