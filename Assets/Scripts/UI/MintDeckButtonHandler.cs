@@ -26,6 +26,9 @@ public class MintDeckButtonHandler : MonoBehaviour
         }
 
         GetComponent<Button>().interactable = true;
+        
+        // Wait for blockchain state to propagate before refreshing
+        await Cysharp.Threading.Tasks.UniTask.Delay(2000);
         _deckList.GetComponent<DeckListLoader>().ReloadAllDecks(true);
     }
 }
