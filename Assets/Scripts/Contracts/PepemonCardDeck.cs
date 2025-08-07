@@ -91,12 +91,17 @@ public class PepemonCardDeck
 
     public static async Task<List<ulong>> GetPlayerDecks(string address)
     {
+        Debug.Log($"GetPlayerDecks: Fetching decks for address {address}...");
         var deckCount = await contract.Read<ulong>("getDeckCount", address);
+        Debug.Log($"GetPlayerDecks: Found {deckCount} decks for address {address}");
         List<ulong> deckIds = new List<ulong>();
         for (ulong i = 0; i < deckCount; i++)
         {
-            deckIds.Add(await contract.Read<ulong>("playerToDecks", address, i));
+            var deckId = await contract.Read<ulong>("playerToDecks", address, i);
+            deckIds.Add(deckId);
+            Debug.Log($"GetPlayerDecks: Added deck {deckId} at index {i}");
         }
+        Debug.Log($"GetPlayerDecks: Returning {deckIds.Count} deck IDs: [{string.Join(", ", deckIds)}]");
         return deckIds;
     }
 
@@ -124,10 +129,23 @@ public class PepemonCardDeck
         await contract.Write("mintCards");
     }
 
+    /// <summary>
+    /// Invalidates any cached deck data to force fresh data loading
+    /// </summary>
+    public static void InvalidateCache()
+    {
+        // Note: Currently PepemonCardDeck doesn't use static caching for deck lists,
+        // but this method provides a hook for future caching implementations
+        // and ensures consistency with the expected interface
+        Debug.Log("PepemonCardDeck: Cache invalidated - forcing fresh data on next reload");
+    }
+
     public static async Task CreateDeck()
     {
         // note: deck is created using the sender's address
+        Debug.Log("CreateDeck: Starting deck creation...");
         await contract.Write("createDeck");
+        Debug.Log("CreateDeck: Deck creation completed!");
     }
 
     public static async Task SetBattleCard(ulong deckId, ulong battleCardId)
