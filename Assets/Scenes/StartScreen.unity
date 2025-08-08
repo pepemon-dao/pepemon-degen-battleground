@@ -35997,6 +35997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _deckList: {fileID: 1248269243}
+  _loadingMessage: {fileID: 1341068232}
 --- !u!1 &1688859692
 GameObject:
   m_ObjectHideFlags: 0

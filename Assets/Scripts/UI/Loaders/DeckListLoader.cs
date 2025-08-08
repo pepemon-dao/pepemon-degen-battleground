@@ -38,11 +38,21 @@ public class DeckListLoader : MonoBehaviour
         var loadingMessageLabel = _loadingMessage.GetComponent<TMPro.TMP_Text>();
         loadingMessageLabel.text = "Loading decks...";
 
-        // destroy before re-creating
-        foreach (var deck in _deckList.GetComponentsInChildren<Button>())
+        // destroy all existing deck instances before re-creating
+        // Store children in array first to avoid modification during iteration
+        var children = new Transform[_deckList.transform.childCount];
+        for (int i = 0; i < _deckList.transform.childCount; i++)
         {
-            if (!deck.name.Contains("StarterDeck"))
-                Destroy(deck.gameObject);
+            children[i] = _deckList.transform.GetChild(i);
+        }
+        
+        foreach (var child in children)
+        {
+            // Only keep objects that explicitly should not be destroyed
+            if (child != null && !child.name.Contains("StarterDeck"))
+            {
+                Destroy(child.gameObject);
+            }
         }
         
         string account = "";
