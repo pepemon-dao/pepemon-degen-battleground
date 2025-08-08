@@ -36,8 +36,35 @@ public class MintDeckButtonHandler : MonoBehaviour
             // Check if wallet is connected before attempting to mint
             if (Web3Controller.instance == null || !Web3Controller.instance.IsConnected)
             {
-                Debug.LogError("Wallet is not connected. Cannot mint deck.");
-                return;
+                Debug.Log("Wallet not connected. Attempting to connect...");
+                
+                // Update loading message to show connection attempt
+                var textComponent = _loadingMessage?.GetComponent<TMPro.TMP_Text>();
+                if (textComponent != null)
+                {
+                    textComponent.text = "Connecting wallet...";
+                }
+                
+                // Try to connect wallet first
+                await Web3Controller.instance.ConnectWallet();
+                
+                // Verify connection was successful
+                if (!Web3Controller.instance.IsConnected)
+                {
+                    Debug.LogError("Failed to connect wallet. Cannot mint deck.");
+                    if (textComponent != null)
+                    {
+                        textComponent.text = "Wallet connection failed";
+                    }
+                    await Cysharp.Threading.Tasks.UniTask.Delay(2000); // Show error for 2 seconds
+                    return;
+                }
+                
+                // Update loading message back to minting
+                if (textComponent != null)
+                {
+                    textComponent.text = "Minting new deck...";
+                }
             }
             
             // Verify we have a valid address
