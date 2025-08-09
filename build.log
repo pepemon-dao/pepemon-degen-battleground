@@ -1,0 +1,24 @@
+Unity Editor version:    2021.3.12f1 (8af3c3e441b1)
+Branch:                  2021.3/release
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 15.5 (Build 24F74)
+Darwin version:          24.5.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        16384 MB
+[LicensingClient] Channel doesn't exist: "LicenseClient-0xhodler"
+Launching external process: /Applications/Unity/Hub/Editor/2021.3.12f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/Resources/Unity.Licensing.Client
+[Licensing::Module] Successfully launched the LicensingClient (PId: 96397)
+[LicensingClient] Error: Code 10 while verifying Licensing Client signature (process Id: 96397, path: "/Applications/Unity/Hub/Editor/2021.3.12f1/Unity.app/Contents/Frameworks/UnityLicensingClient.app/Contents/Resources/Unity.Licensing.Client")
+[Licensing::Module] Warning: LicensingClient has failed validation; ignoring
+[LicensingClient] Handshaking with LicensingClient (version: 1.9.0+249add7)
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-0xhodler" (connect: 4.41s, validation: 0.14s, handshake: 0.20s)
+[Licensing::Module] Connected to LicensingClient (PId: 96397, launch time: 0.01, total connection time: 4.75s)
+Entitlement-based licensing initiated
+[Licensing::Module] Error: Access token is unavailable
+[LicensingClient] Licenses updated successfully
+Cancelling DisplayDialog: Information The license file directory does not exist and needs to be created in a process with elevated privileges. A separate process will be spawned to do this, and you will be prompted for permissions. To avoid this, run the installer which automatically creates this directory.
+This should not be called in batch mode.
+Cancelling DisplayDialog: Error Unity license path in /Library/Application Support does not exist and we failed to create it. Use the installer to ensure the folder exists.
+This should not be called in batch mode.

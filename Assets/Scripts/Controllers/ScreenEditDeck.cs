@@ -47,16 +47,16 @@ public class ScreenEditDeck : MonoBehaviour
         _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
-    public void LoadAllCards(ulong deckId, int filter)
+    public void LoadAllCards(ulong deckId, int filter, bool forceFullRefresh = false)
     {
         if (isLoading)
         {
             return;
         }
-        StartCoroutine(LoadAllCardsCoroutine(deckId, filter));
+        StartCoroutine(LoadAllCardsCoroutine(deckId, filter, forceFullRefresh));
     }
 
-    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter)
+    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter, bool forceFullRefresh = false)
     {
         isLoading = true;
         _textLoading.SetActive(true);
@@ -69,6 +69,15 @@ public class ScreenEditDeck : MonoBehaviour
         {
             currentDeckId = deckId;
             loadingNewDeck = true;
+        }
+        
+        // Force full refresh when explicitly requested (e.g., after minting cards)
+        if (forceFullRefresh)
+        {
+            loadingNewDeck = true;
+            // Clear metadata cache to ensure fresh metadata lookup
+            metadataLookup.Clear();
+            Debug.Log("Force refresh: Cleared metadata cache");
         }
 
         account = "";
@@ -142,21 +151,37 @@ public class ScreenEditDeck : MonoBehaviour
                     if (!metadataLookup.TryGetValue(entry.Key, out var metadata))
                     {
                         // Metadata not found in lookup, retrieve it
+                        Debug.Log($"Fetching metadata for card ID: {entry.Key}");
                         metadata = PepemonFactoryCardCache.GetMetadata(entry.Key);
                         if (metadata != null)
                         {
                             metadataLookup[entry.Key] = metadata;
+                            Debug.Log($"Successfully cached metadata for card ID: {entry.Key}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Failed to fetch metadata for card ID: {entry.Key}. Skipping card.");
+                            continue; // Skip this card if metadata is null
                         }
                     }
 
-                    bool isBattleCard = metadata.Value.description.Contains("Battle ver");
-                    if (isBattleCard)
+                    // Additional null check before accessing metadata
+                    if (metadata.HasValue && !string.IsNullOrEmpty(metadata.Value.description))
                     {
-                        // Add to ownedBattleCardIds
-                        ownedBattleCardIds.Add(entry.Key, entry.Value);
+                        bool isBattleCard = metadata.Value.description.Contains("Battle ver");
+                        if (isBattleCard)
+                        {
+                            // Add to ownedBattleCardIds
+                            ownedBattleCardIds.Add(entry.Key, entry.Value);
 
-                        // Mark the key for removal
-                        keysToRemove.Add(entry.Key);
+                            // Mark the key for removal
+                            keysToRemove.Add(entry.Key);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Metadata is null or empty for card ID: {entry.Key}. Treating as support card.");
+                        // If metadata is missing, assume it's a support card and leave in ownedCardIds
                     }
                 }
 
@@ -212,8 +237,9 @@ public class ScreenEditDeck : MonoBehaviour
         // Load deck data into the display
         deckDisplayComponent.ClearMyCardsList();
         deckDisplayComponent.LoadSelectedCards(battleCard, supportCards);
-        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
+        // Load battle cards (Pepemon) first so they appear at the top
         deckDisplayComponent.LoadAllBattleCards(ownedBattleCardIds, battleCard);
+        deckDisplayComponent.LoadAllSupportCards(ownedCardIds, supportCards);
 
         DeckDisplay.Instance.UpdateCardInDeckDisplay(loadingNewDeck);
 
@@ -285,11 +311,39 @@ public class ScreenEditDeck : MonoBehaviour
     public async void HandleMintCardsButtonClick()
     {
         setButtonsInteractibleState(false);
+        
+        // Show minting feedback
+        _textLoading.SetActive(true);
+        var loadingText = _textLoading.GetComponent<TMPro.TMP_Text>();
+        if (loadingText != null)
+        {
+            loadingText.text = "Minting cards...";
+        }
+        
         try
         {
+            // Fire mint transaction
             await PepemonCardDeck.MintCards();
-            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter);
-        } 
+            Debug.Log("Mint transaction completed, waiting for blockchain propagation...");
+            
+            // Update loading text
+            if (loadingText != null)
+            {
+                loadingText.text = "Waiting for cards to appear...";
+            }
+
+            // Minimal propagation wait (simplified approach)
+            await System.Threading.Tasks.Task.Delay(3000);
+
+            // Force full refresh to fetch newly minted cards from wallet
+            var filter = FilterController.Instance != null ? FilterController.Instance.currentFilter : 0;
+            LoadAllCards(currentDeckId, filter, forceFullRefresh: true);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error during mint process: {ex.Message}");
+            _textLoading.SetActive(false);
+        }
         finally
         {
             setButtonsInteractibleState(true);
