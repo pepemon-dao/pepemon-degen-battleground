@@ -29392,7 +29392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56d9559a79e304f44b5ac4d726f1ee68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeChain: base-sepolia-testnet
+  activeChain: base-mainnet
   supportedChains:
   - identifier: fantom
     chainId: 250
