@@ -53,10 +53,20 @@ public class ScreenEditDeck : MonoBehaviour
         {
             return;
         }
-        StartCoroutine(LoadAllCardsCoroutine(deckId, filter));
+        StartCoroutine(LoadAllCardsCoroutine(deckId, filter, false));
     }
 
-    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter)
+    // Overload to allow forcing a full refresh (fetch owned cards again) without changing deckId
+    public void LoadAllCards(ulong deckId, int filter, bool forceFullRefresh)
+    {
+        if (isLoading)
+        {
+            return;
+        }
+        StartCoroutine(LoadAllCardsCoroutine(deckId, filter, forceFullRefresh));
+    }
+
+    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter, bool forceFullRefresh)
     {
         isLoading = true;
         _textLoading.SetActive(true);
@@ -114,7 +124,7 @@ public class ScreenEditDeck : MonoBehaviour
 
             */
             
-
+            
             
             if (loadingNewDeck)
             {
@@ -127,10 +137,10 @@ public class ScreenEditDeck : MonoBehaviour
                 // Fetch battle card
                 yield return StartCoroutine(PepemonCardDeck.GetBattleCard(deckId, result => battleCard = result));
 
-                // Fetch all support cards
+                // Fetch all support cards for this deck from chain
                 yield return StartCoroutine(PepemonCardDeck.GetAllSupportCards(deckId, result => supportCards = result));
 
-                // Fetch owned cards
+                // Fetch owned cards from chain
                 yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
 
                 starterSupportCards = supportCards;
@@ -165,10 +175,48 @@ public class ScreenEditDeck : MonoBehaviour
                 {
                     ownedCardIds.Remove(key);
                 }
+            }
+            else if (forceFullRefresh)
+            {
+                // Do a minimal refresh: only fetch owned cards again to reflect newly minted items.
+                // Do NOT change current deck selection or battle card when we're not loading a new deck.
+                ownedCardIds = new();
+                ownedBattleCardIds = new();
 
+                // Fetch owned cards from chain
+                yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
+
+                var keysToRemove = new List<ulong>();
+                foreach (var entry in ownedCardIds)
+                {
+                    if (!metadataLookup.TryGetValue(entry.Key, out var metadata))
+                    {
+                        metadata = PepemonFactoryCardCache.GetMetadata(entry.Key);
+                        if (metadata != null)
+                        {
+                            metadataLookup[entry.Key] = metadata;
+                        }
+                    }
+
+                    bool isBattleCardMeta = metadata.Value.description.Contains("Battle ver");
+                    if (isBattleCardMeta)
+                    {
+                        ownedBattleCardIds.Add(entry.Key, entry.Value);
+                        keysToRemove.Add(entry.Key);
+                    }
+                }
+                foreach (var key in keysToRemove)
+                {
+                    ownedCardIds.Remove(key);
+                }
+
+                // Keep current UI selection intact
+                battleCard = deckDisplayComponent.GetSelectedBattleCard();
+                supportCards = deckDisplayComponent.GetSelectedSupportCards();
             }
             else
             {
+                // No chain fetch; reuse current UI selection
                 battleCard = deckDisplayComponent.GetSelectedBattleCard();
                 supportCards = deckDisplayComponent.GetSelectedSupportCards();
             }
@@ -288,11 +336,28 @@ public class ScreenEditDeck : MonoBehaviour
         try
         {
             await PepemonCardDeck.MintCards();
-            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter);
+            // Initial refresh immediately after mint (force full refresh to re-fetch owned cards)
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, true);
+            // Additional minimal, non-intrusive polling refresh attempts to account for chain/indexer propagation
+            StartCoroutine(PollRefreshAfterMint());
         } 
         finally
         {
             setButtonsInteractibleState(true);
+        }
+    }
+
+    // Minimal polling coroutine: attempts to reload cards at ~2, 4, 6, 8, 10 seconds after mint
+    private IEnumerator PollRefreshAfterMint()
+    {
+        // Five additional attempts spaced by 2 seconds each (cumulative ~2,4,6,8,10s)
+        const int attempts = 5;
+        const float intervalSeconds = 2f;
+        for (int i = 0; i < attempts; i++)
+        {
+            yield return new WaitForSeconds(intervalSeconds);
+            // Reuse the current filter and deck id, do not alter any other state. Force full refresh to fetch owned cards.
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, true);
         }
     }
     
