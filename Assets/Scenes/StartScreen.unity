@@ -31856,8 +31856,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'TIP: Don''t worry about making the perfect choice now. You can always
-    adjust your decision later.'
+  m_text: 'Pick your starter. This is the one you''ll mint - you can collect the
+    rest later.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}

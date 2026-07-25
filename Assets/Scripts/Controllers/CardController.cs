@@ -45,8 +45,15 @@ public class CardController : MonoBehaviour
     public void PopulateCard(Card card)
     {
         HostedCard = card;
-        //_cardDisplayName.text = HostedCard.DisplayName;
-        //_cardDescription.text = HostedCard.CardDescription;
+
+        // Card identity was previously invisible in battle: these assignments were commented
+        // out and both objects disabled in Card.prefab, so the tutorial explained support
+        // cards the player had no way to read.
+        //
+        // Only the name is shown on the card itself - a full effect description is not legible
+        // at card scale in the WebGL build. The description is surfaced in CardPreviewController.
+        if (_cardDisplayName != null) _cardDisplayName.text = card.DisplayName;
+        if (_cardDescription != null) _cardDescription.text = card.CardDescription;
 
         /*
         switch (card.Type)
@@ -113,7 +120,7 @@ public class CardController : MonoBehaviour
 
         _targetScale = _startingScale * 1.1f;
 
-        SFXManager.Instance.SlideSFX();
+        if (SFXManager.Instance != null) SFXManager.Instance.SlideSFX();
     }
 
     /// <summary>

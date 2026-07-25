@@ -24,6 +24,9 @@ MonoBehaviour:
   Weakness: 0
   Resistence: 2
   Rarity: 0
+  Tagline: Glass cannon. Ends fights early.
+  Description: The hardest hitter of any starter and the thinnest health bar to match.
+    Fafny wins fast or not at all.
   HealthPoints: 20
   Speed: 5
   Intelligence: 4

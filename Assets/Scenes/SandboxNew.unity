@@ -6418,13 +6418,7 @@ MonoBehaviour:
   tutorialPanel: {fileID: 703023840}
   quitButton: {fileID: 1663285280}
   tutorialText: {fileID: 909649978}
-  tutorials:
-  - "Welcome to your first battle! Each battle lasts 5 rounds. The first player to
-    go down to 0 HP loses the battle. Let\u2019s go!"
-  - "Each player draws cards based on their Pepemon\u2019s INT. The Pepemon with
-    the highest SPD attacks first."
-  - "Attack power is based on your Pepemon\u2019s ATK, SP ATK and the support cards
-    drawn. Defense is based on DEF, SP DEF and support cards drawn. Let\u2019s go!"
+  continuePrompt: {fileID: 224339123}
 --- !u!1 &885881228
 GameObject:
   m_ObjectHideFlags: 0
@@ -15867,7 +15861,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PRESS SPACE TO CONTINUE
+  m_text: TAP OR PRESS SPACE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}
   m_sharedMaterial: {fileID: 4582639141343757650, guid: 8bfa113c19e50f14981b514906a2f76f, type: 2}

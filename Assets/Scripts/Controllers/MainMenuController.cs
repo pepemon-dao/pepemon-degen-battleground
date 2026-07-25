@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Pepemon.Battle;
+using Pepemon.Onboarding;
+using Pepemon.Telemetry;
 using Scripts.Managers.Sound;
 using Sirenix.OdinInspector;
 using Thirdweb;
@@ -34,17 +38,28 @@ public class MainMenuController : MonoBehaviour
 
     public static bool claimedStarterDeck = false;
 
+    /// <summary>Optional status label for the starter-pack claim. Null-safe when unwired.</summary>
+    [SerializeField] private GameObject _claimStatusMessage;
+
     private void Start()
     {
         Application.targetFrameRate = 60;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        // Clear any freeze left behind by leaving the battle scene mid-tutorial or mid-preview,
+        // which would otherwise hold this scene at timeScale 0.
+        TimeControl.ResetAll();
+
+        Funnel.Track(Funnel.AppLoaded);
 
         //PostBattleScreenController.IsClaimingGift = true; //- for testing the gift mechanic with the deck manager
         // TODO: find a better way to handle re-loading the main scene
 
         HandleGoingBackToMenu();
         _connectWalletButton.onClick.AddListener(OnConnectWalletButtonClick);
-        _mintDeckButton.onClick.AddListener(OnConnectWalletButtonClick);
+        // Note: _mintDeckButton is intentionally not wired to OnConnectWalletButtonClick here.
+        // MintDeckButtonHandler already connects the wallet as part of its own flow, and having
+        // both listeners on one button fired two concurrent ConnectWallet() calls per click.
         _startGameButton.onClick.AddListener(OnStartGameButtonClick);
         _manageDecksButton.onClick.AddListener(OnManageDecksButtonClick);
         _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
@@ -80,11 +95,102 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
-    private void ClaimStarterDeck()
+    /// <summary>
+    /// Mints the player's starter pack.
+    ///
+    /// This used to be a stub that logged an error and set the "claimed" flag anyway, so the
+    /// player connected a wallet - the highest-friction step in the funnel - and received
+    /// nothing, permanently marked as having claimed.
+    ///
+    /// Two transactions, using the same permissionless faucet the edit-deck screen already
+    /// ships: mintCards() grants the cards, createDeck() grants the deck NFT to hold them.
+    /// Assembling the chosen starter into that deck needs approval plus two more writes and
+    /// is deferred until the on-chain card ids are confirmed to match the local ScriptableObjects.
+    ///
+    /// The claimed flag is only set after both transactions confirm. A rejected or reverted
+    /// claim leaves the player claimable, so replaying the bot battle offers CLAIM again.
+    /// </summary>
+    private async void ClaimStarterDeck()
     {
-        Debug.LogError("gift claim is not yet implemented");
-        PlayerPrefs.SetInt("GotStarterPack", 1);
-        //claimedStarterDeck = true;
+        if (OnboardingState.HasClaimedStarterPack)
+        {
+            Debug.Log("[claim] Starter pack already claimed, nothing to do.");
+            return;
+        }
+
+        Funnel.Track(Funnel.ClaimClicked);
+        SetClaimStatus("Claiming your starter pack...");
+
+        try
+        {
+            if (Web3Controller.instance == null)
+            {
+                FailClaim("no_web3_controller", "Wallet unavailable. Try again from the Deck screen.");
+                return;
+            }
+
+            if (!Web3Controller.instance.IsConnected)
+            {
+                SetClaimStatus("Connecting wallet...");
+                Funnel.Track(Funnel.WalletConnectRequested);
+                await Web3Controller.instance.ConnectWallet();
+            }
+
+            if (!Web3Controller.instance.IsConnected)
+            {
+                Funnel.Track(Funnel.WalletConnectResult, "success", false, "error", "not_connected");
+                FailClaim("wallet_not_connected", "Wallet not connected. Try again from the Deck screen.");
+                return;
+            }
+
+            Funnel.Track(Funnel.WalletConnectResult, "success", true);
+
+            var address = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+            if (string.IsNullOrEmpty(address))
+            {
+                FailClaim("no_address", "No wallet address found. Try again from the Deck screen.");
+                return;
+            }
+
+            SetClaimStatus("Minting your cards...");
+            await PepemonCardDeck.MintCards();
+
+            SetClaimStatus("Creating your deck...");
+            await PepemonCardDeck.CreateDeck();
+
+            // Only now is the promise actually kept.
+            OnboardingState.HasClaimedStarterPack = true;
+            claimedStarterDeck = true;
+
+            Funnel.Track(Funnel.MintResult, "success", true);
+            SetClaimStatus("Starter pack claimed!");
+
+            // Explicit null check rather than ?. - Unity's fake-null does not short-circuit.
+            if (_screenManageDecks != null) _screenManageDecks.ReloadAllDecks();
+        }
+        catch (Exception e)
+        {
+            Funnel.Track(Funnel.MintResult, "success", false, "error", e.Message);
+            FailClaim(e.Message, "Claim failed. Try again from the Deck screen.");
+        }
+    }
+
+    private void FailClaim(string reason, string userMessage)
+    {
+        Debug.LogError($"[claim] Starter pack claim failed: {reason}");
+        SetClaimStatus(userMessage);
+    }
+
+    private void SetClaimStatus(string message)
+    {
+        Debug.Log($"[claim] {message}");
+
+        if (_claimStatusMessage == null) return;
+
+        _claimStatusMessage.SetActive(!string.IsNullOrEmpty(message));
+
+        var label = _claimStatusMessage.GetComponent<TMPro.TMP_Text>();
+        if (label != null) label.text = message;
     }
 
     private async void DeInitMainScene(bool toLoadScreen)
@@ -192,6 +298,10 @@ public class MainMenuController : MonoBehaviour
 
     public void OnStartGameButtonClick()
     {
+        Funnel.Track(
+            Funnel.StartPressed,
+            "connected", Web3Controller.instance != null && Web3Controller.instance.IsConnected);
+
         ShowScreen(MainSceneScreensEnum.LeagueSelection);
     }
 

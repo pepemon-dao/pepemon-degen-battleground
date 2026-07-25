@@ -63,6 +63,20 @@ namespace Pepemon.Battle
         [LabelWidth(80)]
         public CardRarity Rarity;
 
+        /// <summary>
+        /// One-line playstyle hook shown on the starter-selection screen.
+        ///
+        /// This copy previously lived as a UnityEvent string argument inside StartScreen.unity,
+        /// where it could not be reviewed or edited without opening the scene.
+        /// </summary>
+        [BoxGroup("Flavour")]
+        [LabelWidth(80)]
+        public string Tagline;
+
+        [BoxGroup("Flavour")]
+        [LabelWidth(80), TextArea(2, 4)]
+        public string Description;
+
         [TitleGroup("Properties")] public int HealthPoints = 400;
         [TitleGroup("Properties")] public int Speed;
         [TitleGroup("Properties")] public int Intelligence;
