@@ -327,7 +327,7 @@ public class ScreenEditDeck : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"Unable to mint cards: {ex.Message}");
-            SetStatus("Minting failed. Please try again.");
+            SetStatus("Minting failed. Please try again.", autoHide: true);
         }
         finally
         {
@@ -341,17 +341,44 @@ public class ScreenEditDeck : MonoBehaviour
     /// Every failure path here previously did nothing but Debug.LogError, so a rejected or
     /// reverted transaction looked exactly like success.
     /// </summary>
-    private void SetStatus(string message)
+    private Coroutine _statusHideRoutine;
+
+    /// <param name="autoHide">
+    /// True for terminal messages ("Deck saved.", failures). Those have no follow-up step to
+    /// clear them, so without this they sit over the deck forever - the label is centred on
+    /// screen, so it covers the Pepemon card and reads as the screen being stuck.
+    /// </param>
+    private void SetStatus(string message, bool autoHide = false)
     {
         Debug.Log($"[deck] {message}");
 
         if (_textLoading == null) return;
+
+        if (_statusHideRoutine != null)
+        {
+            StopCoroutine(_statusHideRoutine);
+            _statusHideRoutine = null;
+        }
 
         _textLoading.SetActive(!string.IsNullOrEmpty(message));
 
         var label = _textLoading.GetComponent<TMPro.TMP_Text>();
         if (label == null) label = _textLoading.GetComponentInChildren<TMPro.TMP_Text>();
         if (label != null) label.text = message;
+
+        if (autoHide && isActiveAndEnabled && !string.IsNullOrEmpty(message))
+        {
+            _statusHideRoutine = StartCoroutine(HideStatusAfter(2.5f));
+        }
+    }
+
+    private IEnumerator HideStatusAfter(float seconds)
+    {
+        // Realtime: this must clear even if something else has frozen the game.
+        yield return new WaitForSecondsRealtime(seconds);
+
+        if (_textLoading != null) _textLoading.SetActive(false);
+        _statusHideRoutine = null;
     }
     
     public void FilterCards(int filter)
@@ -396,7 +423,7 @@ public class ScreenEditDeck : MonoBehaviour
 
             if (!approvalOk)
             {
-                SetStatus("Approval declined - deck not saved.");
+                SetStatus("Approval declined - deck not saved.", autoHide: true);
                 return;
             }
 
@@ -421,12 +448,13 @@ public class ScreenEditDeck : MonoBehaviour
 
             SetStatus(failures == 0
                 ? "Deck saved."
-                : "Deck partly saved - some changes failed. Check your deck and retry.");
+                : "Deck partly saved - some changes failed. Check your deck and retry.",
+                autoHide: true);
         }
         catch (Exception ex)
         {
             Debug.LogError($"Unable to save deck: {ex.Message}");
-            SetStatus("Save failed. Please try again.");
+            SetStatus("Save failed. Please try again.", autoHide: true);
         }
         finally
         {
