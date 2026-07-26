@@ -47,13 +47,21 @@ namespace Pepemon.Onboarding
         private const int DeckPropagationPollMs = 1000;
         private const int DefaultMaxSupportCards = 60;
 
+        /// <summary>Number of stages reported to the player, for "step N of M".</summary>
+        public const int TotalSteps = 7;
+
+        /// <param name="onStep">
+        /// Reports progress as (stepIndex, totalSteps, action, requiresWalletSignature). The
+        /// signature flag matters: the player must always know whether a wallet prompt is
+        /// about to appear and what it is for.
+        /// </param>
         public static async Task<StarterPackClaimResult> Run(
             ulong pepemonId,
             IReadOnlyList<ulong> desiredSupportCardIds,
-            Action<string> onStatus)
+            Action<int, int, string, bool> onStep)
         {
             var result = new StarterPackClaimResult();
-            void Status(string m) => onStatus?.Invoke(m);
+            void Step(int i, string m, bool sig) => onStep?.Invoke(i, TotalSteps, m, sig);
 
             string address;
             try
@@ -87,7 +95,7 @@ namespace Pepemon.Onboarding
             // ---- 1. Mint the cards -------------------------------------------------------
             try
             {
-                Status("Minting your cards...");
+                Step(1, "Minting your cards...", true);
                 await PepemonCardDeck.MintCards();
                 result.CardsMinted = true;
             }
@@ -100,7 +108,7 @@ namespace Pepemon.Onboarding
             // ---- 2. Create the deck that will hold them ----------------------------------
             try
             {
-                Status("Creating your deck...");
+                Step(2, "Creating your deck...", true);
                 await PepemonCardDeck.CreateDeck();
                 result.DeckCreated = true;
             }
@@ -115,7 +123,7 @@ namespace Pepemon.Onboarding
             // and a too-short wait silently assembles nothing.
             try
             {
-                Status("Finding your new deck...");
+                Step(3, "Finding your new deck...", false);
                 result.DeckId = await WaitForNewDeck(address, deckCountBefore);
             }
             catch (Exception e)
@@ -136,7 +144,7 @@ namespace Pepemon.Onboarding
                 var deckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
                 if (!await PepemonFactory.GetApprovalState(deckAddress))
                 {
-                    Status("Approving card transfers...");
+                    Step(4, "Approving card transfers...", true);
                     await PepemonFactory.SetApprovalState(true, deckAddress);
                 }
             }
@@ -156,7 +164,7 @@ namespace Pepemon.Onboarding
             Dictionary<ulong, int> owned;
             try
             {
-                Status("Checking your new cards...");
+                Step(5, "Checking your new cards...", false);
                 owned = await PepemonFactory.GetOwnedCards(address, candidateIds);
             }
             catch (Exception e)
@@ -175,7 +183,7 @@ namespace Pepemon.Onboarding
             {
                 try
                 {
-                    Status("Adding your Pepemon...");
+                    Step(6, "Adding your Pepemon...", true);
                     await PepemonCardDeck.SetBattleCard(result.DeckId, pepemonId);
                     result.BattleCardSet = true;
                 }
@@ -194,7 +202,7 @@ namespace Pepemon.Onboarding
             {
                 try
                 {
-                    Status("Building your deck...");
+                    Step(7, "Building your deck...", true);
                     await PepemonCardDeck.AddSupportCards(result.DeckId, requests.ToArray());
 
                     foreach (var r in requests) result.SupportCardsAdded += (int)r.Amount;

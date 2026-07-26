@@ -15,16 +15,34 @@ public class MintDeckButtonHandler : MonoBehaviour
         GetComponent<Button>().onClick.AddListener(OnButtonClicked);
     }
 
+    /// <summary>
+    /// Falls back to the deck list's own loading label when no message object is wired.
+    ///
+    /// The live Mint New Deck button has no _loadingMessage assigned - the only wired instance
+    /// sits on an inactive legacy screen - so every progress and failure string this handler
+    /// produced went nowhere. Minting a deck showed no feedback at all while the wallet was
+    /// waiting on a signature.
+    /// </summary>
+    private GameObject ResolveLoadingMessage()
+    {
+        if (_loadingMessage != null) return _loadingMessage;
+        if (_deckList == null) return null;
+
+        var loader = _deckList.GetComponent<DeckListLoader>();
+        return loader != null ? loader.LoadingMessage : null;
+    }
+
     async void OnButtonClicked()
     {
+        var _resolvedLoadingMessage = ResolveLoadingMessage();
         var button = GetComponent<Button>();
         button.interactable = false;
         
         // Show loading message
-        if (_loadingMessage != null)
+        if (_resolvedLoadingMessage != null)
         {
-            _loadingMessage.SetActive(true);
-            var textComponent = _loadingMessage.GetComponent<TMPro.TMP_Text>();
+            _resolvedLoadingMessage.SetActive(true);
+            var textComponent = _resolvedLoadingMessage.GetComponent<TMPro.TMP_Text>();
             if (textComponent != null)
             {
                 textComponent.text = "Minting new deck...";
@@ -39,7 +57,7 @@ public class MintDeckButtonHandler : MonoBehaviour
                 Debug.Log("Wallet not connected. Attempting to connect...");
                 
                 // Update loading message to show connection attempt
-                var textComponent = _loadingMessage?.GetComponent<TMPro.TMP_Text>();
+                var textComponent = _resolvedLoadingMessage?.GetComponent<TMPro.TMP_Text>();
                 if (textComponent != null)
                 {
                     textComponent.text = "Connecting wallet...";
@@ -96,15 +114,24 @@ public class MintDeckButtonHandler : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError("Unable to mint new deck: " + e.Message);
+
+            // Surface it. The finally below hides the label immediately, so without holding it
+            // here a rejected or reverted mint looked exactly like nothing happening.
+            var errorText = _resolvedLoadingMessage?.GetComponent<TMPro.TMP_Text>();
+            if (errorText != null)
+            {
+                errorText.text = "Could not mint deck. Please try again.";
+                await Cysharp.Threading.Tasks.UniTask.Delay(2500);
+            }
         }
         finally
         {
             button.interactable = true;
             
             // Hide loading message
-            if (_loadingMessage != null)
+            if (_resolvedLoadingMessage != null)
             {
-                _loadingMessage.SetActive(false);
+                _resolvedLoadingMessage.SetActive(false);
             }
         }
     }
