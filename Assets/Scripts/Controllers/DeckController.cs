@@ -82,11 +82,21 @@ public class DeckController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Keeps an unplayable deck visible in the selection list instead of removing it.
+    ///
+    /// This used to do gameObject.SetActive(!notValidDeck), which deleted invalid decks from
+    /// the picker. A player whose decks were all incomplete - or whose valid decks were
+    /// misclassified by a metadata cache miss - got an empty screen with nothing to click and
+    /// no explanation of why. The deck now stays listed with its error message showing; only
+    /// the Select button is withheld.
+    /// </summary>
     private void UpdateNotValidDeckIsNotShowWhenSelecting()
     {
-        if(!_editButton.gameObject.activeSelf)
+        if (!_editButton.gameObject.activeSelf)
         {
-            gameObject.SetActive(!notValidDeck); //hide the deck on selection if it is not valid
+            gameObject.SetActive(true);
+            _selectButton.gameObject.SetActive(!notValidDeck);
         }
     }
 
@@ -154,11 +164,21 @@ public class DeckController : MonoBehaviour
             _supportCardCount.text = starterDeck.Count.ToString();
         }
 
-        notValidDeck = metadata?.name == null || supportCardCount == 0;
+        // Validity is decided purely by what the deck contains on-chain.
+        //
+        // This previously keyed off metadata?.name, which comes from the card metadata cache.
+        // A cache miss - which happens routinely for a freshly minted card, or any time the
+        // cache has not finished loading - made a deck that was perfectly valid on-chain look
+        // invalid, and invalid decks were then removed from the selection list entirely. The
+        // result was an empty deck picker with nothing to select and no way to play.
+        bool hasBattleCard = battleCard != 0;
+        bool hasSupportCards = supportCardCount > 0;
+
+        notValidDeck = !hasBattleCard || !hasSupportCards;
 
         if (!isStarterDeck)
         {
-            if (metadata?.name == null)
+            if (!hasBattleCard)
             {
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Pepemon card missing";
@@ -166,7 +186,7 @@ public class DeckController : MonoBehaviour
                 UpdateNotValidDeckIsNotShowWhenSelecting();
                 return true;
             }
-            if (supportCardCount == 0)
+            if (!hasSupportCards)
             {
                 _errorDisplay.SetActive(true);
                 _errorText.text = "Support cards missing";

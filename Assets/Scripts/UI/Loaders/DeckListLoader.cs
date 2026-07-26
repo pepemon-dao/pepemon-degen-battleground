@@ -55,6 +55,15 @@ public class DeckListLoader : MonoBehaviour
             }
         }
         
+        // Everything from here runs inside try/finally. The guard and the loading label were
+        // previously only cleared on the happy path, so a single throw - an RPC hiccup while
+        // reading decks, for instance - left loadingInProgress stuck at true forever. Every
+        // later ReloadAllDecks() then returned immediately at the guard, leaving the player
+        // staring at "Loading decks..." with an empty list for the rest of the session. The
+        // `force` flag exists to work around exactly this; it is no longer the only escape.
+        try
+        {
+
         string account = "";
 
         try
@@ -67,15 +76,21 @@ public class DeckListLoader : MonoBehaviour
         // should not happen, but if it happens then it won't crash the game
         if (string.IsNullOrEmpty(account))
         {
-            loadingMessageLabel.text = "Error: No account selected";
-            //return;
+            loadingMessageLabel.text = "Connect your wallet to see your decks";
+            return;
         }
 
         // load all decks
         List<ulong> decks = new List<ulong>();
-        if (!string.IsNullOrEmpty(account))
+        try
         {
             decks = await PepemonCardDeck.GetPlayerDecks(account);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[decks] Unable to read decks: {ex.Message}");
+            loadingMessageLabel.text = "Could not load your decks. Please retry.";
+            return;
         }
 
         var loadingTasks = new List<UniTask>();
@@ -117,16 +132,48 @@ public class DeckListLoader : MonoBehaviour
             loadingTasks.Add(LoadAndAddDeck(deckInstance, deckId));
         });
         await UniTask.WhenAll(loadingTasks);
+
+        // Tell the player when there is genuinely nothing to pick, rather than showing an
+        // empty screen with no explanation.
+        if (_deckList.transform.childCount == 0)
+        {
+            loadingMessageLabel.text = decks.Count == 0
+                ? "No decks yet - mint one from the Deck screen"
+                : "Your decks could not be loaded. Please retry.";
+            return;
+        }
+
         _loadingMessage.SetActive(false);
-        loadingInProgress = false;
+
+        }
+        finally
+        {
+            loadingInProgress = false;
+        }
     }
 
     private async UniTask LoadAndAddDeck(GameObject deckInstance, ulong deckId)
     {
-        var showDeck = await deckInstance.GetComponent<DeckController>().LoadDeckInfo(deckId, !_deckEditMode);
+        bool showDeck;
+        try
+        {
+            showDeck = await deckInstance.GetComponent<DeckController>().LoadDeckInfo(deckId, !_deckEditMode);
+        }
+        catch (System.Exception ex)
+        {
+            // One bad deck must not take down the whole list.
+            Debug.LogError($"[decks] Unable to load deck {deckId}: {ex.Message}");
+            Destroy(deckInstance);
+            return;
+        }
+
         if (showDeck)
         {
             deckInstance.transform.SetParent(_deckList.transform, false);
+            return;
         }
+
+        // Was instantiated but never parented, so it used to leak at the scene root.
+        Destroy(deckInstance);
     }
 }
