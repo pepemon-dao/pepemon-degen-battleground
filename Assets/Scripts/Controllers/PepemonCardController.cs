@@ -83,7 +83,9 @@ public class PepemonCardController : MonoBehaviour
 
     public void ActivateCard(bool isAttacker)
     {
-        if (BotTextTutorial.Instance.IsInTutorial)
+        // Null-safe: the battle scene must still run without the tutorial component, and this
+        // is reached from a coroutine that can outlive it.
+        if (BotTextTutorial.Instance != null && BotTextTutorial.Instance.IsInTutorial)
             return;
 
         Color color = isAttacker ? Color.red : Color.cyan;

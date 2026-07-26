@@ -14,6 +14,39 @@ using DG;
 using DG.Tweening;
 using Org.BouncyCastle.X509;
 using System.Reflection;
+using Pepemon.BattleRules;
+using Pepemon.Onboarding;
+using Pepemon.Telemetry;
+
+/// <summary>
+/// Timing of the battle presentation. Previously these were magic numbers scattered through
+/// the coroutines, which made the pacing untunable and left player 2's turn running twice as
+/// long as player 1's.
+/// </summary>
+[System.Serializable]
+public class BattlePacing
+{
+    public float preBattleDelay = 1.5f;
+    public float roundBannerSeconds = 1.2f;
+    public float bannerToDrawSeconds = 0.2f;
+    public float handSettleSeconds = 1f;
+
+    /// <summary>Time from cards lifting to the clash. Identical for both players by design.</summary>
+    public float liftToClashSeconds = 1f;
+
+    /// <summary>
+    /// Length of the clash. Must not be shorter than the Clash animation clip (1.667s) or the
+    /// tally icons are torn down mid-animation.
+    /// </summary>
+    public float clashToDamageSeconds = 1.7f;
+
+    public float damageHoldSeconds = 0.8f;
+    public float postDamageSeconds = 0.5f;
+    public float cardResetSeconds = 0.5f;
+
+    /// <summary>Multiplier applied while the player holds the fast-forward input.</summary>
+    public float fastForwardSpeed = 3f;
+}
 
 // Manages the automation of the game. Each round is composed of two hands being played (offense and defense)
 public class GameController : MonoBehaviour
@@ -21,6 +54,18 @@ public class GameController : MonoBehaviour
     private const int PLAYER1_SEED = 69;
     private const int PLAYER2_SEED = 420;
     private const int TIEBREAK_SEED = 69420;
+
+    /// <summary>
+    /// Fixed seed for the scripted first battle.
+    ///
+    /// The tutorial battle used to reseed from System.Random on every run, so the "guaranteed"
+    /// first win was actually just a stat mismatch that could and did lose. A constant seed
+    /// makes the battle identical for every player and therefore tunable.
+    ///
+    /// Retune with Pepemon > Simulate Tutorial Battles after changing either starter deck.
+    /// </summary>
+    private static readonly BigInteger TUTORIAL_BATTLE_SEED = BigInteger.Parse(
+        "68188038832262297884772284640717549873770515354422947402145954532168121309549");
 
     //Attacker can either be PLAYER_ONE or PLAYER_TWO
     private enum Attacker
@@ -53,22 +98,96 @@ public class GameController : MonoBehaviour
 
     [ReadOnly] private BigInteger battleSeed;
 
+    [TitleGroup("Pacing"), SerializeField] private BattlePacing pacing = new BattlePacing();
+
     [Header("StarterDeck")]
     public List<Card> starterDeck1;
     public List<Card> starterDeck2;
 
+    /// <summary>
+    /// True while the first battle must not be lost. Cleared once the starter pack has been
+    /// claimed, after which bot battles are ordinary fights.
+    /// </summary>
+    private bool _guaranteePlayerSurvives;
+
+    private bool _survivedOnOne;
+    private float _battleStartedAtUnscaled;
+
+    /// <summary>Unscaled time the current fast-forward hold began, or -1 when not held.</summary>
+    private float _holdStartedAtUnscaled = -1f;
+
+    private const float FastForwardHoldSeconds = 0.35f;
+
     private void Start()
     {
+        // Statics survive scene loads: clear any freeze or speed left over from the menu or
+        // from a previous battle exited mid-beat.
+        TimeControl.ResetAll();
+
         PrepareDecksBeforeBattle();
 
         player1Controller.PopulateCard(_player1.PlayerPepemon);
         player2Controller.PopulateCard(_player2.PlayerPepemon);
+
+        _guaranteePlayerSurvives =
+            BattlePrepController.battleData.isBotMatch && !OnboardingState.HasClaimedStarterPack;
+
+        _battleStartedAtUnscaled = Time.unscaledTime;
+
+        Funnel.Track(
+            Funnel.FirstBattleStarted,
+            "is_bot_match", BattlePrepController.battleData.isBotMatch,
+            "guaranteed_win", _guaranteePlayerSurvives);
 
         if (playAutomatically)
         {
             InitFirstRound();
             StartCoroutine(LoopGame());
         }
+    }
+
+    private void OnDestroy()
+    {
+        TimeControl.ResetAll();
+    }
+
+    /// <summary>
+    /// Hold to fast-forward. Only available from round 2 so the first round always plays at
+    /// full weight, and never while a tutorial beat is on screen so the input cannot be
+    /// consumed twice.
+    /// </summary>
+    private void Update()
+    {
+        if (_gameHasFinished || _roundNumber < 1)
+        {
+            if (!Mathf.Approximately(TimeControl.Speed, 1f)) TimeControl.SetSpeed(1f);
+            return;
+        }
+
+        if (BotTextTutorial.Instance != null && BotTextTutorial.Instance.IsBeatVisible)
+        {
+            TimeControl.SetSpeed(1f);
+            return;
+        }
+
+        bool inputDown = Input.GetKey(KeyCode.Space)
+                         || Input.GetMouseButton(0)
+                         || Input.touchCount > 0;
+
+        if (!inputDown)
+        {
+            _holdStartedAtUnscaled = -1f;
+            TimeControl.SetSpeed(1f);
+            return;
+        }
+
+        if (_holdStartedAtUnscaled < 0f) _holdStartedAtUnscaled = Time.unscaledTime;
+
+        // Must be a deliberate hold. A quick tap is the card-preview gesture, and speeding up
+        // on every stray tap would make the battle feel broken on touch.
+        bool held = Time.unscaledTime - _holdStartedAtUnscaled >= FastForwardHoldSeconds;
+
+        TimeControl.SetSpeed(held ? Mathf.Max(1f, pacing.fastForwardSpeed) : 1f);
     }
 
     /// <summary>
@@ -175,7 +294,10 @@ public class GameController : MonoBehaviour
         if (starterDeckID != 0)
         {
             PrepareSimulatedBattle(starterDeckID);
-            battleSeed = new System.Random().NextBigInteger();
+
+            // Fixed, not random: the first battle is authored content and must play out the
+            // same way for everyone. Reseeding here is what made the scripted win a coin flip.
+            battleSeed = TUTORIAL_BATTLE_SEED;
         }
         else
         {
@@ -235,7 +357,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator LoopGame()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(pacing.preBattleDelay);
         while (!_gameHasFinished)
         {
             yield return new WaitUntil(() => !_isPlayingRound);
@@ -255,17 +377,12 @@ public class GameController : MonoBehaviour
         {
             yield return null;
         }
-        if (BattlePrepController.battleData.isBotMatch)
-        {
-            BotTextTutorial.Instance.TriggerTutorialEvent(1);
-        }
-        
-        //if (_roundNumber <= 1)
-        //   yield return new WaitForSeconds(1.2f);
+        TriggerTutorialBeat(TutorialScript.BeatIntro);
+
         _uiController.NewRoundDisplay();
-        yield return new WaitForSeconds(1.6f);
+        yield return new WaitForSeconds(pacing.roundBannerSeconds);
         _uiController.HideNewRoundDisplay();
-        yield return new WaitForSeconds(.3f);
+        yield return new WaitForSeconds(pacing.bannerToDrawSeconds);
 
         //Reset both players' hand infos to base stats
         _player1.ResetCurrentPepemonStats();
@@ -305,16 +422,14 @@ public class GameController : MonoBehaviour
         _uiController.DisplayHands();
 
         //delay to show drawing of cards
-        yield return new WaitForSeconds(1.5f); //3
+        yield return new WaitForSeconds(pacing.handSettleSeconds);
 
         //! need to think of a better way to display the cards being played
 
         _isPlayingRound = true;
         Debug.Log("<b>STARTING ROUND: </b>" + _roundNumber);
-        if (BattlePrepController.battleData.isBotMatch)
-        {
-            BotTextTutorial.Instance.TriggerTutorialEvent(2);
-        }
+
+        TriggerTutorialBeat(TutorialScript.BeatDraw);
 
         for (int i = 0; i < 2; i++)
         {
@@ -348,18 +463,22 @@ public class GameController : MonoBehaviour
                     player2Controller.ActivateCard(false);
 
                     //wait for animations showing the attacking/defending cards
-                    yield return new WaitForSeconds(1.5f); //3f
+                    yield return new WaitForSeconds(pacing.liftToClashSeconds);
 
-                    _uiController.StartCoroutine(_uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower));
+                    // Awaited. This used to be fire-and-forget while the caller waited a
+                    // shorter time, so the blur overlay was still up when the damage number
+                    // appeared underneath it.
+                    yield return _uiController.StartCoroutine(
+                        _uiController.DisplayTotalValues(1, totalAttackPower, totalDefensePower, pacing.clashToDamageSeconds));
 
-                    yield return new WaitForSeconds(1f); //1.5
-                    int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    int dmg = TutorialWinGuarantee.ResolveDamage(totalAttackPower, totalDefensePower);
 
                     _player2.CurrentHP -= dmg;
                     AttackDisplay(false, dmg);
                     healthBar2.TakeDamage(dmg);
+                    ApplyHitJuice(dmg, _player2.PlayerPepemon.HealthPoints);
 
-                    yield return new WaitForSeconds(1f); //1.5
+                    yield return new WaitForSeconds(pacing.damageHoldSeconds);
 
                     DisableAttackTexts();
 
@@ -376,17 +495,39 @@ public class GameController : MonoBehaviour
                     player1Controller.ActivateCard(false);
                     player2Controller.ActivateCard(true);
 
-                    yield return new WaitForSeconds(3f);
-                    _uiController.StartCoroutine(_uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower));
+                    // Same duration as player 1's turn. This branch used to wait 3s where the
+                    // other waited 1.5s, so the opponent's turns visibly dragged.
+                    yield return new WaitForSeconds(pacing.liftToClashSeconds);
 
-                    yield return new WaitForSeconds(1f); //1.5
-                    int dmg = totalAttackPower > totalDefensePower ? (totalAttackPower - totalDefensePower) : 1;
+                    yield return _uiController.StartCoroutine(
+                        _uiController.DisplayTotalValues(2, totalAttackPower, totalDefensePower, pacing.clashToDamageSeconds));
+
+                    int dmg = TutorialWinGuarantee.ResolveDamage(totalAttackPower, totalDefensePower);
+
+                    // First-battle safety net. The onboarding promises a guaranteed win, so the
+                    // player can be taken to the brink but not killed until they have claimed
+                    // the starter pack. Minimum damage is 1 in both directions, so the bot still
+                    // dies within a bounded number of rounds and the battle always terminates.
+                    if (_guaranteePlayerSurvives && TutorialWinGuarantee.IsLethal(_player1.CurrentHP, dmg))
+                    {
+                        dmg = TutorialWinGuarantee.ClampLethalDamage(_player1.CurrentHP, dmg, true);
+                        _survivedOnOne = true;
+                        Debug.Log("[tutorial] Lethal blow clamped - player survives on 1 HP.");
+                    }
 
                     _player1.CurrentHP -= dmg;
                     AttackDisplay(true, dmg);
                     healthBar1.TakeDamage(dmg);
+                    ApplyHitJuice(dmg, _player1.PlayerPepemon.HealthPoints);
 
-                    yield return new WaitForSeconds(1f); //1.5
+                    // Stakes beat, fired the moment the player is genuinely in trouble.
+                    if (_player1.PlayerPepemon.HealthPoints > 0 &&
+                        _player1.CurrentHP <= _player1.PlayerPepemon.HealthPoints * TutorialScript.ComebackHpThreshold)
+                    {
+                        TriggerTutorialBeat(TutorialScript.BeatComeback);
+                    }
+
+                    yield return new WaitForSeconds(pacing.damageHoldSeconds);
 
                     DisableAttackTexts();
 
@@ -399,21 +540,21 @@ public class GameController : MonoBehaviour
                 Debug.Log("goForBattle _player1.CurrentHP=" + _player1.CurrentHP);
                 Debug.Log("goForBattle _player2.CurrentHP=" + _player2.CurrentHP);
 
-                if (BattlePrepController.battleData.isBotMatch)
+                // Only after the player's own attack: the beat explains "your ATK minus their
+                // defense", which reads as nonsense straight after the opponent has swung.
+                if (_currentAttacker == Attacker.PLAYER_ONE)
                 {
-                    BotTextTutorial.Instance.TriggerTutorialEvent(3);
+                    TriggerTutorialBeat(TutorialScript.BeatDamage);
                 }
 
-                Debug.Log("waiting 2.5f");
-                yield return new WaitForSeconds(1f); //1.5
+                yield return new WaitForSeconds(pacing.postDamageSeconds);
 
                 // cleanup UI
                 _uiController.FlipCards(3);
                 player1Controller.DeActivateCard();
                 player2Controller.DeActivateCard();
-                Debug.Log(" after slow");
 
-                yield return new WaitForSeconds(1f); //1
+                yield return new WaitForSeconds(pacing.cardResetSeconds);
             }
         }
         Debug.Log("<b>FINISHED ROUND: </b>" + _roundNumber);
@@ -781,6 +922,21 @@ public class GameController : MonoBehaviour
         // when player1won=false and currentPlayerIsPlayer1=false, currentPlayerWon=true
         // because player2 won and current player is Player2
         var currentPlayerWon = player1won == BattlePrepController.battleData.currentPlayerIsPlayer1;
+
+        var maxHp = _player1.PlayerPepemon != null ? _player1.PlayerPepemon.HealthPoints : 0;
+
+        Funnel.Track(Funnel.FirstBattleEnded, new Dictionary<string, object>
+        {
+            ["won"] = currentPlayerWon,
+            ["rounds"] = GetRoundNumber(),
+            ["duration_s"] = Mathf.RoundToInt(Time.unscaledTime - _battleStartedAtUnscaled),
+            ["final_hp_pct"] = maxHp > 0 ? Mathf.RoundToInt(100f * _player1.CurrentHP / maxHp) : 0,
+            ["is_bot_match"] = BattlePrepController.battleData.isBotMatch,
+            ["survived_on_one"] = _survivedOnOne
+        });
+
+        TimeControl.SetSpeed(1f);
+
         _uiController.DisplayBattleResult(winner, currentPlayerWon);
         _gameHasFinished = true;
     }
@@ -797,23 +953,55 @@ public class GameController : MonoBehaviour
 
     private void AttackDisplay(bool isPlayer1, int dmg)
     {
-        if (isPlayer1)
-        {
-            dmgText1.text = "-" + dmg.ToString();
-            dmgText1.DOFade(1f, 1.5f);
-        }
-        else
-        {
-            dmgText2.text = "-" + dmg.ToString();
-            dmgText2.DOFade(1f, 1.5f);
-        }
+        // A fully blocked hit has nothing to report. Only reachable via the tutorial clamp.
+        if (dmg <= 0) return;
 
-        SFXManager.Instance.HitSFX();
+        var label = isPlayer1 ? dmgText1 : dmgText2;
+        if (label == null) return;
+
+        label.text = "-" + dmg.ToString();
+
+        // Was a 1.5s fade-in held for only 1s before being faded back out, so the damage
+        // number never actually reached full opacity. It should land, not drift in.
+        DOTween.Kill(label);
+        label.DOFade(1f, 0.12f);
     }
 
     private void DisableAttackTexts()
     {
-        dmgText1.DOFade(0f, 1f);
-        dmgText2.DOFade(0f, 1f);
+        if (dmgText1 != null) dmgText1.DOFade(0f, 0.35f);
+        if (dmgText2 != null) dmgText2.DOFade(0f, 0.35f);
+    }
+
+    /// <summary>
+    /// Shows a tutorial beat. Null-safe and bot-match-gated: the battle must still run if the
+    /// tutorial object is absent from the scene.
+    /// </summary>
+    private void TriggerTutorialBeat(int beatId)
+    {
+        if (!BattlePrepController.battleData.isBotMatch) return;
+
+        // The killing blow can land before a beat's trigger point is reached. Once the battle
+        // is over the post-battle screen owns the display, so no beat may appear on top of it.
+        if (_gameHasFinished) return;
+
+        if (BotTextTutorial.Instance == null) return;
+
+        BotTextTutorial.Instance.TriggerTutorialEvent(beatId);
+    }
+
+    /// <summary>Impact feedback scaled to how hard the hit landed relative to max HP.</summary>
+    private void ApplyHitJuice(int dmg, int maxHp)
+    {
+        if (dmg <= 0) return;
+
+        var severity = maxHp > 0 ? Mathf.Clamp01(dmg / (float)maxHp) : 0f;
+
+        if (_uiController != null) _uiController.ShakeBoard(severity);
+
+        if (SFXManager.Instance == null) return;
+
+        if (severity >= 0.25f) SFXManager.Instance.BigHitSFX();
+        else SFXManager.Instance.HitSFX();
     }
 }

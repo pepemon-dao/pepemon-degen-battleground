@@ -9,6 +9,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scripts.Managers.Sound;
 using Pepemon.Battle;
+using Pepemon.Onboarding;
+using Pepemon.Telemetry;
 using Cysharp.Threading.Tasks.Triggers;
 
 [RequireComponent(typeof(CanvasGroup)), RequireComponent(typeof(Animator))]
@@ -25,9 +27,11 @@ public class PostBattleScreenController : MonoBehaviour
     protected const string DEFEAT_TEXT = "DEFEAT";
     protected const string YOU_LOSE_TEXT = "YOU LOSE";
 
-    protected const string RANKING_GAIN = "Gained +#pts";
-    protected const string RANKING_LOSS = "Lost -#pts";
+    /// <summary>How long to wait for the wallet before letting the player retry the claim.</summary>
+    protected const float ClaimConnectTimeoutSeconds = 45f;
     #endregion
+
+    private float _claimWaitStartedAtUnscaled;
 
     #region Editor Exposed Data
     [Title("Screen Settings")]
@@ -81,43 +85,61 @@ public class PostBattleScreenController : MonoBehaviour
         _winDisplay.SetActive(win);
         _loseDisplay.SetActive(!win);
 
-        // TODO: replace this with the actual gain/loss
-
         bool isBotMatch = BattlePrepController.battleData.isBotMatch;
-        bool isTutorial = BotTextTutorial.Instance.wasInTutorial;
-        bool claimedStarterPack = PlayerPrefs.GetInt("GotStarterPack", 0) == 1;
+        bool claimedStarterPack = OnboardingState.HasClaimedStarterPack;
+        bool starterPackOnOffer = isBotMatch && !claimedStarterPack;
 
-        if (isTutorial || claimedStarterPack)
+        // The reward line previously read a hardcoded "Gained +10pts". No ranking is written
+        // on-chain for bot matches, and the client never reads the real ELO delta for PvP
+        // either, so that number was invented. Show only what is actually true: for the first
+        // battle the reward is the starter pack, which is now really minted.
+        SetRewardText(win && starterPackOnOffer ? "Starter Pack unlocked" : string.Empty);
+
+        var winText = isBotMatch ? TutorialScript.WinHeadline + " " : "You won! ";
+        var loseText = isBotMatch ? TutorialScript.RivalName + " took that one. " : "You lost! ";
+
+        if (starterPackOnOffer)
         {
-            _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText((win ? RANKING_GAIN : RANKING_LOSS).Replace("#", "10"));
+            winText += TutorialScript.WinSubline;
+            loseText += TutorialScript.LoseSubline;
         }
         else
         {
-            _rewardDisplay.SetActive(false);
-            _rewardDisplay.GetComponentInChildren<TextReveal>()
-            .SetText(win && !claimedStarterPack ? "Gained Starter Pack" : "");
+            winText += "- Score will be updated in Leaderboards";
+            loseText += "- Better luck next time";
         }
 
-        _winMsg.GetComponent<TMPro.TMP_Text>().text = "You won! ";
-        _loseMsg.GetComponent<TMPro.TMP_Text>().text = "You lost! ";
+        SetLabel(_winMsg, winText);
+        SetLabel(_loseMsg, loseText);
 
-        _btnClaimGift.gameObject.SetActive(isBotMatch && !claimedStarterPack);
-        /*
-        bool winMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && win;
-        _winMsg.SetActive(winMsgShouldBeDisplayed);
-        bool loseMsgShouldBeDisplayed = ((isBotMatch && claimedStarterPack) || !isBotMatch) && !win;
-        _loseMsg.SetActive(loseMsgShouldBeDisplayed);
-        */
-
-        _winMsg.GetComponent<TMPro.TMP_Text>().text += (isBotMatch && !claimedStarterPack) ? "claim your starter pack" : "- Score will be updated in Leaderboards";
-        //_starterPackMsg.SetActive(isBotMatch && !claimedStarterPack);
-        _loseMsg.GetComponent<TMPro.TMP_Text>().text += (isBotMatch && !claimedStarterPack) ? "claim your starter pack" : "- Better luck next time";
-        //_starterPackMsg2.SetActive(isBotMatch && !claimedStarterPack);
+        _btnClaimGift.gameObject.SetActive(starterPackOnOffer);
         _btnShowMenu.gameObject.SetActive(true);
-        _btnPlayAgain.gameObject.SetActive((isBotMatch && claimedStarterPack) || !isBotMatch);
+        _btnPlayAgain.gameObject.SetActive(!starterPackOnOffer);
 
-        ThemePlayer.Instance.PlayGameOverSong(win);
+        if (ThemePlayer.Instance != null) ThemePlayer.Instance.PlayGameOverSong(win);
+    }
+
+    private static void SetLabel(GameObject host, string text)
+    {
+        if (host == null) return;
+
+        var label = host.GetComponent<TMPro.TMP_Text>();
+        if (label != null) label.text = text;
+    }
+
+    private void SetRewardText(string text)
+    {
+        if (_rewardDisplay == null) return;
+
+        var hasText = !string.IsNullOrEmpty(text);
+
+        // Set the text before hiding: GetComponentInChildren skips inactive objects by
+        // default, so the previous order wrote to a null reference whenever the display
+        // had already been deactivated.
+        var reveal = _rewardDisplay.GetComponentInChildren<TextReveal>(true);
+        if (reveal != null) reveal.SetText(text);
+
+        _rewardDisplay.SetActive(hasText);
     }
 
     public void LoadPepemonDisplay(ulong cardId)
@@ -143,38 +165,74 @@ public class PostBattleScreenController : MonoBehaviour
 
     public void OnBtnShowMenuClick()
     {
-        // go back to previous scene
-        IsGoingFromBattle = true;
-
-        //reset the bot battle values
-        Web3Controller.instance.StarterDeckID = 0;
-        Web3Controller.instance.StarterPepemonID = 0;
-
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex - 1);
+        Funnel.Track(Funnel.ReturnedToMenu);
+        GoToMenuScene();
     }
-    
+
     public void OnBtnClaimGiftClick()
     {
-        // go back to previous scene
         IsGoingFromBattle = true;
         IsClaimingGift = true;
 
-        if (!Web3Controller.instance.IsConnected)
+        Funnel.Track(Funnel.ClaimClicked, "from", "post_battle");
+
+        // Guard against a second click while the wallet prompt is open.
+        if (_btnClaimGift != null) _btnClaimGift.interactable = false;
+
+        if (Web3Controller.instance != null && !Web3Controller.instance.IsConnected)
         {
+            Funnel.Track(Funnel.WalletConnectRequested);
             Web3Controller.instance.ConnectWallet();
         }
 
+        _claimWaitStartedAtUnscaled = Time.unscaledTime;
         InvokeRepeating(nameof(CheckIfWalletConnected), 0.5f, 0.3f);
     }
 
+    /// <summary>
+    /// Polls for the wallet connection kicked off by the claim button.
+    ///
+    /// This used to run forever: it never cancelled itself, so once connected it called
+    /// LoadScene every 0.3s until the scene finally unloaded, and if the player dismissed
+    /// the wallet prompt it polled for the rest of the session with no way out.
+    /// </summary>
     private void CheckIfWalletConnected()
     {
-        if (Web3Controller.instance.IsConnected)
+        if (Web3Controller.instance != null && Web3Controller.instance.IsConnected)
         {
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            SceneManager.LoadScene(currentSceneIndex - 1);
+            CancelInvoke(nameof(CheckIfWalletConnected));
+            Funnel.Track(Funnel.WalletConnectResult, "success", true);
+            GoToMenuScene();
+            return;
         }
+
+        if (Time.unscaledTime - _claimWaitStartedAtUnscaled < ClaimConnectTimeoutSeconds) return;
+
+        CancelInvoke(nameof(CheckIfWalletConnected));
+
+        // Stay on this screen so the claim is still reachable rather than silently lost.
+        IsClaimingGift = false;
+        IsGoingFromBattle = false;
+
+        Funnel.Track(Funnel.WalletConnectResult, "success", false, "error", "timeout");
+        SetLabel(_winMsg, "Wallet not connected - tap CLAIM to try again.");
+
+        if (_btnClaimGift != null) _btnClaimGift.interactable = true;
+    }
+
+    private void GoToMenuScene()
+    {
+        IsGoingFromBattle = true;
+
+        // Reset the bot battle values so the next START goes to the real game.
+        if (Web3Controller.instance != null)
+        {
+            Web3Controller.instance.StarterDeckID = 0;
+            Web3Controller.instance.StarterPepemonID = 0;
+        }
+
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex - 1);
     }
 
     #region INIT

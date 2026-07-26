@@ -16,6 +16,11 @@ public class CardPreviewController : MonoBehaviour
     [Header("Game Card")]
     [SerializeField] private Image _cardImg;
 
+    // Optional. Until these are wired in the scene the preview shows artwork only, which is
+    // why players could not read what any support card actually did.
+    [SerializeField] private TextMeshProUGUI _cardNameText;
+    [SerializeField] private TextMeshProUGUI _cardDescriptionText;
+
     [Header("Pepemon Card")]
     [BoxGroup("Images"), SerializeField] private Image _backDropImage;
     [BoxGroup("Images"), SerializeField] private Image _cardContent;
@@ -40,9 +45,17 @@ public class CardPreviewController : MonoBehaviour
 
     private void Update()
     {
+        // A visible tutorial beat owns the screen. Without this, the tap that dismisses a
+        // beat also lands here, and closing the preview would unfreeze the battle running
+        // behind a modal beat.
+        if (BotTextTutorial.Instance != null && BotTextTutorial.Instance.IsBeatVisible)
+        {
+            return;
+        }
+
         if (isInPreview)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) || HasTouchBegan())
             {
                 HidePreview();
                 clickTime = 0f;
@@ -56,7 +69,8 @@ public class CardPreviewController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (Time.time - clickTime < doubleClickTimeThreshold)
+            // Unscaled: Time.time does not advance while the game is frozen.
+            if (Time.unscaledTime - clickTime < doubleClickTimeThreshold)
             {
                 GetObject(out currentObject);
                 //check if the objects doesn't changed between the clicks
@@ -70,7 +84,7 @@ public class CardPreviewController : MonoBehaviour
                 GetObject(out currentObject);
                 prevObject = currentObject;
             }
-            clickTime = Time.time;
+            clickTime = Time.unscaledTime;
         }
 
         if (Input.GetMouseButtonDown(1))
@@ -78,11 +92,70 @@ public class CardPreviewController : MonoBehaviour
             GetObject(out currentObject);
             SetPreview(currentObject);
         }
+
+        HandleTouchPreview();
+    }
+
+    /// <summary>Longest touch still counted as a tap rather than a fast-forward hold.</summary>
+    private const float MaxTapSeconds = 0.3f;
+
+    private readonly Dictionary<int, float> _touchStartTimes = new Dictionary<int, float>();
+
+    /// <summary>
+    /// Touch has no right-click, so a quick tap directly on a card opens its preview.
+    ///
+    /// Resolved on Ended and duration-limited: a held touch is the battle fast-forward gesture,
+    /// and previewing on Began would freeze the game the moment the player tried to speed it up.
+    /// Touch duration is tracked here because Touch.deltaTime is the time since the last frame,
+    /// not how long the finger has been down.
+    /// </summary>
+    private void HandleTouchPreview()
+    {
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            var touch = Input.GetTouch(i);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                _touchStartTimes[touch.fingerId] = Time.unscaledTime;
+                continue;
+            }
+
+            if (touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled) continue;
+
+            var wasQuickTap = _touchStartTimes.TryGetValue(touch.fingerId, out var startedAt)
+                              && Time.unscaledTime - startedAt <= MaxTapSeconds;
+
+            _touchStartTimes.Remove(touch.fingerId);
+
+            if (touch.phase == TouchPhase.Canceled || !wasQuickTap) continue;
+
+            GetObject(out currentObject, touch.position);
+            if (currentObject != null)
+            {
+                SetPreview(currentObject);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Touch devices have no right-click and no reliable double-click, so a begun touch is
+    /// treated as a preview gesture. Mouse emulation does not fire on every mobile browser,
+    /// which is why this is checked explicitly rather than relying on GetMouseButtonDown.
+    /// </summary>
+    private bool HasTouchBegan()
+    {
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            if (Input.GetTouch(i).phase == TouchPhase.Began) return true;
+        }
+        return false;
     }
 
     private void HidePreview()
     {
-        Time.timeScale = 1f;
+        TimeControl.Unfreeze(TimeControl.HolderCardPreview);
         isInPreview = false;
         previewPanel.SetActive(false);
         gameCard.SetActive(false);
@@ -91,10 +164,17 @@ public class CardPreviewController : MonoBehaviour
 
     private void GetObject(out GameObject currentObject)
     {
+        GetObject(out currentObject, Input.mousePosition);
+    }
+
+    private void GetObject(out GameObject currentObject, Vector2 screenPosition)
+    {
         currentObject = null;
 
+        if (EventSystem.current == null) return;
+
         PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
-        pointerEventData.position = Input.mousePosition;
+        pointerEventData.position = screenPosition;
         List<RaycastResult> raycastResultList = new List<RaycastResult>(); 
         EventSystem.current.RaycastAll(pointerEventData, raycastResultList);
         for (int i = 0; i < raycastResultList.Count; i++)
@@ -144,7 +224,7 @@ public class CardPreviewController : MonoBehaviour
 
         previewPanel.SetActive(true);
 
-        Time.timeScale = 0f;
+        TimeControl.Freeze(TimeControl.HolderCardPreview);
     }
 
     private void SetPepemonCardPreview(PepemonCardController card)
@@ -170,6 +250,10 @@ public class CardPreviewController : MonoBehaviour
     private void SetCardPreview(CardController card)
     {
         _cardImg.sprite = card.HostedCard.CardEffectSprite;
+
+        if (_cardNameText != null) _cardNameText.text = card.HostedCard.DisplayName;
+        if (_cardDescriptionText != null) _cardDescriptionText.text = card.HostedCard.CardDescription;
+
         gameCard.SetActive(true);
     }
 

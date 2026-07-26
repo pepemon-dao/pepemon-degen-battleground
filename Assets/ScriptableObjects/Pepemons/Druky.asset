@@ -24,6 +24,9 @@ MonoBehaviour:
   Weakness: 5
   Resistence: 8
   Rarity: 0
+  Tagline: Tank. Refuses to die.
+  Description: The most health and defense of any starter, and quick enough to swing
+    first. Druky grinds opponents down and refuses to die.
   HealthPoints: 30
   Speed: 14
   Intelligence: 4

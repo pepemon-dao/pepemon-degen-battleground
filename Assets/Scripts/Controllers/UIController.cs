@@ -4,7 +4,9 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
+using DG.Tweening;
 using Pepemon.Battle;
+using Pepemon.Onboarding;
 using static UnityEngine.ParticleSystem;
 using System.Reflection;
 // Handles displaying game state
@@ -41,7 +43,13 @@ public class UIController : MonoBehaviour
 
     [SerializeField, BoxGroup("Effects")] GameObject _attackTallyPS;         //the effect spawned by the card when tally the defense/attack amount
 
+    [TitleGroup("Pacing"), SerializeField] float _cardDealStagger = 0.15f;
+    [TitleGroup("Pacing"), SerializeField] float _cardFlipStagger = 0.22f;
+
     [TitleGroup("Post battle control"), SerializeField] PostBattleScreenController PostScreenController;
+
+    /// <summary>Colour of a card that is not being played this turn.</summary>
+    private static readonly Color DimmedCardColor = new Color(0.45f, 0.45f, 0.45f, 1f);
 
     Player _player1;
     Player _player2;
@@ -53,7 +61,9 @@ public class UIController : MonoBehaviour
     {
         _player1 = player1;
         _player2 = player2;
-        _sidebar = GameObject.Find("Sidebar").transform;
+
+        var sidebarGo = GameObject.Find("Sidebar");
+        _sidebar = sidebarGo != null ? sidebarGo.transform : null;
 
         UpdateUI();
 
@@ -72,7 +82,12 @@ public class UIController : MonoBehaviour
         string rN = player2.PlayerPepemon.DisplayName;
         string bN = player1.PlayerPepemon.DisplayName;
 
-        _versusScreen.SetVersusScreen(imgR, imgB, bgB, bgR, bN, rN);
+        // In the first battle the opponent is a named rival rather than an anonymous bot.
+        string taunt = BattlePrepController.battleData.isBotMatch
+            ? $"{TutorialScript.RivalName}: \"{TutorialScript.RivalTaunt}\""
+            : null;
+
+        _versusScreen.SetVersusScreen(imgR, imgB, bgB, bgR, bN, rN, taunt);
     }
 
     public void NewRoundDisplay()
@@ -115,7 +130,7 @@ public class UIController : MonoBehaviour
         for (int i = 0; i < _whichPlayer.CurrentHand.GetCardsInHand.Count; i++)
         {
             //delay between each card spawn for effect
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(_cardDealStagger);
             GameObject go = new GameObject("Card Container", typeof(RectTransform));
             GameObject card;
             if (_whichPlayer == _player1) card = Instantiate(_cardPrefab, _deck2Transform.position, Quaternion.identity);
@@ -132,7 +147,7 @@ public class UIController : MonoBehaviour
             if (_whichPlayer == _player1) _player1Cards.Add(card.GetComponent<CardController>());
             else _player2Cards.Add(card.GetComponent<CardController>());
 
-            SFXManager.Instance.DealSFX();
+            if (SFXManager.Instance != null) SFXManager.Instance.DealSFX();
         }
     }
 
@@ -143,82 +158,78 @@ public class UIController : MonoBehaviour
     }
 
 
-    // disables cards based on attacking or defending
+    /// <summary>
+    /// Lifts the cards actually played this turn and dims the rest.
+    ///
+    /// This previously greyed the played cards - the opposite of the intended emphasis - and
+    /// never restored the colour, so every card in the battle was permanently grey after the
+    /// first turn. Now the played cards are the only ones at full colour, which doubles as
+    /// the spotlight the tutorial needs when it explains what support cards do.
+    /// </summary>
     public IEnumerator FlipCardsRoutine(int attackIndex)
     {
-        if (attackIndex == 1) // p1
+        if (attackIndex == 3) // reset
         {
-            for (int i = 0; i < _player1Cards.Count; i++)
-            {
-                if (_player1Cards[i].HostedCard.IsAttackingCard() != false)
-                {
-                    _player1Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
-                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
+            foreach (var card in _player2Cards) ResetCard(card);
+            foreach (var card in _player1Cards) ResetCard(card);
 
-                    yield return new WaitForSeconds(0.3f);
-                }
-            }
-
-            for (int i = 0; i < _player2Cards.Count; i++)
-            {
-                if (_player2Cards[i].HostedCard.IsAttackingCard() != true)
-                {
-                    _player2Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
-                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
-
-                    yield return new WaitForSeconds(0.3f);
-                }
-            }
-        }
-        else if (attackIndex == 2) // p2
-        {
-            for (int i = 0; i < _player2Cards.Count; i++)
-            {
-                if (_player2Cards[i].HostedCard.IsAttackingCard() != false)
-                {
-                    _player2Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
-
-                    _player2Cards[i].GetComponent<Image>().color = Color.gray;
-
-                    yield return new WaitForSeconds(0.3f);
-                }
-            }
-
-            for (int i = 0; i < _player1Cards.Count; i++)
-            {
-                if (_player1Cards[i].HostedCard.IsAttackingCard() != true)
-                {
-                    _player1Cards[i].SetAttackingTransform(new Vector3(0, 5f, 0));
-
-                    _player1Cards[i].GetComponent<Image>().color = Color.gray;
-
-                    yield return new WaitForSeconds(0.3f);
-                }
-            }
-        }
-        else if (attackIndex == 3) // reset cards
-        {
-            for (int i = 0; i < _player2Cards.Count; i++)
-            {
-                _player2Cards[i].ReturnToBaseTransform();
-
-                _player2Cards[i].GetComponent<Image>().color = Color.gray;
-
-                yield return new WaitForSeconds(0.1f);
-            }
-
-            for (int i = 0; i < _player1Cards.Count; i++)
-            {
-                _player1Cards[i].ReturnToBaseTransform();
-
-                _player1Cards[i].GetComponent<Image>().color = Color.gray;
-
-                yield return new WaitForSeconds(0.1f);
-            }
+            BringSidebarToFront();
+            yield break;
         }
 
+        var attackerCards = attackIndex == 1 ? _player1Cards : _player2Cards;
+        var defenderCards = attackIndex == 1 ? _player2Cards : _player1Cards;
+
+        foreach (var card in attackerCards) SetCardHighlight(card, false);
+        foreach (var card in defenderCards) SetCardHighlight(card, false);
+
+        // The attacker plays its offense cards.
+        foreach (var card in attackerCards)
+        {
+            if (card == null || card.HostedCard == null || !card.HostedCard.IsAttackingCard()) continue;
+
+            card.SetAttackingTransform(new Vector3(0, 5f, 0));
+            SetCardHighlight(card, true);
+
+            yield return new WaitForSeconds(_cardFlipStagger);
+        }
+
+        // The defender answers with its defense cards.
+        foreach (var card in defenderCards)
+        {
+            if (card == null || card.HostedCard == null || card.HostedCard.IsAttackingCard()) continue;
+
+            card.SetAttackingTransform(new Vector3(0, 5f, 0));
+            SetCardHighlight(card, true);
+
+            yield return new WaitForSeconds(_cardFlipStagger);
+        }
+
+        BringSidebarToFront();
+    }
+
+    private static void ResetCard(CardController card)
+    {
+        if (card == null) return;
+
+        card.ReturnToBaseTransform();
+        SetCardHighlight(card, true);
+    }
+
+    private static void SetCardHighlight(CardController card, bool highlighted)
+    {
+        if (card == null) return;
+
+        var image = card.GetComponent<Image>();
+        if (image == null) return;
+
+        image.color = highlighted ? Color.white : DimmedCardColor;
+    }
+
+    private void BringSidebarToFront()
+    {
         // Make pepemon card, stage & hp points appear in front of support cards
-        _sidebar.SetAsLastSibling();
+        if (_sidebar != null) _sidebar.SetAsLastSibling();
     }
 
     /// <summary>
@@ -228,7 +239,7 @@ public class UIController : MonoBehaviour
     /// <param name="_totalAttack"></param>
     /// <param name="_totalDef"></param>
     /// <returns></returns>
-    public IEnumerator DisplayTotalValues(int attackIndex, int _totalAttack, int _totalDef)
+    public IEnumerator DisplayTotalValues(int attackIndex, int _totalAttack, int _totalDef, float clashSeconds = 1.5f)
     {
         //display the proper attack and defend symbols
         if (attackIndex == 1)
@@ -256,14 +267,30 @@ public class UIController : MonoBehaviour
 
         _blurryScreen.SetActive(true);
 
-        yield return new WaitForSeconds(2.5f);
+        // The caller now awaits this routine and applies damage immediately afterwards, so the
+        // whole clash has to fit inside clashSeconds. Previously this ran ~3.5s regardless
+        // while the caller waited 2s, leaving the blur up over the damage number.
+        yield return new WaitForSeconds(Mathf.Max(0.2f, clashSeconds));
 
         _blurryScreen.SetActive(false);
 
-        yield return new WaitForSeconds(1f);
-
         _player1TotalDisplay.gameObject.SetActive(false);
         _player2TotalDisplay.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Impact shake on the board. <paramref name="severity"/> is 0..1 as a fraction of max HP.
+    /// The project had no impact feedback of any kind before this.
+    /// </summary>
+    public void ShakeBoard(float severity)
+    {
+        if (_board == null) return;
+
+        var strength = Mathf.Lerp(5f, 24f, Mathf.Clamp01(severity));
+
+        // Complete any in-flight shake first so repeated hits cannot accumulate drift.
+        _board.DOComplete();
+        _board.DOShakePosition(0.22f, strength, 18, 90f, false, true);
     }
 
     /// <summary>
@@ -279,7 +306,7 @@ public class UIController : MonoBehaviour
                 if (_card.HostedCard.IsAttackingCard())
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player1TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
                     var mainModule = _ps.GetComponent<ParticleSystem>().main;
                     Color startColor = Color.red;
                     startColor.a = 0.5f;
@@ -291,7 +318,7 @@ public class UIController : MonoBehaviour
                 if (_card.HostedCard.Type == PlayCardType.Defense)
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player2TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
                     var mainModule = _ps.GetComponent<ParticleSystem>().main;
                     Color startColor = Color.blue;
                     startColor.a = 0.5f;
@@ -307,7 +334,7 @@ public class UIController : MonoBehaviour
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
                     //particle system moves toward the tally display for effect
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player1TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player1TotalDisplay.transform.position;
                     var mainModule = _ps.GetComponent<ParticleSystem>().main;
                     Color startColor = Color.blue;
                     startColor.a = 0.5f;
@@ -320,7 +347,7 @@ public class UIController : MonoBehaviour
                 {
                     GameObject _ps = Instantiate(_attackTallyPS, _card.transform.position, Quaternion.identity);
                     //particle system moves toward the tally display for effect
-                    _ps.GetComponent<TallyParticleEffect>().targetPosition = Vector2.zero; // _player2TotalDisplay.transform.position;
+                    _ps.GetComponent<TallyParticleEffect>().targetPosition = _player2TotalDisplay.transform.position;
                     var mainModule = _ps.GetComponent<ParticleSystem>().main;
                     Color startColor = Color.red;
                     startColor.a = 0.5f;
@@ -345,6 +372,10 @@ public class UIController : MonoBehaviour
     public void DisplayBattleResult(Player winner, bool currentPlayerWon)
     {
         Debug.Log("WINNER: " + winner.PlayerPepemon.DisplayName + " - " + (currentPlayerWon ? "Victory" : "Defeat"));
+
+        // The post-battle screen animates itself in and waits on its Animator, which cannot
+        // advance while a tutorial beat holds the game frozen.
+        if (BotTextTutorial.Instance != null) BotTextTutorial.Instance.ForceDismiss();
         PostScreenController.LoadPepemonDisplay(ulong.Parse(winner.PlayerPepemon.ID));
         PostScreenController.SetResult(currentPlayerWon);
         PostScreenController.Show();

@@ -29,11 +29,15 @@ public class HealthSystem : MonoBehaviour
         {
             _health = 0;
             IsDead = true;
-            return;
+        }
+        else
+        {
+            _health -= value;
         }
 
-        _health -= value;
-
+        // Restart the drain in both cases. The lethal branch used to return before this, so
+        // the killing blow - the single most dramatic moment in the battle - snapped the bar
+        // to empty instead of animating.
         lerpTimer = 0f;
     }
 
@@ -44,6 +48,9 @@ public class HealthSystem : MonoBehaviour
 
     private void UpdateHealthUI()
     {
+        if (_healthBackImage == null || _healthFrontImage == null) return;
+        if (starterHealth <= 0f) return;
+
         float fillB = _healthBackImage.fillAmount;
         float hFraction = _health / starterHealth;
 
