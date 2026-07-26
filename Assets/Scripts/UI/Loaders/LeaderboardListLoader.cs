@@ -31,55 +31,67 @@ public class LeaderboardListLoader : MonoBehaviour
 
         loadingInProgress = true;
 
-        _loadingMessage.gameObject.SetActive(true);
-        _loadingMessage.text = "Loading leaderboard...";
-
-        // destroy before re-creating
-        foreach (var playerRanking in _rankingList.GetComponentsInChildren<PlayerRankingController>())
-        {
-            Destroy(playerRanking.gameObject);
-        }
-
-        // should not happen, but if it happens then it won't crash the game
-        var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
-        if (string.IsNullOrEmpty(account))
-        {
-            _loadingMessage.text = "Error: No account selected";
-            return;
-        }
-
-        // load all rankings
-        List<(string Address, ulong Ranking)> rankings = new();
+        // try/finally: both early returns below used to leave loadingInProgress stuck at true,
+        // which made the guard above reject every later call - so Refresh became a permanent
+        // no-op and the screen sat on "Loading leaderboard..." for the rest of the session.
         try
         {
-            var totalPlayers = await PepemonMatchmaker.GetLeaderboardPlayersCount(league);
-            for (ulong i = 0; i < totalPlayers; i+= FETCH_SIZE)
+            _loadingMessage.gameObject.SetActive(true);
+            _loadingMessage.text = "Loading leaderboard...";
+
+            // destroy before re-creating
+            foreach (var playerRanking in _rankingList.GetComponentsInChildren<PlayerRankingController>())
             {
-                rankings.AddRange(await PepemonMatchmaker.GetPlayersRankings(league, count: FETCH_SIZE, offset: i));
+                Destroy(playerRanking.gameObject);
             }
 
-            rankings = rankings.OrderByDescending((i) => i.Ranking).Take(TOP_PLAYERS_AMOUNT).ToList();
+            // should not happen, but if it happens then it won't crash the game
+            var account = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
+            if (string.IsNullOrEmpty(account))
+            {
+                _loadingMessage.text = "Connect your wallet to see the leaderboard";
+                return;
+            }
+
+            // load all rankings
+            List<(string Address, ulong Ranking)> rankings = new();
+            try
+            {
+                var totalPlayers = await PepemonMatchmaker.GetLeaderboardPlayersCount(league);
+                for (ulong i = 0; i < totalPlayers; i += FETCH_SIZE)
+                {
+                    rankings.AddRange(await PepemonMatchmaker.GetPlayersRankings(league, count: FETCH_SIZE, offset: i));
+                }
+
+                rankings = rankings.OrderByDescending((i) => i.Ranking).Take(TOP_PLAYERS_AMOUNT).ToList();
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log($"Unable to load leaderboard: {e.Message}");
+                _loadingMessage.text = "Could not load the leaderboard. Tap Refresh to retry.";
+                return;
+            }
+
+            // An empty leaderboard is a normal state, not a failure - no PvP battle has ever
+            // been completed, so this is what a new player actually sees.
+            if (rankings.Count == 0)
+            {
+                _loadingMessage.text = "No ranked players yet - be the first";
+                return;
+            }
+
+            foreach (var playerRanking in rankings)
+            {
+                var playerRankingInstance = Instantiate(_playerRankingPrefab);
+                playerRankingInstance.transform.SetParent(_rankingList.transform, false);
+                playerRankingInstance.SetInfo(playerRanking.Address, playerRanking.Ranking.ToString());
+            }
+
+            _loadingMessage.gameObject.SetActive(false);
         }
-        catch(System.Exception e)
+        finally
         {
-            // Might always happen when there are no players in the leaderboard, eg.: new deployment of the Matchmaker contract.
-            // Also when there are network issues
-            Debug.Log($"Unable to load leaderboard: {e.Message}");
-            _loadingMessage.text = "Unable to load leaderboard";
-            return;
+            loadingInProgress = false;
         }
-
-
-        List<PlayerRankingController> refs = new List<PlayerRankingController>();
-        foreach (var playerRanking in rankings)
-        {
-            var playerRankingInstance = Instantiate(_playerRankingPrefab);
-            playerRankingInstance.transform.SetParent(_rankingList.transform, false);
-            playerRankingInstance.SetInfo(playerRanking.Address, playerRanking.Ranking.ToString());
-            refs.Add(playerRankingInstance);
-        }
-
-        _loadingMessage.gameObject.SetActive(false);
-        loadingInProgress = false;
     }
 }
