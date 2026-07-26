@@ -47,23 +47,38 @@ public class ScreenEditDeck : MonoBehaviour
         _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
     }
 
-    public void LoadAllCards(ulong deckId, int filter)
+    /// <summary>
+    /// Loads a deck into the editor.
+    /// </summary>
+    /// <param name="forceRefresh">
+    /// Re-read ownership from chain even when the deck id has not changed. Required after
+    /// minting: the owned-card fetch is otherwise gated on the deck id changing, so minting
+    /// and reloading the deck you are already viewing showed stale data and the new cards
+    /// never appeared.
+    /// </param>
+    public void LoadAllCards(ulong deckId, int filter, bool forceRefresh = false)
     {
         if (isLoading)
         {
             return;
         }
-        StartCoroutine(LoadAllCardsCoroutine(deckId, filter));
+        StartCoroutine(LoadAllCardsCoroutine(deckId, filter, forceRefresh));
     }
 
-    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter)
+    private IEnumerator LoadAllCardsCoroutine(ulong deckId, int filter, bool forceRefresh)
     {
         isLoading = true;
         _textLoading.SetActive(true);
 
+        // Everything below runs inside try/finally so a throw can never strand isLoading at
+        // true - which previously left the screen showing "Loading" forever, unrecoverable
+        // without a scene reload.
+        try
+        {
+
         var deckDisplayComponent = _deckDisplay.GetComponent<DeckDisplay>();
 
-        bool loadingNewDeck = false;
+        bool loadingNewDeck = forceRefresh;
 
         if (currentDeckId != deckId)
         {
@@ -149,7 +164,17 @@ public class ScreenEditDeck : MonoBehaviour
                         }
                     }
 
-                    bool isBattleCard = metadata.Value.description.Contains("Battle ver");
+                    // Metadata can legitimately be missing - a freshly minted id may not be in
+                    // the cache yet. Dereferencing the nullable here used to throw, kill this
+                    // coroutine, and leave the screen stuck on "Loading" permanently.
+                    if (metadata == null)
+                    {
+                        Debug.LogWarning($"[deck] No metadata for card {entry.Key}; treating it as a support card.");
+                        continue;
+                    }
+
+                    var description = metadata.Value.description ?? string.Empty;
+                    bool isBattleCard = description.Contains("Battle ver");
                     if (isBattleCard)
                     {
                         // Add to ownedBattleCardIds
@@ -217,8 +242,12 @@ public class ScreenEditDeck : MonoBehaviour
 
         DeckDisplay.Instance.UpdateCardInDeckDisplay(loadingNewDeck);
 
-        _textLoading.SetActive(false);
-        isLoading = false;
+        }
+        finally
+        {
+            _textLoading.SetActive(false);
+            isLoading = false;
+        }
     }
 
     // Helper method for setting up the starter deck
@@ -287,13 +316,42 @@ public class ScreenEditDeck : MonoBehaviour
         setButtonsInteractibleState(false);
         try
         {
+            SetStatus("Minting cards...");
             await PepemonCardDeck.MintCards();
-            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter);
-        } 
+
+            // forceRefresh: the deck id has not changed, so without this the owned-card fetch
+            // is skipped and the freshly minted cards never show up.
+            SetStatus("Loading your new cards...");
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, forceRefresh: true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Unable to mint cards: {ex.Message}");
+            SetStatus("Minting failed. Please try again.");
+        }
         finally
         {
             setButtonsInteractibleState(true);
         }
+    }
+
+    /// <summary>
+    /// Shows a transient message using the existing loading label.
+    ///
+    /// Every failure path here previously did nothing but Debug.LogError, so a rejected or
+    /// reverted transaction looked exactly like success.
+    /// </summary>
+    private void SetStatus(string message)
+    {
+        Debug.Log($"[deck] {message}");
+
+        if (_textLoading == null) return;
+
+        _textLoading.SetActive(!string.IsNullOrEmpty(message));
+
+        var label = _textLoading.GetComponent<TMPro.TMP_Text>();
+        if (label == null) label = _textLoading.GetComponentInChildren<TMPro.TMP_Text>();
+        if (label != null) label.text = message;
     }
     
     public void FilterCards(int filter)
@@ -313,26 +371,35 @@ public class ScreenEditDeck : MonoBehaviour
     {
         setButtonsInteractibleState(false);
 
-        var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
-
-        // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
-        // TODO: place this in an "approve" button
-        var approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
-        if (!approvalOk)
+        // try/finally: the re-enable used to sit after the awaits with no protection, so any
+        // exception that was not an RpcResponseException - a wallet rejection, for instance -
+        // left the Save button disabled for good.
+        try
         {
-            try
-            {
-                await PepemonFactory.SetApprovalState(true, pepemonCardDeckAddress);
-                approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
-            }
-        }
+            var pepemonCardDeckAddress = Web3Controller.instance.GetChainConfig().pepemonCardDeckAddress;
 
-        if (approvalOk)
-        {
+            // necessary to avoid "ERC1155#safeTransferFrom: INVALID_OPERATOR"
+            var approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
+            if (!approvalOk)
+            {
+                try
+                {
+                    SetStatus("Approving card transfers...");
+                    await PepemonFactory.SetApprovalState(true, pepemonCardDeckAddress);
+                    approvalOk = await PepemonFactory.GetApprovalState(pepemonCardDeckAddress);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("SetApprovedForAll failed: " + ex.Message);
+                }
+            }
+
+            if (!approvalOk)
+            {
+                SetStatus("Approval declined - deck not saved.");
+                return;
+            }
+
             shouldUpdateTheStarterSupportCardsAfterSave = true;
 
             GetSupportCardsDiff(
@@ -341,21 +408,41 @@ public class ScreenEditDeck : MonoBehaviour
                 out var supportCardsToBeAdded,
                 out var supportCardsToBeRemoved);
 
-            // TODO: wait for transaction receipt
-            if (supportCardsToBeAdded.Length > 0 ||supportCardsToBeRemoved.Length > 0)
-            {
-                await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
-            }
-            
-            await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
-        }
+            var failures = 0;
 
-        setButtonsInteractibleState(true);
+            if (supportCardsToBeAdded.Length > 0 || supportCardsToBeRemoved.Length > 0)
+            {
+                SetStatus("Saving your cards...");
+                failures += await UpdateSupportCards(supportCardsToBeAdded, supportCardsToBeRemoved);
+            }
+
+            SetStatus("Saving your Pepemon...");
+            failures += await UpdateBattlecard(_deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard());
+
+            SetStatus(failures == 0
+                ? "Deck saved."
+                : "Deck partly saved - some changes failed. Check your deck and retry.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Unable to save deck: {ex.Message}");
+            SetStatus("Save failed. Please try again.");
+        }
+        finally
+        {
+            setButtonsInteractibleState(true);
+        }
     }
 
-    private async Task UpdateBattlecard(ulong newBattleCard)
+    /// <summary>Returns the number of transactions that failed, so the caller can tell the player.</summary>
+    private async Task<int> UpdateBattlecard(ulong newBattleCard)
     {
-        if (newBattleCard != battleCard && newBattleCard != 0) // 0 is an invalid card
+        if (newBattleCard == battleCard) return 0;
+
+        // Catch Exception rather than only RpcResponseException: a wallet rejection and
+        // thirdweb's WebGL error wrapping are not RpcResponseExceptions, and used to escape
+        // all the way out of the async void click handler.
+        if (newBattleCard != 0) // 0 is an invalid card
         {
             try
             {
@@ -364,34 +451,37 @@ public class ScreenEditDeck : MonoBehaviour
 
                 // update currently selected battlecard in case of success
                 battleCard = newBattleCard;
+                return 0;
             }
-            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            catch (Exception ex)
             {
-                Debug.LogError($"Unable to process transaction: {ex.Message}");
-                // TODO: display error toast
+                Debug.LogError($"Unable to set battle card: {ex.Message}");
+                return 1;
             }
         }
-        else if (newBattleCard != battleCard && newBattleCard == 0)
-        {
-            try
-            {
-                Debug.Log($"Removing battlecard {newBattleCard} on deck {currentDeckId}");
-                await PepemonCardDeck.RemoveBattleCard(currentDeckId);
 
-                // update currently selected battlecard in case of success
-                battleCard = newBattleCard;
-            }
-            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
-            {
-                Debug.LogError($"Unable to process transaction: {ex.Message}");
-                // TODO: display error toast
-            }
+        try
+        {
+            Debug.Log($"Removing battlecard on deck {currentDeckId}");
+            await PepemonCardDeck.RemoveBattleCard(currentDeckId);
+
+            // update currently selected battlecard in case of success
+            battleCard = newBattleCard;
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Unable to remove battle card: {ex.Message}");
+            return 1;
         }
     }
 
-    private async Task UpdateSupportCards(SupportCardRequest[] supportCardsToBeAdded, 
+    /// <summary>Returns the number of transactions that failed, so the caller can tell the player.</summary>
+    private async Task<int> UpdateSupportCards(SupportCardRequest[] supportCardsToBeAdded,
                                          SupportCardRequest[] supportCardsToBeRemoved)
     {
+        var failures = 0;
+
         if (supportCardsToBeAdded.Count() > 0)
         {
             try
@@ -408,10 +498,10 @@ public class ScreenEditDeck : MonoBehaviour
                     }
                 }
             }
-            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            catch (Exception ex)
             {
                 Debug.LogError($"Unable to process transaction AddSupportCards: {ex.Message}");
-                // TODO: display error toast
+                failures++;
             }
         }
         if (supportCardsToBeRemoved.Count() > 0)
@@ -436,12 +526,14 @@ public class ScreenEditDeck : MonoBehaviour
                     }
                 }
             }
-            catch (Nethereum.JsonRpc.Client.RpcResponseException ex)
+            catch (Exception ex)
             {
                 Debug.LogError($"Unable to process transaction RemoveSupportCards: {ex.Message}");
-                // TODO: display error toast
+                failures++;
             }
         }
+
+        return failures;
     }
 
     public void GetSupportCardsDiff(IDictionary<ulong, int> oldSupportCards, 
