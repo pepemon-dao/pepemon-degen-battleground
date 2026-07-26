@@ -16,6 +16,12 @@ public class DeckListLoader : MonoBehaviour
     [TitleGroup("Component References"), SerializeField] GameObject _loadingMessage;
     [TitleGroup("Deck display options"), SerializeField] bool _deckEditMode;
 
+    /// <summary>
+    /// The loading label this list owns, so sibling controls on the same screen can reuse it
+    /// instead of needing their own scene-wired reference.
+    /// </summary>
+    public GameObject LoadingMessage => _loadingMessage;
+
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
     [ReadOnly] public UnityEvent<ulong, bool> onSelectDeck;
     private bool loadingInProgress = false;
