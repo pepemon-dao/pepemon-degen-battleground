@@ -175,7 +175,20 @@ public class MainMenuController : MonoBehaviour
                 Debug.LogWarning("[claim] BattlePrepController not found; deck will be created without support cards.");
             }
 
-            var result = await StarterPackClaim.Run((ulong)pepemonId, supportCardIds, SetClaimStatus);
+            // Runtime-built overlay: the serialized status label was never wired, so all of
+            // this previously reached the console only and the player signed five wallet
+            // prompts with nothing on screen telling them what any of them were for.
+            var overlay = ClaimProgressOverlay.Instance;
+            overlay.Show("Claiming your starter pack");
+
+            var result = await StarterPackClaim.Run(
+                (ulong)pepemonId,
+                supportCardIds,
+                (step, total, action, requiresSignature) =>
+                {
+                    overlay.SetStep(step, total, action, requiresSignature);
+                    SetClaimStatus(action);
+                });
 
             Funnel.Track(Funnel.MintResult, new Dictionary<string, object>
             {
@@ -189,6 +202,10 @@ public class MainMenuController : MonoBehaviour
             if (!result.AssetsGranted)
             {
                 // Nothing irreversible happened, so leave the claim available to retry.
+                overlay.SetResult("Claim did not complete. Nothing was charged.", success: false);
+                await Cysharp.Threading.Tasks.UniTask.Delay(4000, Cysharp.Threading.Tasks.DelayType.Realtime);
+                overlay.Hide();
+
                 FailClaim(result.Error ?? "unknown", "Claim failed. Try again from the Deck screen.");
                 return;
             }
@@ -198,9 +215,15 @@ public class MainMenuController : MonoBehaviour
             OnboardingState.HasClaimedStarterPack = true;
             claimedStarterDeck = true;
 
-            SetClaimStatus(result.DeckIsPlayable
-                ? "Starter pack claimed - your deck is ready!"
-                : "Cards minted. Finish your deck in the Deck screen.");
+            var summary = result.DeckIsPlayable
+                ? "Your deck is ready to battle."
+                : "Cards minted. Finish your deck in the Deck screen.";
+
+            overlay.SetResult(summary, success: true);
+            SetClaimStatus(summary);
+
+            await Cysharp.Threading.Tasks.UniTask.Delay(3500, Cysharp.Threading.Tasks.DelayType.Realtime);
+            overlay.Hide();
 
             if (!result.DeckIsPlayable)
             {
@@ -214,6 +237,12 @@ public class MainMenuController : MonoBehaviour
         catch (Exception e)
         {
             Funnel.Track(Funnel.MintResult, "success", false, "error", e.Message);
+
+            var overlay = ClaimProgressOverlay.Instance;
+            overlay.SetResult("Something went wrong. You can try again.", success: false);
+            await Cysharp.Threading.Tasks.UniTask.Delay(4000, Cysharp.Threading.Tasks.DelayType.Realtime);
+            overlay.Hide();
+
             FailClaim(e.Message, "Claim failed. Try again from the Deck screen.");
         }
     }
