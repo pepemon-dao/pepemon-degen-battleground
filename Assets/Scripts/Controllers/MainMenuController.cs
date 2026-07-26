@@ -152,18 +152,61 @@ public class MainMenuController : MonoBehaviour
                 return;
             }
 
-            SetClaimStatus("Minting your cards...");
-            await PepemonCardDeck.MintCards();
+            // The choice is read from persisted state, not Web3Controller: the post-battle
+            // screen zeroes StarterPepemonID/StarterDeckID before this scene loads.
+            var pepemonId = OnboardingState.PendingStarterPepemonId;
+            if (pepemonId <= 0)
+            {
+                Debug.LogWarning("[claim] No starter Pepemon recorded, defaulting to Fafny.");
+                pepemonId = 1;
+            }
 
-            SetClaimStatus("Creating your deck...");
-            await PepemonCardDeck.CreateDeck();
+            var starterDeckId = (ulong)OnboardingState.PendingStarterDeckId;
 
-            // Only now is the promise actually kept.
+            // Include inactive: the prep controller lives on a menu screen that is not the
+            // one currently shown.
+            var prep = FindObjectOfType<BattlePrepController>(true);
+            var supportCardIds = prep != null
+                ? prep.GetStarterSupportCardIds(starterDeckId)
+                : new List<ulong>();
+
+            if (prep == null)
+            {
+                Debug.LogWarning("[claim] BattlePrepController not found; deck will be created without support cards.");
+            }
+
+            var result = await StarterPackClaim.Run((ulong)pepemonId, supportCardIds, SetClaimStatus);
+
+            Funnel.Track(Funnel.MintResult, new Dictionary<string, object>
+            {
+                ["success"] = result.AssetsGranted,
+                ["deck_playable"] = result.DeckIsPlayable,
+                ["support_cards"] = result.SupportCardsAdded,
+                ["battle_card_set"] = result.BattleCardSet,
+                ["error"] = result.Error ?? string.Empty
+            });
+
+            if (!result.AssetsGranted)
+            {
+                // Nothing irreversible happened, so leave the claim available to retry.
+                FailClaim(result.Error ?? "unknown", "Claim failed. Try again from the Deck screen.");
+                return;
+            }
+
+            // The faucet has fired and cannot be undone - re-running it would mint twice.
+            // Record the claim even if assembly failed, and tell the player what is left to do.
             OnboardingState.HasClaimedStarterPack = true;
             claimedStarterDeck = true;
 
-            Funnel.Track(Funnel.MintResult, "success", true);
-            SetClaimStatus("Starter pack claimed!");
+            SetClaimStatus(result.DeckIsPlayable
+                ? "Starter pack claimed - your deck is ready!"
+                : "Cards minted. Finish your deck in the Deck screen.");
+
+            if (!result.DeckIsPlayable)
+            {
+                Debug.LogWarning($"[claim] Deck not fully assembled: battleCard={result.BattleCardSet} " +
+                                 $"supportCards={result.SupportCardsAdded} error={result.Error}");
+            }
 
             // Explicit null check rather than ?. - Unity's fake-null does not short-circuit.
             if (_screenManageDecks != null) _screenManageDecks.ReloadAllDecks();

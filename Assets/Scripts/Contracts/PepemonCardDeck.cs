@@ -89,6 +89,27 @@ public class PepemonCardDeck
     }
 
 
+    /// <summary>Number of decks owned by <paramref name="address"/>.</summary>
+    public static async Task<ulong> GetDeckCount(string address)
+    {
+        return await contract.Read<ulong>("getDeckCount", address);
+    }
+
+    /// <summary>Deck id at <paramref name="index"/> in the player's deck list.</summary>
+    public static async Task<ulong> GetPlayerDeckAt(string address, ulong index)
+    {
+        return await contract.Read<ulong>("playerToDecks", address, index);
+    }
+
+    /// <summary>
+    /// Contract-enforced cap on support cards per deck. Read rather than hardcoded so the
+    /// starter deck assembly cannot exceed it if the contract changes.
+    /// </summary>
+    public static async Task<int> GetMaxSupportCards()
+    {
+        return (int)await contract.Read<ulong>("MAX_SUPPORT_CARDS");
+    }
+
     public static async Task<List<ulong>> GetPlayerDecks(string address)
     {
         var deckCount = await contract.Read<ulong>("getDeckCount", address);

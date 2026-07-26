@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Pepemon.Battle;
+using Pepemon.Onboarding;
+using Pepemon.Telemetry;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
@@ -49,12 +51,40 @@ public class BattlePrepController : MonoBehaviour
         if (isStarterDeck)
         {
             Web3Controller.instance.StarterDeckID = deckId;
+
+            // Also persisted: the post-battle screen clears StarterDeckID before loading the
+            // menu scene, so the claim that runs there would otherwise not know what to build.
+            OnboardingState.PendingStarterDeckId = (int)deckId;
         }
     }
-    
+
     public void OnPepemonSelected(int pepemonID)
     {
         Web3Controller.instance.StarterPepemonID = pepemonID;
+        OnboardingState.PendingStarterPepemonId = pepemonID;
+
+        Funnel.Track(Funnel.PepemonSelected, "pepemon_id", pepemonID);
+    }
+
+    /// <summary>
+    /// Card ids making up a starter deck, for assembling the claimed starter pack on-chain.
+    /// Mirrors the selection in <see cref="GetAllSupportCards"/>: anything that is not the
+    /// first starter deck falls back to the second.
+    /// </summary>
+    public List<ulong> GetStarterSupportCardIds(ulong deckId)
+    {
+        var source = deckId == 10001 ? starterDeck1 : starterDeck2;
+        var ids = new List<ulong>();
+
+        if (source == null) return ids;
+
+        foreach (var card in source)
+        {
+            if (card == null) continue;
+            ids.Add((ulong)card.ID);
+        }
+
+        return ids;
     }
 
     private async void OnSearchForOpponentButtonClick()

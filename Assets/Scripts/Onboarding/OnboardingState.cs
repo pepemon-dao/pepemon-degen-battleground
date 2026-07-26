@@ -29,6 +29,37 @@ namespace Pepemon.Onboarding
 
         public const string StarterPackKey = "GotStarterPack";
 
+        /// <summary>
+        /// The Pepemon and starter deck the player chose before their first battle.
+        ///
+        /// Persisted at selection time rather than read from Web3Controller at claim time:
+        /// the post-battle screen zeroes StarterPepemonID/StarterDeckID before loading the
+        /// menu scene, so by the time the claim runs the choice is already gone.
+        /// </summary>
+        public const string PendingPepemonKey = "PENDING_STARTER_PEPEMON";
+        public const string PendingDeckKey = "PENDING_STARTER_DECK";
+
+        public static int PendingStarterPepemonId
+        {
+            get => PlayerPrefs.GetInt(PendingPepemonKey, 0);
+            set
+            {
+                PlayerPrefs.SetInt(PendingPepemonKey, value);
+                PlayerPrefs.Save();
+            }
+        }
+
+        /// <summary>Starter deck id (10001 / 10002). 0 when the player has not chosen yet.</summary>
+        public static int PendingStarterDeckId
+        {
+            get => PlayerPrefs.GetInt(PendingDeckKey, 0);
+            set
+            {
+                PlayerPrefs.SetInt(PendingDeckKey, value);
+                PlayerPrefs.Save();
+            }
+        }
+
         public static int TutorialBeatsSeen
         {
             get => PlayerPrefs.GetInt(TutorialBeatsKey, 0);
@@ -70,6 +101,8 @@ namespace Pepemon.Onboarding
             PlayerPrefs.DeleteKey(TutorialBeatsKey);
             PlayerPrefs.DeleteKey(LegacyTutorialStateKey);
             PlayerPrefs.DeleteKey(StarterPackKey);
+            PlayerPrefs.DeleteKey(PendingPepemonKey);
+            PlayerPrefs.DeleteKey(PendingDeckKey);
             PlayerPrefs.Save();
         }
     }
