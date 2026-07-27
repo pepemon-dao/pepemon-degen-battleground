@@ -454,6 +454,13 @@ public class ScreenEditDeck : MonoBehaviour
                 ? "Deck saved."
                 : "Deck partly saved - some changes failed. Check your deck and retry.",
                 autoHide: true);
+
+            // Re-read ownership from chain. Saving moves cards out of the wallet and into the
+            // deck, but ownedCardIds was only refetched when the deck id changed - so after a
+            // save the editor still offered cards the wallet no longer held. Adding one of
+            // those produced "want 2, own 0" and a failed save, which is what made every
+            // second edit fail.
+            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, forceRefresh: true);
         }
         catch (Exception ex)
         {
