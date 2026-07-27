@@ -386,6 +386,30 @@ public class ScreenEditDeck : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Polls until the chain reports the battle card we just saved, then reloads the editor.
+    /// Reloads anyway on timeout so the screen never stays stale.
+    /// </summary>
+    private IEnumerator RefreshAfterSave(ulong expectedBattleCard)
+    {
+        const float timeoutSeconds = 12f;
+        const float pollSeconds = 1.5f;
+
+        var deadline = Time.unscaledTime + timeoutSeconds;
+
+        while (Time.unscaledTime < deadline)
+        {
+            yield return new WaitForSecondsRealtime(pollSeconds);
+
+            ulong onChain = 0;
+            yield return StartCoroutine(PepemonCardDeck.GetBattleCard(currentDeckId, r => onChain = r));
+
+            if (onChain == expectedBattleCard) break;
+        }
+
+        LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, forceRefresh: true);
+    }
+
     private IEnumerator HideStatusAfter(float seconds)
     {
         // Realtime: this must clear even if something else has frozen the game.
@@ -465,12 +489,14 @@ public class ScreenEditDeck : MonoBehaviour
                 : "Deck partly saved - some changes failed. Check your deck and retry.",
                 autoHide: true);
 
-            // Re-read ownership from chain. Saving moves cards out of the wallet and into the
-            // deck, but ownedCardIds was only refetched when the deck id changed - so after a
-            // save the editor still offered cards the wallet no longer held. Adding one of
-            // those produced "want 2, own 0" and a failed save, which is what made every
-            // second edit fail.
-            LoadAllCards(currentDeckId, FilterController.Instance.currentFilter, forceRefresh: true);
+            // Wait for the node to reflect the write before re-reading.
+            //
+            // Reloading the instant the transaction returns reads back pre-save state: the
+            // card leaves the owned pool but the deck renders empty, because GetBattleCard
+            // still answers with the old value. Polling until the chain agrees is the same
+            // approach the starter-pack claim already uses for deck propagation.
+            StartCoroutine(RefreshAfterSave(
+                _deckDisplay.GetComponent<DeckDisplay>().GetSelectedBattleCard()));
         }
         catch (Exception ex)
         {
