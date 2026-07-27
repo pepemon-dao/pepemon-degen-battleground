@@ -148,7 +148,11 @@ public class ScreenEditDeck : MonoBehaviour
                 // Fetch owned cards
                 yield return StartCoroutine(PepemonFactory.GetOwnedCards(account, PepemonFactoryCardCache.CardsIds.ToList(), result => ownedCardIds = result));
 
-                starterSupportCards = supportCards;
+                // Snapshot, not an alias. These were the same object, so every mutation of
+                // supportCards after a successful save also rewrote the baseline the next
+                // diff is computed against - producing deltas that ask the contract to
+                // transfer cards the wallet no longer holds.
+                starterSupportCards = new Dictionary<ulong, int>(supportCards);
 
                 var keysToRemove = new List<ulong>();
 
@@ -202,7 +206,7 @@ public class ScreenEditDeck : MonoBehaviour
             {
                 if (shouldUpdateTheStarterSupportCardsAfterSave)
                 {
-                    starterSupportCards = supportCards;
+                    starterSupportCards = new Dictionary<ulong, int>(supportCards);
                 }
             }
 
@@ -509,6 +513,28 @@ public class ScreenEditDeck : MonoBehaviour
                                          SupportCardRequest[] supportCardsToBeRemoved)
     {
         var failures = 0;
+
+        // Pre-flight against actual wallet balances. addSupportCardsToDeck transfers the
+        // cards out of the wallet, so requesting more copies than are held makes ERC1155
+        // revert with no reason string - which is unattributable in the UI and looks like
+        // "saving is broken". Cards already inside the deck are no longer in the wallet.
+        var unaffordable = supportCardsToBeAdded
+            .Where(r => !ownedCardIds.TryGetValue((ulong)r.SupportCardId, out var held)
+                        || held < (int)r.Amount)
+            .ToArray();
+
+        if (unaffordable.Length > 0)
+        {
+            var detail = string.Join(", ", unaffordable.Select(r =>
+            {
+                ownedCardIds.TryGetValue((ulong)r.SupportCardId, out var held);
+                return $"card {r.SupportCardId} (want {r.Amount}, own {held})";
+            }));
+
+            Debug.LogError($"[deck] Refusing addSupportCards - not enough copies owned: {detail}");
+            SetStatus("You don't own enough copies of some cards. Reload the deck and try again.", autoHide: true);
+            return supportCardsToBeAdded.Length;
+        }
 
         if (supportCardsToBeAdded.Count() > 0)
         {
