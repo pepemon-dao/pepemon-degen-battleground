@@ -109,7 +109,18 @@ public class DeckController : MonoBehaviour
     {
         if (!isStarterDeck)
         {
-            GetComponent<SelectionItem>().ToggleSelected();
+            // Null-guarded: an NRE here would swallow the click with no visible effect,
+            // which is indistinguishable from the button doing nothing.
+            var selectionItem = GetComponent<SelectionItem>();
+            if (selectionItem != null)
+            {
+                selectionItem.ToggleSelected();
+            }
+            else
+            {
+                Debug.LogError($"[deckpick] Deck {starterDeckId} has no SelectionItem; selection cannot toggle.");
+            }
+
             onSelectButtonClicked?.Invoke();
         }
         else
@@ -184,6 +195,7 @@ public class DeckController : MonoBehaviour
                 _errorText.text = "Pepemon card missing";
                 _selectButton.gameObject.SetActive(false);
                 UpdateNotValidDeckIsNotShowWhenSelecting();
+                LogSelectability(deckId, selectionMode, supportCardCount);
                 return true;
             }
             if (!hasSupportCards)
@@ -192,6 +204,7 @@ public class DeckController : MonoBehaviour
                 _errorText.text = "Support cards missing";
                 _selectButton.gameObject.SetActive(false);
                 UpdateNotValidDeckIsNotShowWhenSelecting();
+                LogSelectability(deckId, selectionMode, supportCardCount);
                 return true;
             }
             _selectButton.gameObject.SetActive(selectionMode);
@@ -201,7 +214,34 @@ public class DeckController : MonoBehaviour
             }
             _errorDisplay.SetActive(false);
         }
-        
+
+        LogSelectability(deckId, selectionMode, supportCardCount);
+
         return true;
+    }
+
+    /// <summary>
+    /// Reports exactly why a deck is or is not selectable.
+    ///
+    /// Deck selection has failed in the field in ways that could not be reproduced or
+    /// explained from the code alone, and each guess at the cause was wrong. This makes the
+    /// running build state the facts rather than requiring them to be inferred.
+    /// </summary>
+    private void LogSelectability(ulong deckId, bool selectionMode, int supportCardCount)
+    {
+        var selectableNow = _selectButton != null
+                            && _selectButton.gameObject.activeSelf
+                            && _selectButton.gameObject.activeInHierarchy;
+
+        Debug.Log(
+            $"[deckpick] deck={deckId} " +
+            $"battleCard={battleCard} supportCards={supportCardCount} " +
+            $"notValidDeck={notValidDeck} isStarterDeck={isStarterDeck} " +
+            $"selectionMode={selectionMode} " +
+            $"editBtnActive={(_editButton != null && _editButton.gameObject.activeSelf)} " +
+            $"selectBtnActiveSelf={(_selectButton != null && _selectButton.gameObject.activeSelf)} " +
+            $"selectBtnInHierarchy={selectableNow} " +
+            $"deckObjActive={gameObject.activeSelf} " +
+            $"hasSelectionItem={GetComponent<SelectionItem>() != null}");
     }
 }
