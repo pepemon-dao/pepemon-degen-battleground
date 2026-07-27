@@ -353,6 +353,9 @@ public class MainMenuController : MonoBehaviour
 
             if (selectionLoader != null)
             {
+                // This screen is for picking a deck to battle with, never for editing one.
+                // Stated here rather than trusting the scene, where it was checked.
+                selectionLoader.SetEditMode(false);
                 selectionLoader.ReloadAllDecks(force: true);
             }
             else

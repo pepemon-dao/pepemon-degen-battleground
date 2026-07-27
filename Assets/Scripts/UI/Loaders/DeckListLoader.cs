@@ -23,6 +23,16 @@ public class DeckListLoader : MonoBehaviour
     /// </summary>
     public GameObject LoadingMessage => _loadingMessage;
 
+    /// <summary>
+    /// Forces this list into selection or edit mode, overriding the scene setting.
+    ///
+    /// The battle deck picker's loader ships with _deckEditMode checked, so it rendered Edit
+    /// buttons and never a Select button - decks appeared but none could be chosen, and every
+    /// [deckpick] line read selectionMode=False. Callers that know which mode a screen needs
+    /// now state it instead of depending on the inspector.
+    /// </summary>
+    public void SetEditMode(bool editMode) => _deckEditMode = editMode;
+
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
     [ReadOnly] public UnityEvent<ulong, bool> onSelectDeck;
     private bool loadingInProgress = false;
