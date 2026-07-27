@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
 using UnityEngine.UI;
+using Pepemon.UI;
 
 /// <summary>
 /// Handles the loading of player rankings; Creates instances of _playerRankingPrefab controlled by PlayerRankingController
@@ -50,6 +51,16 @@ public class LeaderboardListLoader : MonoBehaviour
             if (string.IsNullOrEmpty(account))
             {
                 _loadingMessage.text = "Connect your wallet to see the leaderboard";
+                PixelNotice.Instance.Show(
+                    "No wallet connected",
+                    "Connect your wallet to see where you rank.",
+                    "CONNECT WALLET",
+                    async () =>
+                    {
+                        if (Web3Controller.instance == null) return;
+                        await Web3Controller.instance.ConnectWallet();
+                        if (Web3Controller.instance.IsConnected) ReloadLeaderboard(league);
+                    });
                 return;
             }
 

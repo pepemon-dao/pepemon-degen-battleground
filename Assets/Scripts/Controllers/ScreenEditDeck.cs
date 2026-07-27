@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Pepemon.Battle;
+using Pepemon.UI;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
@@ -362,6 +363,15 @@ public class ScreenEditDeck : MonoBehaviour
         {
             StopCoroutine(_statusHideRoutine);
             _statusHideRoutine = null;
+        }
+
+        // Terminal outcomes get the on-brand panel; transient progress keeps using the
+        // in-place label so it does not cover the deck the player is editing.
+        if (autoHide)
+        {
+            _textLoading.SetActive(false);
+            PixelNotice.Instance.Show("Deck", message, autoHideSeconds: 2.5f);
+            return;
         }
 
         _textLoading.SetActive(!string.IsNullOrEmpty(message));
