@@ -336,16 +336,29 @@ public class MainMenuController : MonoBehaviour
         //
         // Done here rather than at a call site so every route into the screen is covered,
         // including the ShowScreen calls wired directly to buttons in the scene.
-        if (screenId == (int)MainSceneScreensEnum.DeckSelection && _selectDeckListLoader != null)
+        if (screenId == (int)MainSceneScreensEnum.DeckSelection)
         {
-            var selectionLoader = _selectDeckListLoader.GetComponent<DeckListLoader>();
+            // Found by searching the screen itself rather than through _selectDeckListLoader.
+            // That field is public but was never assigned in the scene, so the previous
+            // null-check silently skipped the reload and logged nothing - the picker stayed
+            // empty and every [deckpick] line still read selectionMode=False.
+            var selectionLoader = _selectDeckListLoader != null
+                ? _selectDeckListLoader.GetComponent<DeckListLoader>()
+                : null;
+
+            if (selectionLoader == null && screenId < menuScreens.Count && menuScreens[screenId] != null)
+            {
+                selectionLoader = menuScreens[screenId].GetComponentInChildren<DeckListLoader>(true);
+            }
+
             if (selectionLoader != null)
             {
                 selectionLoader.ReloadAllDecks(force: true);
             }
             else
             {
-                Debug.LogError("[decks] _selectDeckListLoader has no DeckListLoader; the battle deck picker cannot be filled.");
+                Debug.LogError("[decks] No DeckListLoader found on the deck selection screen; " +
+                               "the battle deck picker cannot be filled.");
             }
         }
 
