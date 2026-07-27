@@ -327,6 +327,28 @@ public class MainMenuController : MonoBehaviour
             menuScreens[i].SetActive(i == screenId);
         }
 
+        // Populate the battle deck picker.
+        //
+        // Nothing ever did this: _selectDeckListLoader was declared and never referenced, and
+        // BattlePrepController only subscribes to the list's onSelectDeck event without ever
+        // filling it. The PvE/PvP deck selection screen was therefore empty by construction -
+        // no decks to pick, so no battle could ever be started.
+        //
+        // Done here rather than at a call site so every route into the screen is covered,
+        // including the ShowScreen calls wired directly to buttons in the scene.
+        if (screenId == (int)MainSceneScreensEnum.DeckSelection && _selectDeckListLoader != null)
+        {
+            var selectionLoader = _selectDeckListLoader.GetComponent<DeckListLoader>();
+            if (selectionLoader != null)
+            {
+                selectionLoader.ReloadAllDecks(force: true);
+            }
+            else
+            {
+                Debug.LogError("[decks] _selectDeckListLoader has no DeckListLoader; the battle deck picker cannot be filled.");
+            }
+        }
+
         screenNavigationPosition = (screenNavigationPosition + 1) % screenNavigationHistory.Length;
         screenNavigationHistory[screenNavigationPosition] = screenId;
     }

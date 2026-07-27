@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Nethereum.Web3;
 using Pepemon.Battle;
+using Pepemon.UI;
 using Sirenix.OdinInspector;
 using Thirdweb;
 using UnityEngine;
@@ -82,7 +83,19 @@ public class DeckListLoader : MonoBehaviour
         // should not happen, but if it happens then it won't crash the game
         if (string.IsNullOrEmpty(account))
         {
+            // A gated empty state must offer the action, not just describe it. This screen
+            // previously told the player to connect a wallet and gave them nothing to press.
             loadingMessageLabel.text = "Connect your wallet to see your decks";
+            PixelNotice.Instance.Show(
+                "No wallet connected",
+                "Connect your wallet to see and mint your decks.",
+                "CONNECT WALLET",
+                async () =>
+                {
+                    if (Web3Controller.instance == null) return;
+                    await Web3Controller.instance.ConnectWallet();
+                    if (Web3Controller.instance.IsConnected) ReloadAllDecks(force: true);
+                });
             return;
         }
 
