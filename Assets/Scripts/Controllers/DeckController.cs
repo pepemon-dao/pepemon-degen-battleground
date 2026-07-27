@@ -195,7 +195,7 @@ public class DeckController : MonoBehaviour
                 _errorText.text = "Pepemon card missing";
                 _selectButton.gameObject.SetActive(false);
                 UpdateNotValidDeckIsNotShowWhenSelecting();
-                LogSelectability(deckId, selectionMode, supportCardCount);
+                LogSelectability(deckId, battleCard, selectionMode, supportCardCount);
                 return true;
             }
             if (!hasSupportCards)
@@ -204,7 +204,7 @@ public class DeckController : MonoBehaviour
                 _errorText.text = "Support cards missing";
                 _selectButton.gameObject.SetActive(false);
                 UpdateNotValidDeckIsNotShowWhenSelecting();
-                LogSelectability(deckId, selectionMode, supportCardCount);
+                LogSelectability(deckId, battleCard, selectionMode, supportCardCount);
                 return true;
             }
             _selectButton.gameObject.SetActive(selectionMode);
@@ -215,7 +215,7 @@ public class DeckController : MonoBehaviour
             _errorDisplay.SetActive(false);
         }
 
-        LogSelectability(deckId, selectionMode, supportCardCount);
+        LogSelectability(deckId, battleCard, selectionMode, supportCardCount);
 
         return true;
     }
@@ -227,7 +227,7 @@ public class DeckController : MonoBehaviour
     /// explained from the code alone, and each guess at the cause was wrong. This makes the
     /// running build state the facts rather than requiring them to be inferred.
     /// </summary>
-    private void LogSelectability(ulong deckId, bool selectionMode, int supportCardCount)
+    private void LogSelectability(ulong deckId, ulong battleCard, bool selectionMode, int supportCardCount)
     {
         var selectableNow = _selectButton != null
                             && _selectButton.gameObject.activeSelf
