@@ -29675,7 +29675,7 @@ MonoBehaviour:
   - {fileID: 894610811}
   - {fileID: 1745425730}
   - {fileID: 317452774}
-  _selectDeckListLoader: {fileID: 170429870}
+  _selectDeckListLoader: {fileID: 453832911}
   _screenManageDecks: {fileID: 349455304}
   _screenLeaderboard: {fileID: 1745425734}
   _connectWalletButton: {fileID: 1661287232}

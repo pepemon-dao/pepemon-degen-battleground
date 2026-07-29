@@ -23,6 +23,15 @@ public class DeckListLoader : MonoBehaviour
     /// </summary>
     public GameObject LoadingMessage => _loadingMessage;
 
+    /// <summary>
+    /// Chooses between Edit and Select buttons on each deck.
+    ///
+    /// Set in code before a reload so a screen's intent does not depend on a checkbox someone
+    /// has to remember to tick. The battle picker must always be in Select mode: with Edit
+    /// mode on, the list renders Edit buttons and no deck can be chosen to fight with.
+    /// </summary>
+    public void SetEditMode(bool editMode) => _deckEditMode = editMode;
+
     [ReadOnly] public UnityEvent<ulong> onEditDeck;
     [ReadOnly] public UnityEvent<ulong, bool> onSelectDeck;
     private bool loadingInProgress = false;
