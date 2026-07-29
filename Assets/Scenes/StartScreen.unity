@@ -27620,6 +27620,7 @@ MonoBehaviour:
       - 0x4fB8b44149750e247A5Cde33DBc0aDC0FF38720a
       - 0xB36F1496196667C992D31467f1fdD96A990A02ef
     - chainId: 84532
+      pepemonBoosterPackAddress: 0xd325B92A8e4FB022d5b5f3204C7f820C71760858
       chainName: Base Sepolia Testnet
       chainCurrencyName: ETH
       chainCurrencySymbol: ETH

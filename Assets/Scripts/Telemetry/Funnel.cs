@@ -69,6 +69,15 @@ namespace Pepemon.Telemetry
         public const string WalletConnectResult = "wallet_connect_result";
         public const string MintResult = "mint_result";
         public const string ReturnedToMenu = "returned_to_menu";
+
+        // Booster pack store. The purchase funnel is the one place in the game where a player
+        // spends real value, so each step is separated: how many open the store, how many press
+        // buy, how many confirm in the wallet, and how many actually see cards.
+        public const string StoreOpened = "store_opened";
+        public const string PackTierViewed = "pack_tier_viewed";
+        public const string PackPurchaseStarted = "pack_purchase_started";
+        public const string PackPurchaseResult = "pack_purchase_result";
+        public const string PackRevealed = "pack_revealed";
         #endregion
 
         private static ITelemetryBackend _backend = new DebugLogTelemetryBackend();

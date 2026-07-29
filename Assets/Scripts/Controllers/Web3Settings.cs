@@ -28,6 +28,16 @@ public class Web3Settings
         public long pepemonGasLimit;
         public string pepemonMatchmakerAbi;
         public string[] pepemonMatchmakerAddresses;
+
+        /// <summary>
+        /// Booster pack store. Address only: the ABI is a property of the contract source
+        /// rather than of a deployment, so it lives in PepemonBoosterPack.cs instead of being
+        /// pasted into scene YAML.
+        ///
+        /// Empty until a booster contract is deployed for this chain. The store screen checks
+        /// PepemonBoosterPack.IsConfigured and shows an explanatory state rather than failing.
+        /// </summary>
+        public string pepemonBoosterPackAddress;
     }
 
     public Web3ChainConfig GetChainConfig(int chainId)
