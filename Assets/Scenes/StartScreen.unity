@@ -18438,7 +18438,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _searchForOpponentButton: {fileID: 1421260176}
   _exitButton: {fileID: 1353372986}
-  _deckList: {fileID: 170429870}
+  _deckList: {fileID: 453832911}
   starterDeck1:
   - {fileID: 11400000, guid: 41ebd60f34726ca49b82d68c9c5a45fa, type: 2}
   - {fileID: 11400000, guid: 2a87c5db3e39c9d4791e1f1bbc96d69d, type: 2}

@@ -26,6 +26,7 @@ namespace Pepemon.Tests
     {
         private const string DeckListLoaderGuid = "586d812f1d3d3214c8f36802f1c76a78";
         private const string MainMenuControllerGuid = "4d4e9932512721548b386f8a0399d6b3";
+        private const string BattlePrepControllerGuid = "b1b06452cb3f9f34abff20f82c8066c0";
         private const string DeckSelectionScreen = "Screen_4_DeckSelection";
 
         private static string ScenePath =>
@@ -92,6 +93,35 @@ namespace Pepemon.Tests
                         "screen, leaving the picker empty while that screen fills up.");
                 }
             }
+        }
+
+        /// <summary>
+        /// The picker being filled is only half of it: something has to be listening.
+        ///
+        /// BattlePrepController._deckList pointed at the Manage Decks loader, so selecting a deck
+        /// raised onSelectDeck on a list nobody was watching. A full picker that refuses to start
+        /// a battle looks exactly like a broken picker, and neither logs anything.
+        /// </summary>
+        [Test]
+        public void BattlePrepListensToTheSameListThatGetsFilled()
+        {
+            var controller = _scene.ComponentsWithScript(BattlePrepControllerGuid).FirstOrDefault();
+            Assert.IsNotNull(controller, "No BattlePrepController in the scene.");
+
+            var target = _scene.ReadReference(controller, "_deckList");
+            Assert.IsNotNull(target, "BattlePrepController._deckList is unassigned.");
+
+            var screen = _scene.FindGameObjectByName(DeckSelectionScreen);
+            Assert.IsTrue(
+                _scene.IsDescendantOf(target, screen),
+                $"BattlePrepController listens to '{_scene.PathOf(target)}', which is outside " +
+                $"{DeckSelectionScreen}. It must watch the same list MainMenuController fills, " +
+                "or choosing a deck raises an event with no listener.");
+
+            var filled = LoadersUnderDeckSelection().Select(l => _scene.OwnerOf(l)).ToList();
+            Assert.Contains(
+                target, filled,
+                "BattlePrepController listens to a different loader than the one the picker fills.");
         }
 
         [Test]
