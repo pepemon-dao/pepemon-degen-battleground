@@ -22,6 +22,7 @@ public class BattlePrepController : MonoBehaviour
     [ReadOnly] private PepemonMatchmaker.PepemonLeagues selectedLeague;
     [ReadOnly] private ulong selectedDeck;
     [ReadOnly] private CancellationTokenSource _cancellationTokenSource;
+    private DeckListLoader _deckListLoader;
 
     // Used on GameController on the battle scene
     public static BattleData battleData { get; private set; } = new BattleData();
@@ -36,7 +37,81 @@ public class BattlePrepController : MonoBehaviour
     {
         _searchForOpponentButton.GetComponent<Button>().onClick.AddListener(OnSearchForOpponentButtonClick);
         _exitButton.GetComponent<Button>().onClick.AddListener(onExitButtonClick);
-        _deckList.GetComponent<DeckListLoader>().onSelectDeck.AddListener(OnDeckSelected);
+
+        // Listen to the deck list on this screen, falling back to _deckList.
+        //
+        // That field pointed at the Manage Decks loader, which is a different list on a
+        // different screen. Selecting a deck here raised an event nobody was listening to, so
+        // the picker could be full and still refuse to start a battle - a failure that looks
+        // identical to the picker being broken, with nothing logged either way.
+        //
+        // MainMenuController resolves the picker the same way when it fills it. Both must agree
+        // on which loader is the picker, or one populates a list the other is not listening to.
+        var deckList = GetComponentInChildren<DeckListLoader>(true);
+        if (deckList == null && _deckList != null)
+        {
+            deckList = _deckList.GetComponent<DeckListLoader>();
+        }
+
+        if (deckList != null)
+        {
+            _deckListLoader = deckList;
+            deckList.onSelectDeck.AddListener(OnDeckSelected);
+        }
+        else
+        {
+            Debug.LogError("[decks] BattlePrepController found no DeckListLoader, so choosing a " +
+                           "deck cannot start a battle.");
+        }
+
+        RefreshSelectionState();
+    }
+
+    /// <summary>
+    /// Clears the previous choice each time the screen opens.
+    ///
+    /// The list is rebuilt on every visit, so a deck id held from last time refers to a button
+    /// that no longer exists and nothing on screen indicates a deck is chosen.
+    /// </summary>
+    private void OnEnable()
+    {
+        selectedDeck = 0;
+        RefreshSelectionState();
+    }
+
+    /// <summary>
+    /// Keeps Search for Opponent switched off until a deck is actually chosen, and says which.
+    ///
+    /// Selecting a deck used to have no visible effect whatsoever: OnDeckSelected set a field and
+    /// the SelectionItem highlight hooks in DeckController are commented out, so the screen looked
+    /// exactly the same before and after a click. With the button live from the start, pressing it
+    /// first sent an approval transaction and then entered the matchmaker with deck 0 - real gas
+    /// spent on a call that cannot succeed.
+    /// </summary>
+    private void RefreshSelectionState()
+    {
+        if (_searchForOpponentButton != null)
+        {
+            var button = _searchForOpponentButton.GetComponent<Button>();
+            if (button != null) button.interactable = selectedDeck != 0;
+        }
+
+        var label = _deckListLoader != null && _deckListLoader.LoadingMessage != null
+            ? _deckListLoader.LoadingMessage.GetComponent<TMPro.TMP_Text>()
+            : null;
+
+        if (label == null) return;
+
+        if (selectedDeck != 0)
+        {
+            _deckListLoader.LoadingMessage.SetActive(true);
+            label.text = $"Deck #{selectedDeck} ready - Search for Opponent";
+        }
+        else if (_deckListLoader.LoadingMessage.activeSelf &&
+                 label.text.StartsWith("Deck #", StringComparison.Ordinal))
+        {
+            _deckListLoader.LoadingMessage.SetActive(false);
+        }
     }
 
     // set by LeagueSelection buttons
@@ -48,6 +123,8 @@ public class BattlePrepController : MonoBehaviour
     public void OnDeckSelected(ulong deckId, bool isStarterDeck)
     {
         selectedDeck = deckId;
+        RefreshSelectionState();
+
         if (isStarterDeck)
         {
             Web3Controller.instance.StarterDeckID = deckId;
@@ -89,6 +166,17 @@ public class BattlePrepController : MonoBehaviour
 
     private async void OnSearchForOpponentButtonClick()
     {
+        // Belt and braces alongside the disabled button: entering with deck 0 costs an approval
+        // transaction and a matchmaker call that cannot succeed, and strands the player on the
+        // Waiting for Opponent screen while it fails.
+        if (selectedDeck == 0)
+        {
+            Pepemon.UI.PixelNotice.Instance.Show(
+                "No deck selected",
+                "Choose one of your decks first, then search for an opponent.");
+            return;
+        }
+
         // SetApprovalForAll for CardDeck
         await EnsureDeckTransferApproved();
 

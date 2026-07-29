@@ -338,21 +338,32 @@ public class MainMenuController : MonoBehaviour
         // including the ShowScreen calls wired directly to buttons in the scene.
         if (screenId == (int)MainSceneScreensEnum.DeckSelection)
         {
-            // Found by searching the screen itself rather than through _selectDeckListLoader.
-            // That field is public but was never assigned in the scene, so the previous
-            // null-check silently skipped the reload and logged nothing - the picker stayed
-            // empty and every [deckpick] line still read selectionMode=False.
-            var selectionLoader = _selectDeckListLoader != null
-                ? _selectDeckListLoader.GetComponent<DeckListLoader>()
-                : null;
-
-            if (selectionLoader == null && screenId < menuScreens.Count && menuScreens[screenId] != null)
+            // Search the screen being shown, and treat _selectDeckListLoader only as a fallback.
+            //
+            // The order matters, and getting it wrong is what kept this broken. The field is not
+            // unassigned: it points at a DeckList that sits at the scene root with no parent, and
+            // whose _deckList output target is inside Screen_5_ManageDecksNew. Every deck it
+            // loaded was parented into the Mint Deck screen's list, which is why that screen
+            // filled up while the picker stayed empty. Preferring the field meant the search
+            // below never ran, because a wrong reference is not a null one.
+            //
+            // The loader that actually lives under Screen_4_DeckSelection is already wired
+            // correctly, so finding it is the whole fix and the scene needs no surgery.
+            DeckListLoader selectionLoader = null;
+            if (screenId < menuScreens.Count && menuScreens[screenId] != null)
             {
                 selectionLoader = menuScreens[screenId].GetComponentInChildren<DeckListLoader>(true);
             }
 
+            if (selectionLoader == null && _selectDeckListLoader != null)
+            {
+                selectionLoader = _selectDeckListLoader.GetComponent<DeckListLoader>();
+            }
+
             if (selectionLoader != null)
             {
+                // Select mode, never Edit: this screen exists to pick a deck to fight with.
+                selectionLoader.SetEditMode(false);
                 selectionLoader.ReloadAllDecks(force: true);
             }
             else

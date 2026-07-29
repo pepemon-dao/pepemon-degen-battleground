@@ -58,11 +58,25 @@
     }
 
     var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+
+    // Cache buster, replaced with the commit sha by the deploy workflow.
+    //
+    // GitHub Pages' CDN sets its cache TTL by content type: .js gets four hours, while .wasm
+    // and .data get ten minutes. Every build ships a matched framework.js and .wasm pair, so
+    // after a deploy there is a window where the browser is handed the new .wasm alongside the
+    // previous build's framework.js. They address each other by function index, and the
+    // mismatch crashes on startup with "RuntimeError: index out of bounds" inside initRuntime.
+    //
+    // A hard refresh cannot fix it: the stale copy is held by the CDN, not the browser, and
+    // Fastly does not honour a client's no-cache. Giving every build its own URL is the only
+    // lever available here, because GitHub Pages does not allow custom response headers.
+    var cacheBust = "?v=__BUILD_ID__";
+
+    var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}" + cacheBust;
     var config = {
-      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}" + cacheBust,
+      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}" + cacheBust,
+      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}" + cacheBust,
       #if MEMORY_FILENAME
         memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
       #endif
