@@ -46,6 +46,16 @@ public class ScreenEditDeck : MonoBehaviour
     {
         _saveDeckButton.GetComponent<Button>().onClick.AddListener(HandleSaveButtonClick);
         _mintCardsButton.GetComponent<Button>().onClick.AddListener(HandleMintCardsButtonClick);
+
+        // Hidden now that booster packs are the way to get cards. mintCards() hands out one of
+        // every card in the game for free, so leaving the button next to a paid store would
+        // make the store pointless and teach players that packs are for suckers.
+        //
+        // The listener above is still wired and HandleMintCardsButtonClick still works: the
+        // contract function is permissionless and cannot be disabled without the deployer key,
+        // so hiding the button is the honest description of what this does. Re-enable it from
+        // the inspector if a tester needs a full card set.
+        if (_mintCardsButton != null) _mintCardsButton.SetActive(false);
     }
 
     /// <summary>
