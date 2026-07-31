@@ -225,7 +225,17 @@ public class BattlePrepController : MonoBehaviour
         }
         else if (failedToEnter)
         {
-            // go back to deck selection since the player could not enter nor is already waiting
+            // Say why, rather than bouncing back to deck selection in silence.
+            //
+            // PepemonBattle.goForBattle reverts with no reason string for some deck pairings, so
+            // the transaction fails, the player is returned to the picker with no message, and
+            // the same deck fails again every time. Without this the only visible symptom is a
+            // screen that flicks back, which reads as the picker being broken again.
+            Pepemon.UI.PixelNotice.Instance.Show(
+                "Battle could not start",
+                "The matchmaker rejected this deck. Try a different one - decks whose Pepemon " +
+                "matches the opponent's speed are currently failing on-chain.");
+
             FindObjectOfType<MainMenuController>().ShowScreen(MainSceneScreensEnum.PreviousScreen);
             return;
         }
