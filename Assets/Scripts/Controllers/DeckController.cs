@@ -189,23 +189,24 @@ public class DeckController : MonoBehaviour
 
         if (!isStarterDeck)
         {
-            if (!hasBattleCard)
+            if (!hasBattleCard || !hasSupportCards)
             {
                 _errorDisplay.SetActive(true);
-                _errorText.text = "Pepemon card missing";
+                _errorText.text = hasBattleCard ? "Support cards missing" : "Pepemon card missing";
                 _selectButton.gameObject.SetActive(false);
                 UpdateNotValidDeckIsNotShowWhenSelecting();
                 LogSelectability(deckId, battleCard, selectionMode, supportCardCount);
-                return true;
-            }
-            if (!hasSupportCards)
-            {
-                _errorDisplay.SetActive(true);
-                _errorText.text = "Support cards missing";
-                _selectButton.gameObject.SetActive(false);
-                UpdateNotValidDeckIsNotShowWhenSelecting();
-                LogSelectability(deckId, battleCard, selectionMode, supportCardCount);
-                return true;
+
+                // Keep unplayable decks out of the battle picker entirely.
+                //
+                // A deck with no Pepemon or no support cards cannot enter the matchmaker, so
+                // listing it only to withhold its Select button gives the player a wall of
+                // rejected decks to read past. They still appear in Manage Decks, which is where
+                // the missing cards get added, and that screen is the one that has to show them.
+                //
+                // Validity comes from the deck's on-chain contents rather than the metadata
+                // cache, so a freshly minted card cannot make a good deck vanish from here.
+                return !selectionMode;
             }
             _selectButton.gameObject.SetActive(selectionMode);
             if (selectionMode)

@@ -37,6 +37,13 @@ public class DeckListLoader : MonoBehaviour
     private bool loadingInProgress = false;
 
     /// <summary>
+    /// Counts for this reload, so the empty state can tell "nothing playable yet" apart from
+    /// "loading broke". Reset at the start of every reload rather than accumulated.
+    /// </summary>
+    private int _unplayableDecks;
+    private int _failedDecks;
+
+    /// <summary>
     /// Removes all elements in _deckList and loads all decks using _deckPrefab.
     /// Each deck element invokes onItemSelected when clicked, the deckId is passed as a parameter of this event
     /// </summary>
@@ -49,6 +56,8 @@ public class DeckListLoader : MonoBehaviour
             return;
 
         loadingInProgress = true;
+        _unplayableDecks = 0;
+        _failedDecks = 0;
 
         _loadingMessage.SetActive(true);
         var loadingMessageLabel = _loadingMessage.GetComponent<TMPro.TMP_Text>();
@@ -163,11 +172,29 @@ public class DeckListLoader : MonoBehaviour
 
         // Tell the player when there is genuinely nothing to pick, rather than showing an
         // empty screen with no explanation.
+        //
+        // Owning decks but none that can fight is its own case, and the commonest one for a new
+        // player: minting a deck and adding cards are separate steps, so a half-built deck is
+        // normal. Reporting that as a load failure would send them to retry something that
+        // worked, instead of to the screen where the missing cards are added.
         if (_deckList.transform.childCount == 0)
         {
-            loadingMessageLabel.text = decks.Count == 0
-                ? "No decks yet - mint one from the Deck screen"
-                : "Your decks could not be loaded. Please retry.";
+            if (decks.Count == 0)
+            {
+                loadingMessageLabel.text = "No decks yet - mint one from the Deck screen";
+            }
+            else if (_unplayableDecks > 0 && _failedDecks == 0)
+            {
+                loadingMessageLabel.text = _unplayableDecks == 1
+                    ? "Your deck needs a Pepemon and support cards - add them in Manage Decks"
+                    : $"None of your {_unplayableDecks} decks can battle yet - add a Pepemon and " +
+                      "support cards in Manage Decks";
+            }
+            else
+            {
+                loadingMessageLabel.text = "Your decks could not be loaded. Please retry.";
+            }
+
             return;
         }
 
@@ -191,9 +218,12 @@ public class DeckListLoader : MonoBehaviour
         {
             // One bad deck must not take down the whole list.
             Debug.LogError($"[decks] Unable to load deck {deckId}: {ex.Message}");
+            _failedDecks++;
             Destroy(deckInstance);
             return;
         }
+
+        if (!showDeck) _unplayableDecks++;
 
         if (showDeck)
         {
